@@ -1,0 +1,169 @@
+/* Sign-in — a bespoke split screen. Left: the brand instrument on navy. Right: the
+   form. Headings in Cambria (--font-display); every field/figure in tabular sans.
+   Deliberately not a centered card-on-gradient template. */
+
+.screen {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 0.86fr 1fr;
+  background: var(--bg);
+}
+@media (max-width: 860px) {
+  .screen { grid-template-columns: 1fr; }
+  .brandPanel { display: none; }
+}
+
+/* --- brand panel ------------------------------------------------------- */
+.brandPanel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 18% 12%, rgba(25, 150, 169, 0.28), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgba(80, 145, 175, 0.22), transparent 55%),
+    var(--surface-ink);
+  color: var(--ink-on-dark);
+  padding: clamp(32px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+/* a hairline instrument grid, very recessive, referencing the product's density */
+.brandPanel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(80% 70% at 30% 20%, #000 30%, transparent 75%);
+  pointer-events: none;
+}
+.brandTop { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; }
+.brandLogo {
+  width: 40px; height: 40px; border-radius: var(--r-md);
+  background: #fff; display: grid; place-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+.brandWordmark { font-family: var(--font-display); font-size: 20px; letter-spacing: -0.01em; }
+.brandWordmark b { color: var(--gold); font-weight: 700; }
+.brandTag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-on-dark-2); border: 1px solid rgba(159, 194, 204, 0.34);
+  padding: 3px 7px; border-radius: var(--r-pill);
+}
+
+.brandMid { position: relative; z-index: 1; max-width: 30ch; }
+.brandHeadline {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.brandLede { color: var(--ink-on-dark-2); font-size: 15px; line-height: 1.6; }
+
+/* a small provenance-legend motif — the product's actual visual language */
+.legend { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 14px; }
+.legendItem { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-on-dark-2); }
+.legendDot { width: 8px; height: 8px; border-radius: var(--r-pill); }
+
+/* --- form side --------------------------------------------------------- */
+.formSide { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+.form { width: 100%; max-width: 384px; }
+
+.kicker { color: var(--teal); margin-bottom: 10px; }
+.title { font-family: var(--font-display); font-size: 27px; letter-spacing: -0.015em; margin-bottom: 6px; }
+.subtitle { color: var(--ink-2); font-size: 14px; line-height: 1.55; margin-bottom: 24px; }
+
+.toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px;
+  background: var(--surface-2); border: 1px solid var(--hairline);
+  border-radius: var(--r-md); padding: 3px; margin-bottom: 22px;
+}
+.toggleBtn {
+  border: 0; background: transparent; cursor: pointer;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--ink-2);
+  padding: 8px 10px; border-radius: var(--r-sm); transition: background 0.15s, color 0.15s;
+}
+.toggleBtnActive { background: var(--surface); color: var(--ink-1); box-shadow: var(--shadow-sm); }
+
+.field { margin-bottom: 15px; }
+.label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
+.input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 15px; color: var(--ink-1);
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-md);
+  padding: 11px 13px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 18%, transparent);
+}
+.hint { font-size: 12px; color: var(--ink-3); margin-top: 6px; line-height: 1.5; }
+
+.submit {
+  width: 100%; margin-top: 8px;
+  font-family: var(--font-sans); font-size: 15px; font-weight: 650;
+  color: #fff; background: var(--teal);
+  border: 0; border-radius: var(--r-md); padding: 12px 16px; cursor: pointer;
+  transition: background 0.16s, transform 0.08s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.submit:hover:not(:disabled) { background: color-mix(in srgb, var(--teal) 88%, #000); }
+.submit:active:not(:disabled) { transform: translateY(1px); }
+.submit:disabled { opacity: 0.6; cursor: default; }
+
+.spinner {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4); border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error {
+  display: flex; gap: 9px; align-items: flex-start;
+  background: color-mix(in srgb, var(--coral) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--coral) 32%, transparent);
+  color: color-mix(in srgb, var(--coral) 92%, #000);
+  border-radius: var(--r-md); padding: 10px 12px; font-size: 13px; line-height: 1.45;
+  margin-bottom: 18px;
+}
+.footnote { margin-top: 22px; font-size: 12px; color: var(--ink-3); line-height: 1.55; }
+
+.rowBetween { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.linkBtn {
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; color: var(--teal);
+}
+.linkBtn:hover { text-decoration: underline; }
+.backBtn {
+  background: transparent; border: 0; padding: 0; cursor: pointer; margin-bottom: 16px;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.backBtn:hover { color: var(--ink-1); }
+.success {
+  display: flex; gap: 9px; align-items: flex-start;
+  background: color-mix(in srgb, var(--pos) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pos) 34%, transparent);
+  color: color-mix(in srgb, var(--pos) 92%, #000);
+  border-radius: var(--r-md); padding: 10px 12px; font-size: 13px; line-height: 1.45; margin-bottom: 18px;
+}
+.otpInput {
+  letter-spacing: 0.42em; font-size: 20px; text-align: center; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.devHint {
+  margin-top: 8px; font-size: 12px; color: var(--ink-2);
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--gold) 45%, transparent);
+  border-radius: var(--r-sm); padding: 7px 10px;
+}
+.sentTo { font-weight: 700; color: var(--ink-1); }

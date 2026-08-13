@@ -1,49 +1,175 @@
+/* ==========================================================================
+   Customer 360 — design system
+   Built from the HFCB brand palette (navy / teal / coral primaries; gold,
+   sea-green, slate, light-teal secondaries). Deliberately NOT a default
+   component-library theme: bespoke spacing, a real type hierarchy, hairline
+   structure, and a data-instrument density rather than a marketing layout.
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* --- brand palette (exact brand tokens, do not invent new hues) --- */
+  --navy: #084B65;
+  --teal: #1996A9;
+  --coral: #F04E45;
+  --gold: #F4BE18;
+  --sea-green: #4BA096;
+  --slate: #5091AF;
+  --light-teal: #46ABBD;
+  --ink-black: #000000;
+
+  /* --- chart series (validated; coral reserved for status only) --- */
+  --series-1: var(--teal);
+  --series-2: var(--gold);
+  --series-3: var(--slate);
+  --series-4: var(--navy);
+  --series-5: var(--light-teal);
+
+  /* --- provenance (teal=live, amber=preview, violet=derived, coral=to-source) --- */
+  --prov-live: var(--teal);
+  --prov-preview: var(--gold);
+  --prov-derived: #6b5bd2;   /* computed-from-live: a violet kept off every chart series */
+  --prov-source: var(--coral);
+
+  /* --- status (reserved; never a chart series) --- */
+  --pos: #2f8f6e;      /* positive delta — a green kept distinct from series teal */
+  --neg: var(--coral);
+
+  /* --- LIGHT theme surfaces & ink --- */
+  --bg: #f4f6f7;              /* app background — cool paper, not pure white */
+  --surface: #ffffff;        /* raised card */
+  --surface-2: #eef1f2;      /* inset / secondary panel */
+  --surface-ink: #063a4e;    /* the navy header band */
+  --hairline: #e2e7e9;       /* 1px structure */
+  --hairline-strong: #cfd6d9;
+  --ink-1: #0b2a36;          /* primary text (navy-black) */
+  --ink-2: #43606b;          /* secondary text */
+  --ink-3: #7a929b;          /* muted / captions */
+  --ink-on-dark: #eaf3f5;    /* text on the navy band */
+  --ink-on-dark-2: #9fc2cc;
+
+  --grid: #eaeef0;           /* chart gridlines — recessive */
+  --chart-surface: #ffffff;
+
+  /* --- geometry: an intentional, non-uniform radius scale --- */
+  --r-xs: 3px;
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+
+  /* --- spacing scale (4px base, used with intent, not uniformly) --- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 44px; --s-9: 64px;
+
+  /* --- elevation: soft, low, brand-tinted (not default gray box-shadow) --- */
+  --shadow-sm: 0 1px 2px rgba(8, 75, 101, 0.05), 0 1px 1px rgba(8, 75, 101, 0.03);
+  --shadow-md: 0 2px 8px rgba(8, 75, 101, 0.07), 0 1px 2px rgba(8, 75, 101, 0.04);
+  --shadow-lg: 0 12px 34px rgba(8, 75, 101, 0.12);
+
+  /* HFCB's organisation typeface is Cambria (serif) — used for headings/titles.
+     Body copy and every figure use a tabular humanist sans so dense money columns
+     stay legible and vertically aligned (classic serif-display + sans-text pairing). */
+  --font-display: Cambria, Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-num: var(--font-sans);
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #071b23;
+  --surface: #0c2531;
+  --surface-2: #0a2029;
+  --surface-ink: #061922;
+  --hairline: #163541;
+  --hairline-strong: #1f4553;
+  --ink-1: #eaf3f5;
+  --ink-2: #a9c6cf;
+  --ink-3: #6f929d;
+  --ink-on-dark: #eaf3f5;
+  --ink-on-dark-2: #8fb3bd;
+  --grid: #143039;
+  --chart-surface: #0c2531;
+  --series-4: var(--light-teal);
+  --series-1: var(--light-teal);
+  --pos: #45b389;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
+  :root:not([data-theme="light"]) {
+    --bg: #071b23; --surface: #0c2531; --surface-2: #0a2029; --surface-ink: #061922;
+    --hairline: #163541; --hairline-strong: #1f4553;
+    --ink-1: #eaf3f5; --ink-2: #a9c6cf; --ink-3: #6f929d;
+    --ink-on-dark: #eaf3f5; --ink-on-dark-2: #8fb3bd;
+    --grid: #143039; --chart-surface: #0c2531;
+    --series-4: var(--light-teal); --series-1: var(--light-teal); --pos: #45b389;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 2px 10px rgba(0,0,0,0.36);
+    --shadow-lg: 0 16px 40px rgba(0,0,0,0.5);
     color-scheme: dark;
   }
 }
+
+* { box-sizing: border-box; }
+
+html, body {
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink-1);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Every financial figure gets tabular, lining numerals — the single most
+   important typographic choice for a dense money instrument. */
+.tnum { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1, "lnum" 1; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.014em;
+  margin: 0;
+  color: var(--ink-1);
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+/* Micro-label: the small uppercase caption used throughout for structure. */
+.microlabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+::selection { background: color-mix(in srgb, var(--teal) 26%, transparent); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: var(--r-xs); }
+
+/* Recharts baseline overrides — kill the library defaults the brief calls out. */
+.recharts-cartesian-grid line { stroke: var(--grid); }
+.recharts-cartesian-axis-tick-value { fill: var(--ink-3); font-size: 11px; }
+.recharts-cartesian-axis line, .recharts-cartesian-axis-line { stroke: var(--hairline-strong); }
+.recharts-surface { overflow: visible; }
+.recharts-default-tooltip { display: none !important; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes shimmer { 0% { background-position: -320px 0; } 100% { background-position: 320px 0; } }
+.fadeUp { animation: fadeUp 0.62s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .fadeUp { animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from { opacity: 0; } to { opacity: 1; } }
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--hairline-strong) transparent; }
