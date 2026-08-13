@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
 import { AppShell } from '@/components/AppShell';
+import { asset } from '@/lib/asset';
 
 // HFCB's organisation typeface is Cambria (a serif), so the app is set in Cambria
 // with Georgia/Times as cross-platform fallbacks — see --font-sans in globals.css.
@@ -10,7 +11,7 @@ import { AppShell } from '@/components/AppShell';
 export const metadata: Metadata = {
   title: 'Customer 360 · HFCB',
   description: 'Everything HFCB knows about a customer — portfolio health and next best product, in one instrument.',
-  icons: { icon: '/favicon.png' },
+  icons: { icon: asset('/favicon.png') },
 };
 
 // Set the theme before first paint to avoid a flash.

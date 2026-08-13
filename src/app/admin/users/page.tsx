@@ -285,7 +285,7 @@ function CreateUserPanel({ roles, meta, onClose, onCreated }:
                     <button type="button" className={s.moreToggle} onClick={() => setShowMore((v) => !v)}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
                         style={{ transform: showMore ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}><path d="M6 9l6 6 6-6" /></svg>
-                      {showMore ? 'Hide' : 'Assign additional HF Group roles'}
+                      {showMore ? 'Hide' : 'Assign additional HFCB roles'}
                     </button>
                     {showMore && (
                       <div className={s.legacyChips}>

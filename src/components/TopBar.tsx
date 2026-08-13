@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { asset } from '@/lib/asset';
 import type { Meta } from '@/lib/types';
 import { initials } from '@/lib/format';
 import { ThemeToggle } from './ThemeToggle';
@@ -26,7 +27,7 @@ export function TopBar() {
         <Link href="/portfolio" className={s.brandLink}>
           {/* Official HFCB mark on a white tile — brand-correct on light and dark */}
           <span className={s.logoTile}>
-            <img src="/hfcb-mark.png" alt="HFCB" width={21} height={20} />
+            <img src={asset('/hfcb-mark.png')} alt="HFCB" width={21} height={20} />
           </span>
           <span className={s.brandName}>Customer <b>360</b></span>
           <span className={s.brandTag}>HFCB</span>

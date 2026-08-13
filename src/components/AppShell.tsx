@@ -8,6 +8,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
+import { asset } from '@/lib/asset';
 import { TopBar } from './TopBar';
 import s from './ui.module.css';
 
@@ -40,7 +41,7 @@ function BootSplash() {
   return (
     <div className={s.bootSplash} aria-busy="true">
       <div className={s.bootMark}>
-        <img src="/hfcb-mark.png" alt="" width={26} height={25} />
+        <img src={asset('/hfcb-mark.png')} alt="" width={26} height={25} />
       </div>
       <div className={s.bootPulse} />
     </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { asset } from '@/lib/asset';
 import s from './login.module.css';
 
 type Step = 'signin' | 'otp' | 'forgot' | 'forgotConfirm';
@@ -82,7 +83,7 @@ export default function LoginPage() {
     <div className={s.screen}>
       <aside className={s.brandPanel}>
         <div className={s.brandTop}>
-          <span className={s.brandLogo}><img src="/hfcb-mark.png" alt="HFCB" width={22} height={21} /></span>
+          <span className={s.brandLogo}><img src={asset('/hfcb-mark.png')} alt="HFCB" width={22} height={21} /></span>
           <span className={s.brandWordmark}>Customer <b>360</b></span>
           <span className={s.brandTag}>HFCB</span>
         </div>
@@ -106,7 +107,7 @@ export default function LoginPage() {
           <form className={`${s.form} fadeUp`} onSubmit={submitSignin}>
             <div className={`microlabel ${s.kicker}`}>Relationship intelligence</div>
             <h2 className={s.title}>Sign in</h2>
-            <p className={s.subtitle}>Use your HF Group username and password to continue.</p>
+            <p className={s.subtitle}>Use your HFCB username and password to continue.</p>
             {notice && <Banner kind="success" text={notice} />}
             {error && <Banner kind="error" text={error} />}
             <Field id="username" label="Username" value={username} onChange={setUsername} placeholder="e.g. jkamau" autoComplete="username" autoFocus />
