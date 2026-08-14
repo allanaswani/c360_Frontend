@@ -15,6 +15,13 @@ const nextConfig: NextConfig = {
   // Prefix all routes + assets so the app works under /customer-360 behind nginx.
   ...(basePath ? { basePath } : {}),
 
+  // Do NOT 308-redirect a trailing slash off the URL. The SPA calls the API with a
+  // trailing slash (e.g. /api/auth/me/); if Next strips it, the request reaches Django
+  // slash-less, Django's APPEND_SLASH then 301s to a root-relative path that drops the
+  // /customer-360 basePath, and the browser lands on ceo.hfcb.co.ke/api/... → 404. Keep
+  // the slash so the rewrite forwards /api/auth/me/ straight through to the backend.
+  skipTrailingSlashRedirect: true,
+
   // Pin the workspace root to this app so Turbopack doesn't infer a parent
   // directory's lockfile (there are unrelated lockfiles higher up).
   turbopack: {
@@ -29,6 +36,11 @@ const nextConfig: NextConfig = {
   // automatically prefixed, so this matches /customer-360/api/* .
   async rewrites() {
     return [
+      // Forward the trailing slash straight through. DRF routes require it (APPEND_SLASH);
+      // the plain `/api/:path*` rule captures `auth/me` WITHOUT the slash, so Django 301s to
+      // a root-relative path that drops the /customer-360 basePath and 404s. Match the
+      // slash form first so `/api/auth/me/` reaches the backend as `/api/auth/me/`.
+      { source: '/api/:path*/', destination: `${backendOrigin}/api/:path*/` },
       { source: '/api/:path*', destination: `${backendOrigin}/api/:path*` },
     ];
   },

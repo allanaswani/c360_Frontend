@@ -105,6 +105,22 @@ export function adoptPortfolioSession(): boolean {
   return true;
 }
 
+// Re-read the portfolio's login cookie and adopt it when it's newer than what we hold.
+// adoptPortfolioSession() takes a ONE-TIME snapshot at boot and never overwrites it, but
+// the portfolio's own frontend silently refreshes that cookie (and rotates the refresh
+// token) as the user keeps working. So once 360's snapshot expires the SPA would be
+// stranded — showing "token expired" — even though the user is still signed in next door.
+// Calling this on a 401 lets 360 pick up the portfolio's current, still-fresh token and
+// carry on. Returns true only when it actually swapped in a different (newer) access
+// token, so the caller knows to replay the request. Unlike a refresh, this needs no valid
+// refresh token, so it also rescues a missing or portfolio-blacklisted one.
+export function reAdoptPortfolioSession(): boolean {
+  const access = readCookie(PORTFOLIO_ACCESS_COOKIE);
+  if (!access || access === tokens.access()) return false;
+  tokens.set(access, readCookie(PORTFOLIO_REFRESH_COOKIE) ?? tokens.refresh() ?? undefined);
+  return true;
+}
+
 // A single in-flight refresh shared across concurrent 401s.
 let refreshing: Promise<boolean> | null = null;
 
@@ -157,9 +173,14 @@ async function request<T>(path: string, init: ReqInit = {}, retry = true): Promi
     throw new ApiError(0, `Can't reach the API at ${BASE}. Is the Django server running?`);
   }
 
-  // Expired access token → refresh once, then replay the request.
-  if (res.status === 401 && retry && tokens.refresh()) {
-    if (await tryRefresh()) return request<T>(path, init, false);
+  // Expired access token → recover once, then replay the request. Two recovery paths,
+  // tried in order: (1) our own refresh token — works even with the portfolio tab closed;
+  // (2) re-adopt the portfolio's live login cookie — rescues a missing/rotated-out refresh
+  // token by riding the session the portfolio keeps fresh. Only when both fail do we clear
+  // and fall back to Customer 360's own login.
+  if (res.status === 401 && retry) {
+    if (tokens.refresh() && (await tryRefresh())) return request<T>(path, init, false);
+    if (reAdoptPortfolioSession()) return request<T>(path, init, false);
     tokens.clear();
   }
   return unwrap<T>(res);
