@@ -21,9 +21,19 @@ export function TopBar() {
   const onPortfolio = pathname.startsWith('/portfolio');
   const onCustomers = pathname === '/' || pathname.startsWith('/customers');
 
+  // Where "back to apps" goes — the HFCB app launcher, OUTSIDE this app's
+  // /customer-360 basePath. A plain <a> (not next/link) so the prefix isn't added;
+  // env-configurable so it can point at the exact launcher route. Defaults to the
+  // portfolio root on the shared domain.
+  const appsHome = process.env.NEXT_PUBLIC_PORTFOLIO_HOME || '/';
+
   return (
     <header className={s.topbar}>
       <div className={s.brand}>
+        <a href={appsHome} className={s.backHome} title="Back to HFCB apps" aria-label="Back to HFCB apps">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 18l-6-6 6-6" /></svg>
+          <span className={s.backHomeLabel}>Apps</span>
+        </a>
         <Link href="/portfolio" className={s.brandLink}>
           {/* Official HFCB mark on a white tile — brand-correct on light and dark */}
           <span className={s.logoTile}>

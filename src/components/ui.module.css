@@ -11,6 +11,18 @@
   position: sticky; top: 0; z-index: 40;
 }
 .brand { display: flex; align-items: center; gap: var(--s-5); }
+/* Escape hatch back to the HFCB app launcher — a real anchor (leaves the
+   /customer-360 basePath), divided off from C360's own brand + nav. */
+.backHome {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 600; color: var(--ink-3); white-space: nowrap;
+  padding: 6px 12px 6px 2px; border-right: 1px solid var(--hairline);
+  transition: color 0.14s;
+}
+.backHome:hover { color: var(--ink-1); }
+.backHome svg { color: var(--ink-3); transition: color 0.14s, transform 0.14s; }
+.backHome:hover svg { color: var(--teal); transform: translateX(-2px); }
+@media (max-width: 640px) { .backHomeLabel { display: none; } }
 .brandLink { display: flex; align-items: center; gap: var(--s-3); }
 .nav { display: flex; align-items: center; gap: var(--s-1); }
 .navItem { font-size: 13.5px; font-weight: 600; color: var(--ink-3); padding: 6px 12px; border-radius: var(--r-sm); transition: color 0.14s, background 0.14s; }
