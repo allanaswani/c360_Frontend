@@ -239,6 +239,23 @@ export interface Role {
   member_count: number;
 }
 
+export interface HealthCheck {
+  key: string;
+  label: string;
+  group: string;
+  table: string;
+  status: 'ok' | 'empty' | 'error';
+  value: number | boolean | null;
+  detail: string;
+}
+export interface DataHealth {
+  data_mode: 'mock' | 'live';
+  freshness: { as_of: string | null; days_behind: number | null; status: 'ok' | 'stale' | 'error'; detail?: string } | null;
+  checks: HealthCheck[];
+  note?: string;
+  generated_at: string;
+}
+
 export type RecOutcome = 'pitched' | 'accepted' | 'declined' | 'not_relevant';
 export interface RecFeedback {
   id: number;
@@ -350,6 +367,7 @@ export const api = {
     request<{ detail: string; password: string }>(`/auth/users/${id}/set-password/`, { method: 'POST', body: { password } }),
   roles: () => request<Listing<Role>>('/auth/roles/').then(asList),
   userMeta: () => request<{ branches: string[]; segments: string[] }>('/auth/user-meta/'),
+  dataHealth: () => request<DataHealth>('/admin/health/'),
 
   // --- data ---
   customers: (q: string) =>
