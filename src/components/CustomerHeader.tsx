@@ -29,6 +29,7 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
               <span>· {String(id.branch.value)} branch</span>
               {id.rm_name.value && <span>· RM {String(id.rm_name.value)}</span>}
             </div>
+            {header.summary && <p className={s.custSummary}>{header.summary}</p>}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>

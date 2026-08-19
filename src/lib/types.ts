@@ -65,6 +65,8 @@ export interface CustomerBio {
 
 export interface CustomerHeader {
   cust_id: string;
+  /** One plain-language line composed server-side from the facts on this page. */
+  summary?: string;
   identity: {
     name: Metric<string>;
     segment: Metric<string>;
