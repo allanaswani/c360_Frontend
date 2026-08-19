@@ -42,6 +42,9 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   const [other, setOther] = useState<DomainPayload | null>(null);
   const [meta, setMeta] = useState<{ as_of: string } | null>(null);
   const [error, setError] = useState<{ code: number; msg: string } | null>(null);
+  // Bumped to force a re-fetch of the active domain payload (the "Retry" affordance
+  // on an unavailable domain, so an RM can recover without reloading the whole page).
+  const [reloadTick, setReloadTick] = useState(0);
 
   const setParam = useCallback(
     (key: string, val: string) => {
@@ -82,7 +85,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       api.domain(id, tab, period).then((d) => live && setOther(d)).catch(() => live && setOther(null));
     }
     return () => { live = false; };
-  }, [id, period, tab]);
+  }, [id, period, tab, reloadTick]);
 
   if (error) {
     return (
@@ -135,7 +138,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         ) : tab === 'hfcb' ? (
           <HFCBView domain={hfcb} />
         ) : (
-          <DomainView payload={other} />
+          <DomainView payload={other} onRetry={() => setReloadTick((n) => n + 1)} />
         )}
       </div>
     </main>

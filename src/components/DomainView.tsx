@@ -5,7 +5,7 @@ import { fmtValue } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
 import { DataTable } from './DataTable';
-import { EmptyState, Skeleton } from './States';
+import { EmptyState, Skeleton, UnavailableState } from './States';
 import { LineSeriesChart } from './charts/LineSeriesChart';
 import { BarsChart } from './charts/BarsChart';
 import { GroupedBarChart } from './charts/GroupedBarChart';
@@ -14,8 +14,19 @@ import ui from './ui.module.css';
 
 /** One renderer for every non-core domain. Reads the generic payload the backend
  *  emits, so adding a domain is a backend change only. Whole domain is preview. */
-export function DomainView({ payload }: { payload: DomainPayload | null }) {
+export function DomainView({ payload, onRetry }: { payload: DomainPayload | null; onRetry?: () => void }) {
   if (!payload) return <DomainSkeleton />;
+
+  // Source couldn't be read — honest "couldn't load", never disguised as "no data".
+  if (payload.unavailable) {
+    return (
+      <div className={`${ui.card} fadeUp`} style={{ padding: 8 }}>
+        <UnavailableState title={`${payload.domain} couldn’t be loaded`} onRetry={onRetry}>
+          {payload.empty_reason}
+        </UnavailableState>
+      </div>
+    );
+  }
 
   if (payload.empty_reason) {
     return (

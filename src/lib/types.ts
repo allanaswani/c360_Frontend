@@ -210,6 +210,10 @@ export interface DomainPayload {
   charts: DomainChart[];
   tables: DomainTable[];
   empty_reason?: string;
+  /** True when the domain's SOURCE couldn't be read (error, or the source table is
+   *  empty/unreachable) — as opposed to the customer genuinely holding none. The UI
+   *  renders this as an honest "couldn't load" state with a retry, never as empty. */
+  unavailable?: boolean;
 }
 
 // ---- Level 2 Customer overview ----
