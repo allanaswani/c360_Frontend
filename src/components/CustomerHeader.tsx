@@ -50,6 +50,15 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
           <span className="microlabel">Status</span>
           <span className={s.riskChipVal}>{id.active.value ? 'Active' : 'Dormant'}</span>
         </div>
+        {header.retention && header.retention.flag !== 'stable' && (
+          <div className={s.riskChip} title={header.retention.note}>
+            <span className="microlabel">Retention</span>
+            <span className={s.riskChipVal} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span className={s.badgeDot} style={{ background: header.retention.flag === 'at_risk' ? 'var(--coral)' : 'var(--gold)' }} />
+              {header.retention.flag === 'at_risk' ? 'At risk' : 'Watch'}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

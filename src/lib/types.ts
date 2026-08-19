@@ -85,6 +85,16 @@ export interface CustomerHeader {
     kyc_status: Metric<string | null>;
     relationship_since: Metric<string | null>;
   };
+  /** Silent-attrition early warning, DERIVED from the deposit-balance trend. Null
+   *  when there isn't enough history or the balance is too small to read. */
+  retention?: {
+    flag: 'stable' | 'watch' | 'at_risk';
+    trend_pct: number;
+    note: string;
+    from?: string;
+    to?: string;
+    status: Provenance;
+  } | null;
 }
 
 export interface ValueSummary {
