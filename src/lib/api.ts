@@ -10,6 +10,7 @@ import type {
   CustomerSummary,
   DomainPayload,
   HFCBDomain,
+  LinkedParties,
   Meta,
   PortfolioOverview,
   Recommendations,
@@ -373,6 +374,7 @@ export const api = {
   customers: (q: string) =>
     request<{ count: number; results: CustomerSummary[] }>(`/customers/?q=${encodeURIComponent(q)}`),
   customer: (id: string) => request<CustomerDetail>(`/customers/${id}/`),
+  linked: (id: string) => request<LinkedParties>(`/customers/${id}/linked/`),
   overview: (id: string, period: string) =>
     request<CustomerOverview>(`/customers/${id}/overview/?period=${encodeURIComponent(period)}`),
   hfcb: (id: string, period: string) =>

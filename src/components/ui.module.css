@@ -291,6 +291,24 @@
 .emptyText { font-size: 12.5px; max-width: 340px; }
 .retryBtn { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
 .retryBtn:hover { background: var(--surface-1); border-color: var(--ink-3); }
+
+/* ---------- linked parties / same-person records ---------- */
+.linkedPanel { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: var(--s-4) var(--s-5); }
+.linkedHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.linkedTitle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-1); }
+.linkedTitle svg { color: var(--teal); }
+.linkedNote { font-size: 12.5px; color: var(--ink-3); margin-bottom: 10px; line-height: 1.5; }
+.linkedNote b { color: var(--ink-1); }
+.linkedList { display: flex; flex-direction: column; gap: 2px; }
+.linkedRow { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: var(--r-sm); text-decoration: none; color: inherit; transition: background 0.14s; }
+.linkedRow:hover { background: var(--surface-2); }
+.linkedAvatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--teal); background: color-mix(in srgb, var(--teal) 14%, transparent); }
+.linkedMain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.linkedName { font-size: 13.5px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linkedMeta { font-size: 11.5px; color: var(--ink-3); }
+.linkedFig { display: flex; flex-direction: column; align-items: flex-end; flex: none; }
+.linkedFigVal { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.linkedChevron { flex: none; color: var(--ink-3); }
 .skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--hairline) 37%, var(--surface-2) 63%); background-size: 320px 100%; border-radius: var(--r-sm); animation: shimmer 1.3s infinite linear; }
 
 /* ---------- stacked composition bar ---------- */

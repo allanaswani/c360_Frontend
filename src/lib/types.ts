@@ -97,6 +97,21 @@ export interface CustomerHeader {
   } | null;
 }
 
+export interface LinkedMember {
+  cust_id: string;
+  name: string;
+  segment: string;
+  branch?: string | null;
+  value?: number;
+  products_held?: number;
+}
+export interface LinkedParties {
+  basis?: string;
+  count: number;
+  combined_value?: number;
+  members: LinkedMember[];
+}
+
 export interface ValueSummary {
   headline: {
     relationship_value: Metric;

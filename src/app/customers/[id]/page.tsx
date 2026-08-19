@@ -3,9 +3,10 @@
 import { use, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
-import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, Recommendations } from '@/lib/types';
+import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
 import { BioPanel } from '@/components/BioPanel';
+import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
 import { RecommendationPanel } from '@/components/RecommendationPanel';
@@ -36,6 +37,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   const tab = search.get('tab') ?? 'overview';
 
   const [detail, setDetail] = useState<CustomerDetail | null>(null);
+  const [linked, setLinked] = useState<LinkedPartiesData | null>(null);
   const [recs, setRecs] = useState<Recommendations | null>(null);
   const [overview, setOverview] = useState<CustomerOverview | null>(null);
   const [hfcb, setHfcb] = useState<HFCBDomain | null>(null);
@@ -60,6 +62,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     let live = true;
     setError(null);
     setDetail(null);
+    setLinked(null);
     Promise.all([api.customer(id), api.recommendations(id), api.meta()])
       .then(([d, r, m]) => {
         if (!live) return;
@@ -68,6 +71,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         setMeta({ as_of: m.as_of });
       })
       .catch((e: ApiError) => live && setError({ code: e.status, msg: e.message }));
+    // Linked parties load independently — a slow or empty result never blocks the page.
+    api.linked(id).then((l) => live && setLinked(l)).catch(() => live && setLinked(null));
     return () => { live = false; };
   }, [id]);
 
@@ -111,6 +116,12 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       {detail?.header.bio && (
         <div style={{ marginTop: 12 }}>
           <BioPanel bio={detail.header.bio} />
+        </div>
+      )}
+
+      {linked && linked.count > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <LinkedParties data={linked} />
         </div>
       )}
 
