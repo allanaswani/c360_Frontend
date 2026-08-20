@@ -36,6 +36,28 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
     { label: 'Loan-to-deposit', value: ltdValue, status: ltd.status, meta: ltd.note ?? 'loans ÷ deposits' },
     { label: 'Active channels', countTo: m.active_channels.value as number, fmt: (n) => count(Math.round(n)), value: count(m.active_channels.value as number), status: m.active_channels.status, meta: 'channels used this period' },
     { label: 'Products', countTo: m.products_held.value as number, fmt: (n) => count(Math.round(n)), value: count(m.products_held.value as number), status: m.products_held.status },
+  ];
+
+  // Relationship economics — AUM / profitability / loan status (reporting Postgres),
+  // shown 'Not sourced' honestly where the feed isn't wired rather than a fake figure.
+  const isNum = (v: unknown): v is number => typeof v === 'number';
+  const eco: Stat[] = [
+    {
+      label: 'AUM', lead: true, status: m.aum.status, meta: 'assets under management',
+      value: isNum(m.aum.value) ? kes(m.aum.value) : 'Not sourced',
+      ...(isNum(m.aum.value) ? { countTo: m.aum.value, fmt: (n: number) => kes(n) } : {}),
+    },
+    {
+      label: 'Profitability', status: m.profitability.status, meta: 'net contribution',
+      value: isNum(m.profitability.value) ? kes(m.profitability.value) : 'Not sourced',
+      tone: isNum(m.profitability.value) ? (m.profitability.value >= 0 ? 'pos' : 'neg') : undefined,
+      ...(isNum(m.profitability.value) ? { countTo: m.profitability.value, fmt: (n: number) => kes(n) } : {}),
+    },
+    {
+      label: 'Loan status', status: m.npl_status.status,
+      value: (m.npl_status.value as string | null) ?? 'Not sourced',
+      tone: m.npl_status.value === 'Non-performing' ? 'neg' : m.npl_status.value === 'Performing' ? 'pos' : undefined,
+    },
     { label: 'Revenue', countTo: m.revenue.value as number, fmt: (n) => kes(n), value: kes(m.revenue.value as number), status: m.revenue.status },
   ];
 
@@ -48,6 +70,7 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
   return (
     <div className="fadeUp">
       <StatStrip stats={stats} />
+      <StatStrip stats={eco} />
 
       <div className={ui.chartGrid}>
         <Card
