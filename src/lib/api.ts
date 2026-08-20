@@ -266,6 +266,7 @@ export interface BookSummary {
   loans?: number;
   contribution?: number;
   npl_customers?: number;
+  npl_aum?: number;
   segments?: { segment: string; customers: number; aum: number }[];
   top_customers?: { cust_id: string; name: string | null; segment: string | null; aum: number; contribution: number; npl: boolean }[];
 }

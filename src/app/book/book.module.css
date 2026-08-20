@@ -2,31 +2,44 @@
 .title { font-family: var(--font-display); font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink-1); }
 .lede { margin-top: 6px; max-width: 640px; font-size: 14px; color: var(--ink-3); line-height: 1.5; }
 
-.cardTitle { font-size: 13.5px; font-weight: 700; color: var(--ink-1); margin-bottom: 14px; }
+.cardTitle { font-size: 13.5px; font-weight: 700; color: var(--ink-1); }
+.cardSub { font-size: 12px; color: var(--ink-3); margin: 3px 0 12px; }
 .muted { font-size: 13px; color: var(--ink-3); padding: 8px 0; }
 
-/* AUM-by-segment bars */
-.bars { display: flex; flex-direction: column; gap: 12px; }
-.barRow { display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 12px; }
+/* Two-up composition + risk row */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+@media (max-width: 820px) { .grid2 { grid-template-columns: 1fr; } }
+
+/* NPL exposure panel */
+.nplWrap { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+.nplBig { display: flex; align-items: baseline; gap: 10px; }
+.nplNum { font-family: var(--font-num); font-size: 34px; font-weight: 700; color: var(--coral); letter-spacing: -0.02em; }
+.nplOf { font-size: 12.5px; color: var(--ink-3); }
+.nplRow { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; color: var(--ink-2); margin-top: 6px; }
+.nplAum { font-size: 15px; font-weight: 700; color: var(--ink-1); }
+.nplBar { height: 8px; border-radius: 999px; background: var(--hairline); overflow: hidden; }
+.nplBarFill { height: 100%; border-radius: 999px; background: var(--coral); transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1); }
+.nplHint { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+
+/* Top customers — 2-column grid of rows with a share bar */
+.topGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 28px; margin-top: 12px; }
+@media (max-width: 760px) { .topGrid { grid-template-columns: 1fr; } }
+.topRow { display: flex; align-items: center; gap: 11px; padding: 9px 6px; border-radius: 8px; text-decoration: none; color: inherit; transition: background 120ms ease; }
+.topRow:hover { background: var(--hairline); }
+.rank { flex: 0 0 auto; width: 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.avatar { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: var(--teal); background: color-mix(in srgb, var(--teal) 14%, transparent); }
+.topMain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.topName { font-size: 13px; font-weight: 600; color: var(--ink-1); display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shareTrack { height: 4px; border-radius: 999px; background: var(--hairline); overflow: hidden; }
+.shareFill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--series-1, var(--teal))); }
+.topAum { flex: 0 0 auto; font-size: 13px; font-weight: 700; color: var(--ink-1); white-space: nowrap; }
+.nplTag { flex: 0 0 auto; font-size: 9px; font-weight: 800; letter-spacing: 0.04em; color: var(--coral); border: 1px solid var(--coral); border-radius: 4px; padding: 0 4px; }
+
+/* AUM-by-segment bars (only shown when >1 segment) */
+.bars { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.barRow { display: grid; grid-template-columns: 160px 1fr auto; align-items: center; gap: 12px; }
 .barLabel { font-size: 12.5px; color: var(--ink-2); display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .barCount { font-size: 11px; color: var(--ink-3); }
 .barTrack { height: 10px; border-radius: 999px; background: var(--hairline); overflow: hidden; }
 .barFill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--series-1, var(--teal))); transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1); }
 .barVal { font-size: 12.5px; font-weight: 600; color: var(--ink-1); white-space: nowrap; }
-
-/* Top customers list */
-.top { display: flex; flex-direction: column; }
-.topRow { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--hairline); text-decoration: none; color: inherit; border-radius: 8px; transition: background 120ms ease; }
-.topRow:last-child { border-bottom: none; }
-.topRow:hover { background: var(--hairline); }
-.avatar { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--teal); background: color-mix(in srgb, var(--teal) 14%, transparent); }
-.topMain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
-.topName { font-size: 13.5px; font-weight: 600; color: var(--ink-1); display: flex; align-items: center; gap: 8px; }
-.topSeg { font-size: 11.5px; color: var(--ink-3); }
-.topAum { font-size: 13.5px; font-weight: 700; color: var(--ink-1); white-space: nowrap; }
-.nplTag { font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em; color: var(--coral); border: 1px solid var(--coral); border-radius: 4px; padding: 0 4px; }
-
-@media (max-width: 560px) {
-  .barRow { grid-template-columns: 110px 1fr; }
-  .barVal { grid-column: 2; text-align: right; }
-}
