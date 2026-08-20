@@ -20,6 +20,7 @@ export function TopBar() {
 
   const onPortfolio = pathname.startsWith('/portfolio');
   const onCustomers = pathname === '/' || pathname.startsWith('/customers');
+  const onBook = pathname.startsWith('/book');
 
   // Where "back to apps" goes — the HFCB app launcher, OUTSIDE this app's
   // /customer-360 basePath. A plain <a> (not next/link) so the prefix isn't added;
@@ -45,6 +46,7 @@ export function TopBar() {
         <nav className={s.nav}>
           <Link href="/portfolio" className={`${s.navItem} ${onPortfolio ? s.navItemActive : ''}`}>Portfolio</Link>
           <Link href="/" className={`${s.navItem} ${onCustomers ? s.navItemActive : ''}`}>Customers</Link>
+          <Link href="/book" className={`${s.navItem} ${onBook ? s.navItemActive : ''}`}>My book</Link>
         </nav>
       </div>
       <div className={s.topbarRight}>

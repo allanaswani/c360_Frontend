@@ -255,6 +255,20 @@ export interface HealthPoint {
   days_behind: number | null;
   checks: Record<string, { value: number | null; status: string; latency_ms?: number }>;
 }
+export interface BookSummary {
+  available: boolean;
+  detail?: string;
+  sales_code?: string | null;
+  whole_book?: boolean;
+  customers?: number;
+  aum?: number;
+  deposits?: number;
+  loans?: number;
+  contribution?: number;
+  npl_customers?: number;
+  segments?: { segment: string; customers: number; aum: number }[];
+  top_customers?: { cust_id: string; name: string | null; segment: string | null; aum: number; contribution: number; npl: boolean }[];
+}
 export interface DataHealth {
   data_mode: 'mock' | 'live';
   freshness: { as_of: string | null; days_behind: number | null; status: 'ok' | 'stale' | 'error'; detail?: string } | null;
@@ -376,6 +390,7 @@ export const api = {
   roles: () => request<Listing<Role>>('/auth/roles/').then(asList),
   userMeta: () => request<{ branches: string[]; segments: string[] }>('/auth/user-meta/'),
   dataHealth: () => request<DataHealth>('/admin/health/'),
+  book: () => request<BookSummary>('/book/'),
 
   // --- data ---
   customers: (q: string) =>
