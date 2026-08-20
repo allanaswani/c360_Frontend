@@ -247,12 +247,19 @@ export interface HealthCheck {
   table: string;
   status: 'ok' | 'empty' | 'error';
   value: number | boolean | null;
+  latency_ms?: number;
   detail: string;
+}
+export interface HealthPoint {
+  at: string;
+  days_behind: number | null;
+  checks: Record<string, { value: number | null; status: string; latency_ms?: number }>;
 }
 export interface DataHealth {
   data_mode: 'mock' | 'live';
   freshness: { as_of: string | null; days_behind: number | null; status: 'ok' | 'stale' | 'error'; detail?: string } | null;
   checks: HealthCheck[];
+  history?: HealthPoint[];
   note?: string;
   generated_at: string;
 }

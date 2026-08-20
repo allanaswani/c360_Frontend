@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, type DataHealth, type HealthCheck } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
+import { LineSeriesChart } from '@/components/charts/LineSeriesChart';
 import ui from '@/components/ui.module.css';
 import s from './health.module.css';
 
@@ -44,6 +45,15 @@ export default function DataHealthPage() {
 
   const grouped = groupBy(data?.checks ?? [], (c) => c.group);
   const anyProblem = (data?.checks ?? []).some((c) => c.status !== 'ok') || data?.freshness?.status === 'stale';
+
+  // Trend data for the native (in-app) monitoring graphs — accrues one point per
+  // capture (throttled to ~10 min), so the charts fill in over time.
+  const history = data?.history ?? [];
+  const freshTrend = history
+    .filter((h) => h.days_behind != null)
+    .map((h) => ({ t: shortTime(h.at), days: h.days_behind as number }));
+  const sparkFor = (key: string): number[] =>
+    history.map((h) => h.checks[key]?.value).filter((v): v is number => typeof v === 'number');
 
   return (
     <main className={ui.content}>
@@ -103,6 +113,26 @@ export default function DataHealthPage() {
             </div>
           )}
 
+          {freshTrend.length >= 2 && (
+            <div className={ui.card} style={{ marginTop: 16, padding: 16 }}>
+              <div className={s.trendHead}>Freshness trend</div>
+              <div className={s.trendSub}>Days behind the live warehouse close, over recent checks.</div>
+              <LineSeriesChart
+                data={freshTrend}
+                series={[{ name: 'Days behind', dataKey: 'days', colorRole: 1 }]}
+                fmt="count"
+                xKey="t"
+                height={150}
+              />
+            </div>
+          )}
+          {freshTrend.length < 2 && (
+            <div className={s.trendHint}>
+              Trend graphs build up as this page is checked over time — one point per check, so come
+              back later to see freshness, row-count and latency history.
+            </div>
+          )}
+
           {anyProblem && (
             <div className={s.alertLine}>
               Some sources need attention — rows marked <b>Empty</b> mean the table has no data loaded (a
@@ -120,7 +150,11 @@ export default function DataHealthPage() {
                       <div className={s.rowLabel}>{c.label}</div>
                       <code className={s.rowTable}>{c.table}</code>
                     </div>
-                    <div className={s.rowDetail}>{c.detail}</div>
+                    <div className={s.rowDetail}>
+                      {c.detail}
+                      {typeof c.latency_ms === 'number' && <span className={s.latency}> · {c.latency_ms} ms</span>}
+                    </div>
+                    <Sparkline values={sparkFor(c.key)} />
                     <StatusPill status={c.status} />
                   </div>
                 ))}
@@ -135,6 +169,32 @@ export default function DataHealthPage() {
 
 function StatusPill({ status }: { status: string }) {
   return <span className={`${s.pill} ${s[`pill_${status}`] ?? ''}`}>{STATUS_LABEL[status] ?? status}</span>;
+}
+
+/** A tiny inline row-count/latency sparkline — no chart library, just an SVG polyline. */
+function Sparkline({ values, w = 88, h = 22 }: { values: number[]; w?: number; h?: number }) {
+  if (values.length < 2) return <span className={s.sparkEmpty} aria-hidden />;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pts = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * (w - 2) + 1;
+      const y = h - 1 - ((v - min) / span) * (h - 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  const rising = values[values.length - 1] >= values[0];
+  return (
+    <svg className={s.spark} width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
+      <polyline points={pts} fill="none" stroke={rising ? 'var(--teal)' : 'var(--coral)'} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function shortTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 function groupBy<T>(items: T[], key: (t: T) => string): Record<string, T[]> {

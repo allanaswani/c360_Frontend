@@ -72,6 +72,7 @@ export interface CustomerHeader {
     segment: Metric<string>;
     branch: Metric<string>;
     rm_name: Metric<string | null>;
+    rm_previous?: Metric<string | null> | null;
     sales_code: Metric<string | null>;
     mobile: Metric<string | null>;
     email: Metric<string | null>;

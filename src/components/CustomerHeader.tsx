@@ -28,6 +28,11 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
               <span>· {String(id.segment.value)}</span>
               <span>· {String(id.branch.value)} branch</span>
               {id.rm_name.value && <span>· RM {String(id.rm_name.value)}</span>}
+              {id.rm_previous?.value && (
+                <span title="Reassigned from a previous relationship manager" style={{ opacity: 0.75 }}>
+                  · prev. {String(id.rm_previous.value)}
+                </span>
+              )}
             </div>
             {header.summary && <p className={s.custSummary}>{header.summary}</p>}
           </div>
