@@ -27,10 +27,14 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
 
   const m = domain.metrics;
   const netTone = (m.net_position.value as number) >= 0 ? 'pos' : 'neg';
+  const ltd = m.loan_to_deposit;
+  const ltdValue = ltd.value != null ? `${(ltd.value as number).toFixed(2)}×` : (ltd.label ?? 'n/a');
   const stats: Stat[] = [
     { label: 'Net position', countTo: m.net_position.value as number, fmt: (n) => kes(n), value: kes(m.net_position.value as number), lead: true, tone: netTone, meta: 'deposits − loans', status: m.net_position.status },
     { label: 'Deposits', countTo: m.total_deposits.value as number, fmt: (n) => kes(n), value: kes(m.total_deposits.value as number), status: m.total_deposits.status },
     { label: 'Loans', countTo: m.total_loans.value as number, fmt: (n) => kes(n), value: kes(m.total_loans.value as number), status: m.total_loans.status },
+    { label: 'Loan-to-deposit', value: ltdValue, status: ltd.status, meta: ltd.note ?? 'loans ÷ deposits' },
+    { label: 'Active channels', countTo: m.active_channels.value as number, fmt: (n) => count(Math.round(n)), value: count(m.active_channels.value as number), status: m.active_channels.status, meta: 'channels used this period' },
     { label: 'Products', countTo: m.products_held.value as number, fmt: (n) => count(Math.round(n)), value: count(m.products_held.value as number), status: m.products_held.status },
     { label: 'Revenue', countTo: m.revenue.value as number, fmt: (n) => kes(n), value: kes(m.revenue.value as number), status: m.revenue.status },
   ];

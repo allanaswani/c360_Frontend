@@ -162,6 +162,8 @@ export interface HFCBDomain {
     net_position: Metric;
     products_held: Metric;
     revenue: Metric;
+    loan_to_deposit: Metric;
+    active_channels: Metric;
   };
   charts: {
     balance_trend: ChartBlock;
