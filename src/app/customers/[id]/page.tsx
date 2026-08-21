@@ -9,6 +9,7 @@ import { BioPanel } from '@/components/BioPanel';
 import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
+import { shortDate } from '@/lib/format';
 import { RecommendationPanel } from '@/components/RecommendationPanel';
 import { OverviewView } from '@/components/OverviewView';
 import { HFCBView } from '@/components/HFCBView';
@@ -137,7 +138,10 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         <div>
           <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
           <div style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 2 }}>
-            {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub} · one control drives every chart below
+            {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub}
+            {meta?.as_of
+              ? ` · headline balances are as of ${shortDate(meta.as_of)}; the period filter drives the trend charts only`
+              : ' · the period filter drives the trend charts only'}
           </div>
         </div>
         <PeriodFilter value={period} onChange={(p) => setParam('period', p)} />
