@@ -97,7 +97,7 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
           note={disb.series?.[0]?.note}
         >
           {disb.empty_reason ? (
-            <EmptyState title="No lending relationship">{disb.empty_reason}</EmptyState>
+            <EmptyState title="No active lending">{disb.empty_reason}</EmptyState>
           ) : (
             <DisbursementBalance disbursed={disb.series![0]} balance={disb.series![1]} />
           )}
