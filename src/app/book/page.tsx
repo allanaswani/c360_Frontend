@@ -65,7 +65,7 @@ export default function BookPage() {
   const maxSeg = Math.max(1, ...(data.segments ?? []).map((x) => x.aum));
 
   const stats: Stat[] = [
-    { label: 'AUM', lead: true, countTo: aum, fmt: (n) => kes(n), value: kes(aum), meta: 'assets under management' },
+    { label: 'AUM', lead: true, countTo: aum, fmt: (n) => kes(n), value: kes(aum), meta: 'allocation-base snapshot' },
     { label: 'Customers', countTo: customers, fmt: (n) => count(Math.round(n)), value: count(customers) },
     { label: 'Deposits', countTo: deposits, fmt: (n) => kes(n), value: kes(deposits) },
     { label: 'Loans', countTo: loans, fmt: (n) => kes(n), value: kes(loans) },
@@ -87,15 +87,15 @@ export default function BookPage() {
       <StatStrip stats={stats} />
 
       <div className={s.grid2}>
-        {/* Book composition — deposits vs loans, always meaningful */}
+        {/* Balance-sheet mix — deposits vs loans (NOT AUM: those are separate columns). */}
         <div className={ui.card}>
-          <div className={s.cardTitle}>Book composition</div>
-          <div className={s.cardSub}>How the {kes(aum)} of AUM splits between funding and lending.</div>
+          <div className={s.cardTitle}>Balance-sheet mix</div>
+          <div className={s.cardSub}>Deposits (funding) vs loans (lending) — {kes(deposits + loans)} of balances across the book.</div>
           <PartToWhole
             fmt="kes"
             data={[{ label: 'Deposits', value: deposits }, { label: 'Loans', value: loans }]}
             colors={['var(--teal)', 'var(--series-2)']}
-            centerLabel="AUM"
+            centerLabel="Balances"
           />
         </div>
 
