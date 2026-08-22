@@ -114,47 +114,42 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         <Skeleton height={168} radius={12} />
       )}
 
-      {detail?.header.bio && (
-        <div style={{ marginTop: 12 }}>
-          <BioPanel bio={detail.header.bio} />
-        </div>
-      )}
-
-      {linked && linked.count > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <LinkedParties data={linked} />
-        </div>
-      )}
-
-      {/* Next Best Product is customer-level — a full-width band up top, so it's
-          the first thing an RM sees regardless of which tab they're on. */}
-      <div style={{ marginTop: 12 }}>
-        {recs ? <RecommendationPanel data={recs} custId={id} layout="row" /> : <Skeleton height={150} radius={12} />}
-      </div>
-
-      <DomainTabs active={tab} onChange={(k) => setParam('tab', k)} />
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
+      <div className={ui.custShell}>
+        {/* main column — the domain data, brought up right under the header */}
         <div>
-          <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
-          <div style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 2 }}>
-            {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub}
-            {meta?.as_of
-              ? ` · headline balances are as of ${shortDate(meta.as_of)}; the period filter drives the trend charts only`
-              : ' · the period filter drives the trend charts only'}
+          <DomainTabs active={tab} onChange={(k) => setParam('tab', k)} />
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 2 }}>
+                {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub}
+                {meta?.as_of
+                  ? ` · balances as of ${shortDate(meta.as_of)}; the period filter drives the trend charts only`
+                  : ' · the period filter drives the trend charts only'}
+              </div>
+            </div>
+            <PeriodFilter value={period} onChange={(p) => setParam('period', p)} />
+          </div>
+
+          <div key={tab} className={ui.tabPane}>
+            {tab === 'overview' ? (
+              <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
+            ) : tab === 'hfcb' ? (
+              <HFCBView domain={hfcb} />
+            ) : (
+              <DomainView payload={other} onRetry={() => setReloadTick((n) => n + 1)} />
+            )}
           </div>
         </div>
-        <PeriodFilter value={period} onChange={(p) => setParam('period', p)} />
-      </div>
 
-      <div key={tab} className={ui.tabPane}>
-        {tab === 'overview' ? (
-          <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
-        ) : tab === 'hfcb' ? (
-          <HFCBView domain={hfcb} />
-        ) : (
-          <DomainView payload={other} onRetry={() => setReloadTick((n) => n + 1)} />
-        )}
+        {/* sticky rail — Next Best Product stays in view; profile & links sit beside
+            the data rather than pushing it down the page */}
+        <aside className={ui.custRail}>
+          {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" /> : <Skeleton height={150} radius={12} />}
+          {detail?.header.bio && <BioPanel bio={detail.header.bio} />}
+          {linked && linked.count > 0 && <LinkedParties data={linked} />}
+        </aside>
       </div>
     </main>
   );

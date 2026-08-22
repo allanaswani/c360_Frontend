@@ -35,8 +35,7 @@ export default function Home() {
           <h1 className={s.title}>Find a customer</h1>
           <p className={s.lede}>
             Everything HFCB knows about a customer, in one place — holdings, value, and the next
-            product to pitch. Portfolio-level analytics (Level&nbsp;1) lands in a later phase; today
-            you open a customer to see their core-banking 360.
+            product to pitch. Search by name, customer ID, or ID document to open a full 360.
           </p>
         </div>
         {rows && (

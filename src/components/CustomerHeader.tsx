@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { CustomerHeader as Header, ValueSummary } from '@/lib/types';
-import { initials, kes } from '@/lib/format';
+import { initials, kes, shortDate } from '@/lib/format';
 import { CountUp } from './CountUp';
 import s from './ui.module.css';
 
@@ -42,7 +42,7 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
           <div className="tnum" style={{ fontFamily: 'var(--font-num)', fontWeight: 700, fontSize: 26, color: '#fff', letterSpacing: '-0.01em' }}>
             <CountUp value={rel} format={(n) => kes(n)} />
           </div>
-          <div style={{ fontSize: 11, color: 'var(--ink-on-dark-2)' }}>as of {new Date(asOf).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+          <div style={{ fontSize: 11, color: 'var(--ink-on-dark-2)' }}>as of {shortDate(asOf)}</div>
         </div>
       </div>
 

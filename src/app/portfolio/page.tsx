@@ -76,7 +76,7 @@ function PortfolioInner() {
     <main className={ui.content}>
       <div className={ui.pfHead}>
         <div>
-          <div className="microlabel" style={{ color: 'var(--teal)' }}>Level 1 · Portfolio</div>
+          <div className="microlabel" style={{ color: 'var(--teal)' }}>Portfolio</div>
           <h1 className={ui.pfTitle}>Where should attention go?</h1>
           <div className={ui.pfSub}>
             {ov ? (

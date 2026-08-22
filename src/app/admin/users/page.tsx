@@ -271,8 +271,8 @@ function CreateUserPanel({ roles, meta, onClose, onCreated }:
                           </span>
                           <span className={s.roleCardDesc}>
                             {r.name === 'c360_management'
-                              ? 'Whole-book Level 1 portfolio + every customer 360.'
-                              : 'Looks up any customer’s 360 and next best product (no Level 1 dashboard).'}
+                              ? 'Whole-book portfolio dashboard + every customer 360.'
+                              : 'Looks up any customer’s 360 and next best product (no portfolio dashboard).'}
                           </span>
                         </span>
                       </button>
