@@ -99,23 +99,26 @@ function PortfolioInner() {
 
       {ov ? (
         <div className="fadeUp">
-          <div className={ui.chartGrid}>
-            <Card title="Segment mix" question={ov.segment_mix.question} status={ov.segment_mix.status}>
-              <BarsChart fmt="kes" data={ov.segment_mix.rows.map((r, i) => ({ label: r.segment, value: r.value, colorRole: i + 1 }))} />
-            </Card>
-            <Card title="Risk distribution" question={ov.risk_distribution.question} status={ov.risk_distribution.status} note={ov.risk_distribution.note}>
-              <PartToWhole fmt="count" centerLabel="Customers" colors={RISK_COLORS}
-                data={ov.risk_distribution.rows.map((r) => ({ label: r.class, value: r.customers }))} />
-            </Card>
-          </div>
-
-          {ov.top_products && ov.top_products.rows.length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <Card title="Top deposit products" question={ov.top_products.question} status={ov.top_products.status}>
-                <BarsChart fmt="kes" data={ov.top_products.rows.map((r, i) => ({ label: r.product, value: r.value, colorRole: i + 1 }))} />
+          {/* Tall segment-mix bars on the left; the shorter risk donut and the deposit-
+              products bars stack on the right so the column heights balance out. */}
+          <div className={ui.pfSplit}>
+            <div className={ui.pfCol}>
+              <Card title="Segment mix" question={ov.segment_mix.question} status={ov.segment_mix.status}>
+                <BarsChart fmt="kes" data={ov.segment_mix.rows.map((r, i) => ({ label: r.segment, value: r.value, colorRole: i + 1 }))} />
               </Card>
             </div>
-          )}
+            <div className={ui.pfCol}>
+              <Card title="Risk distribution" question={ov.risk_distribution.question} status={ov.risk_distribution.status} note={ov.risk_distribution.note}>
+                <PartToWhole fmt="count" centerLabel="Customers" colors={RISK_COLORS}
+                  data={ov.risk_distribution.rows.map((r) => ({ label: r.class, value: r.customers }))} />
+              </Card>
+              {ov.top_products && ov.top_products.rows.length > 0 && (
+                <Card title="Top deposit products" question={ov.top_products.question} status={ov.top_products.status}>
+                  <BarsChart fmt="kes" data={ov.top_products.rows.map((r, i) => ({ label: r.product, value: r.value, colorRole: i + 1 }))} />
+                </Card>
+              )}
+            </div>
+          </div>
 
           <div className={ui.chartGrid}>
             <Card title="Deposit vs loan book" question={ov.book_trend.question} status={ov.book_trend.status} note={ov.book_trend.note}>
