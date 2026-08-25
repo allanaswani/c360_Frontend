@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
+import { IdentityStrip } from '@/components/IdentityStrip';
 import { BioPanel } from '@/components/BioPanel';
 import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
@@ -113,6 +114,10 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       ) : (
         <Skeleton height={168} radius={12} />
       )}
+
+      {/* Verification set (customer type + legal IDs) docked directly under the hero —
+          the facts an RM checks first, promoted out of the collapsible Bio card. */}
+      {detail?.header.bio && <IdentityStrip bio={detail.header.bio} />}
 
       <div className={ui.custShell}>
         {/* main column — the domain data, brought up right under the header */}

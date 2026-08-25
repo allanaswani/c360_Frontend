@@ -160,6 +160,32 @@
 .riskChipVal { font-weight: 600; color: #fff; font-size: 14px; }
 .riskChipPending { color: var(--gold); font-weight: 600; font-size: 13px; }
 
+/* ---------- identity strip (verification set, docked under the hero) ---------- */
+.idStrip {
+  display: flex; flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  margin-top: var(--s-3);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.idStripItem {
+  flex: 1 1 0; min-width: 170px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 12px var(--s-6);
+  border-left: 1px solid var(--hairline);
+}
+.idStripItem:first-child { border-left: none; }
+.idStripItem .microlabel { color: var(--ink-3); font-size: 9.5px; }
+.idStripVal { font-size: 14px; font-weight: 600; color: var(--ink-1); letter-spacing: -0.01em; word-break: break-word; }
+/* Below the two-column breakpoint the strip is denser; keep the dividers meaningful
+   by letting items wrap onto their own row rather than crushing to unreadable widths. */
+@media (max-width: 560px) {
+  .idStripItem { flex-basis: 50%; }
+  .idStripItem:nth-child(odd) { border-left: none; }
+}
+
 /* ---------- bio & identification ---------- */
 .bioCard { padding: 0; overflow: hidden; }
 .bioHead {
