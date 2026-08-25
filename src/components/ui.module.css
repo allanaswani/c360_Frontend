@@ -176,7 +176,10 @@
    a grey filler block. The grid is pulled 1px into the card's own border on the right/
    bottom edges so the outer item borders don't double up with the card frame. */
 .bioGrid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* auto-FIT (not fill) so the populated fields stretch to fill the full width on one
+     line — the typical 8-10 fields sit in a single filled row; only an unusually
+     field-rich customer (or a narrow screen) wraps to a second row. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   margin: 0 -1px -1px 0; padding: 0; background: var(--surface);
   border-top: 1px solid var(--hairline);
 }

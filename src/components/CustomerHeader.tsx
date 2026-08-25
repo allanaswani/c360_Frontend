@@ -57,10 +57,7 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
         <RiskChip label="CRB status" metric={risk.crb_status} />
         <RiskChip label="KYC status" metric={risk.kyc_status} />
         <RiskChip label="Relationship since" metric={risk.relationship_since} />
-        <div className={s.riskChip}>
-          <span className="microlabel">Status</span>
-          <span className={s.riskChipVal}>{id.active.value ? 'Active' : 'Dormant'}</span>
-        </div>
+        <StatusChip active={!!id.active.value} lastTransaction={lastTransaction} asOf={asOf} />
         <LastTxnChip metric={lastTransaction} loading={lastTxnLoading} asOf={asOf} />
         {header.retention && header.retention.flag !== 'stable' && (
           <div className={s.riskChip} title={header.retention.note}>
@@ -72,6 +69,42 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Whole months between an ISO date and the as-of date (never negative). */
+function monthsSince(val: string, asOf: string): number {
+  const d = new Date(val), ref = new Date(asOf);
+  return Math.max(0, (ref.getFullYear() - d.getFullYear()) * 12 + (ref.getMonth() - d.getMonth()));
+}
+
+// A customer-facing transaction older than this (months) reads as 'no recent activity'.
+// Matches the LastTxnChip's gold ('over a year') threshold so the two agree.
+const INACTIVE_MONTHS = 12;
+
+/** Status — the CORE-BANKING account-status code, shown verbatim (never overridden). We
+ *  only append a muted '· no recent activity' caveat when the account is Active yet the
+ *  (separately loaded) last customer-facing transaction is over a year old, or there's
+ *  none on record — so 'Active' next to a years-old last transaction stops looking like a
+ *  contradiction. While the probe is still loading, no caveat is shown. */
+function StatusChip({ active, lastTransaction, asOf }: {
+  active: boolean; lastTransaction?: { value: string | null } | null; asOf: string;
+}) {
+  let caveat = false;
+  if (active && lastTransaction != null) {            // null/undefined ⇒ still loading
+    const v = lastTransaction.value;
+    caveat = v === null ? true : monthsSince(v, asOf) >= INACTIVE_MONTHS;
+  }
+  return (
+    <div className={s.riskChip} title={caveat
+      ? 'Core-banking status is Active, but there has been no customer-facing transaction in over a year.'
+      : undefined}>
+      <span className="microlabel">Status</span>
+      <span className={s.riskChipVal}>
+        {active ? 'Active' : 'Dormant'}
+        {caveat && <span style={{ color: 'var(--ink-on-dark-2)', fontWeight: 500 }}> · no recent activity</span>}
+      </span>
     </div>
   );
 }
@@ -100,9 +133,7 @@ function LastTxnChip({ metric, loading, asOf }: {
       </div>
     );
   }
-  const d = new Date(val);
-  const ref = new Date(asOf);
-  const months = Math.max(0, (ref.getFullYear() - d.getFullYear()) * 12 + (ref.getMonth() - d.getMonth()));
+  const months = monthsSince(val, asOf);
   const years = Math.floor(months / 12);
   const color = months >= 36 ? 'var(--coral)' : months >= 12 ? 'var(--gold)' : undefined;
   const ago = months < 1 ? 'this month' : months < 12 ? `${months} mo ago` : `${years} yr${years > 1 ? 's' : ''} ago`;
