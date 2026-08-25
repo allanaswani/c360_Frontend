@@ -160,32 +160,6 @@
 .riskChipVal { font-weight: 600; color: #fff; font-size: 14px; }
 .riskChipPending { color: var(--gold); font-weight: 600; font-size: 13px; }
 
-/* ---------- identity strip (verification set, docked under the hero) ---------- */
-.idStrip {
-  display: flex; flex-wrap: wrap;
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  margin-top: var(--s-3);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-.idStripItem {
-  flex: 1 1 0; min-width: 170px;
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 12px var(--s-6);
-  border-left: 1px solid var(--hairline);
-}
-.idStripItem:first-child { border-left: none; }
-.idStripItem .microlabel { color: var(--ink-3); font-size: 9.5px; }
-.idStripVal { font-size: 14px; font-weight: 600; color: var(--ink-1); letter-spacing: -0.01em; word-break: break-word; }
-/* Below the two-column breakpoint the strip is denser; keep the dividers meaningful
-   by letting items wrap onto their own row rather than crushing to unreadable widths. */
-@media (max-width: 560px) {
-  .idStripItem { flex-basis: 50%; }
-  .idStripItem:nth-child(odd) { border-left: none; }
-}
-
 /* ---------- bio & identification ---------- */
 .bioCard { padding: 0; overflow: hidden; }
 .bioHead {
@@ -197,12 +171,21 @@
 .bioTitle svg { color: var(--teal); }
 .bioChevron { color: var(--ink-3); display: inline-flex; transition: transform 160ms ease; }
 .bioChevron[data-open="false"] { transform: rotate(-90deg); }
+/* Full-width grid under the hero. Dividers are drawn as item borders (not a hairline
+   background showing through 1px gaps) so a partial last row leaves clean surface, never
+   a grey filler block. The grid is pulled 1px into the card's own border on the right/
+   bottom edges so the outer item borders don't double up with the card frame. */
 .bioGrid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 1px; margin: 0; padding: 0; background: var(--hairline);
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  margin: 0 -1px -1px 0; padding: 0; background: var(--surface);
   border-top: 1px solid var(--hairline);
 }
-.bioItem { background: var(--surface); padding: 11px var(--s-5); display: flex; flex-direction: column; gap: 3px; }
+.bioItem {
+  background: var(--surface); padding: 12px var(--s-5);
+  display: flex; flex-direction: column; gap: 3px;
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
 .bioItem .microlabel { color: var(--ink-3); font-size: 9.5px; }
 .bioVal { font-size: 13.5px; font-weight: 600; color: var(--ink-1); word-break: break-word; }
 
@@ -420,8 +403,13 @@
 .chartGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-3); align-items: start; }
 .spanFull { grid-column: 1 / -1; }
 .tabPane { display: block; }
+/* Portfolio top section: a tall card (segment mix, many bars) on the left, a stack of
+   shorter cards on the right. Each column is its own flex stack so the right side fills
+   the height instead of leaving a dead band under a short donut card. */
+.pfSplit { display: grid; grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr); gap: var(--s-3); margin-top: var(--s-3); align-items: start; }
+.pfCol { display: flex; flex-direction: column; gap: var(--s-3); min-width: 0; }
 @media (max-width: 980px) {
-  .gridMain, .chartGrid, .topRow { grid-template-columns: 1fr; }
+  .gridMain, .chartGrid, .topRow, .pfSplit { grid-template-columns: 1fr; }
 }
 
 /* ---------- motion: staggered reveals + tab transitions ----------

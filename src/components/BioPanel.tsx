@@ -5,12 +5,11 @@ import type { CustomerBio } from '@/lib/types';
 import { shortDate } from '@/lib/format';
 import s from './ui.module.css';
 
-/** Bio & identification (backlog item #1) — the reference detail behind the hero:
- *  DOB, personal attributes, contact and account details, sourced live from the
- *  core-banking master. The verification set (customer type + legal IDs) now leads in
- *  the IdentityStrip under the hero, so it is intentionally NOT repeated here. Personal
- *  fields are individual-only, so for an organisation they are simply absent (a real
- *  N/A) rather than shown as a bare dash. Collapsible so the page stays tight. */
+/** Bio & identification (backlog item #1) — identification, personal and account
+ *  details, sourced live from the core-banking master. Rendered full-width directly
+ *  under the hero as one aligned grid. Personal fields are individual-only, so for an
+ *  organisation they are simply absent (a real N/A) rather than shown as a bare dash.
+ *  Collapsible so a user can fold it away, but open by default. */
 export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
   const [open, setOpen] = useState(true);
   if (!bio) return null;
@@ -18,11 +17,13 @@ export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
   const v = (m: { value: string | null } | undefined) => (m && m.value != null && String(m.value).trim() !== '' ? String(m.value) : null);
   const dob = v(bio.date_of_birth);
 
-  // Customer type + the legal IDs (ID type / number, KRA PIN) now lead in the identity
-  // strip docked under the hero (see IdentityStrip); the Bio card carries the remaining
-  // reference detail — issuing authority, the person/entity, then account details.
+  // Ordered so identification leads, then the person/entity, then account details.
   const items: { label: string; value: string | null }[] = [
+    { label: 'Customer type', value: v(bio.customer_type) },
+    { label: 'ID type', value: v(bio.id_type) },
+    { label: 'ID number', value: v(bio.id_no) },
     { label: 'Issuing authority', value: v(bio.issuing_authority) },
+    { label: 'KRA PIN', value: v(bio.kra_pin_status) },
     { label: 'Date of birth', value: dob ? `${shortDate(dob)}${age(dob) != null ? ` · ${age(dob)} yrs` : ''}` : null },
     { label: 'Gender', value: v(bio.gender) },
     { label: 'Place of birth', value: v(bio.city_of_birth) },
