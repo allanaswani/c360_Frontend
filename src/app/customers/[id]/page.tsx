@@ -44,6 +44,9 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   const [hfcb, setHfcb] = useState<HFCBDomain | null>(null);
   const [other, setOther] = useState<DomainPayload | null>(null);
   const [meta, setMeta] = useState<{ as_of: string } | null>(null);
+  // Last customer-facing transaction — loaded from its own (sometimes slow) endpoint so
+  // it never blocks the header; the chip shows 'Checking…' until this resolves.
+  const [lastTxn, setLastTxn] = useState<{ value: string | null; note?: string } | null>(null);
   const [error, setError] = useState<{ code: number; msg: string } | null>(null);
   // Bumped to force a re-fetch of the active domain payload (the "Retry" affordance
   // on an unavailable domain, so an RM can recover without reloading the whole page).
@@ -64,6 +67,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     setError(null);
     setDetail(null);
     setLinked(null);
+    setLastTxn(null);
     Promise.all([api.customer(id), api.recommendations(id), api.meta()])
       .then(([d, r, m]) => {
         if (!live) return;
@@ -72,8 +76,10 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         setMeta({ as_of: m.as_of });
       })
       .catch((e: ApiError) => live && setError({ code: e.status, msg: e.message }));
-    // Linked parties load independently — a slow or empty result never blocks the page.
+    // Linked parties + last-transaction load independently — a slow or empty result
+    // never blocks the page. Last-transaction can be a multi-second warehouse probe.
     api.linked(id).then((l) => live && setLinked(l)).catch(() => live && setLinked(null));
+    api.lastTransaction(id).then((x) => live && setLastTxn(x.last_transaction)).catch(() => { /* chip stays hidden-safe */ });
     return () => { live = false; };
   }, [id]);
 
@@ -109,7 +115,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   return (
     <main className={ui.content}>
       {detail && meta ? (
-        <CustomerHeader header={detail.header} value={detail.value_summary} asOf={meta.as_of} />
+        <CustomerHeader header={detail.header} value={detail.value_summary} asOf={meta.as_of}
+          lastTransaction={lastTxn} lastTxnLoading={lastTxn === null} />
       ) : (
         <Skeleton height={168} radius={12} />
       )}

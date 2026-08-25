@@ -7,7 +7,13 @@ import s from './ui.module.css';
 /** The customer identity band. Identity + RM are live; risk & KYC are DERIVED from
  *  live data (violet, with the basis on hover); CRB stays "not sourced" (needs an
  *  external bureau feed). Never a bare "--". */
-export function CustomerHeader({ header, value, asOf }: { header: Header; value: ValueSummary; asOf: string }) {
+export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLoading }: {
+  header: Header; value: ValueSummary; asOf: string;
+  /** Last customer-facing transaction — loaded separately (own endpoint), so it arrives
+   *  after the header. undefined + lastTxnLoading=true → 'checking…'; a metric → shown. */
+  lastTransaction?: { value: string | null; note?: string } | null;
+  lastTxnLoading?: boolean;
+}) {
   const id = header.identity;
   const risk = header.risk;
   const rel = value.headline.relationship_value.value as number;
@@ -55,6 +61,7 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
           <span className="microlabel">Status</span>
           <span className={s.riskChipVal}>{id.active.value ? 'Active' : 'Dormant'}</span>
         </div>
+        <LastTxnChip metric={lastTransaction} loading={lastTxnLoading} asOf={asOf} />
         {header.retention && header.retention.flag !== 'stable' && (
           <div className={s.riskChip} title={header.retention.note}>
             <span className="microlabel">Retention</span>
@@ -65,6 +72,51 @@ export function CustomerHeader({ header, value, asOf }: { header: Header; value:
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Last customer-facing transaction — the honest 'when was this account last active'.
+ *  An 'Active' status can hide years of no real activity; when the last transaction is
+ *  over a year old we flag it (gold > 1yr, coral > 3yr) with a relative-age caption, so
+ *  a stale account is obvious without opening the transaction history. */
+function LastTxnChip({ metric, loading, asOf }: {
+  metric?: { value: string | null; note?: string } | null; loading?: boolean; asOf: string;
+}) {
+  if (loading && !metric) {
+    return (
+      <div className={s.riskChip} title="Looking up the last customer-facing transaction…">
+        <span className="microlabel">Last transaction</span>
+        <span className={s.riskChipVal} style={{ opacity: 0.6 }}>Checking…</span>
+      </div>
+    );
+  }
+  const val = metric?.value ?? null;
+  if (!val) {
+    return (
+      <div className={s.riskChip} title={metric?.note || 'No customer-facing transaction found on record.'}>
+        <span className="microlabel">Last transaction</span>
+        <span className={s.riskChipPending}>None on record</span>
+      </div>
+    );
+  }
+  const d = new Date(val);
+  const ref = new Date(asOf);
+  const months = Math.max(0, (ref.getFullYear() - d.getFullYear()) * 12 + (ref.getMonth() - d.getMonth()));
+  const years = Math.floor(months / 12);
+  const color = months >= 36 ? 'var(--coral)' : months >= 12 ? 'var(--gold)' : undefined;
+  const ago = months < 1 ? 'this month' : months < 12 ? `${months} mo ago` : `${years} yr${years > 1 ? 's' : ''} ago`;
+  const title = color
+    ? `Account is marked Active, but its last customer-facing transaction was ${shortDate(val)} — ${ago}.`
+    : `Last customer-facing transaction ${shortDate(val)}.`;
+  return (
+    <div className={s.riskChip} title={title}>
+      <span className="microlabel">Last transaction</span>
+      <span className={s.riskChipVal} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        {color && <span className={s.badgeDot} style={{ background: color }} />}
+        {shortDate(val)}
+        <span style={{ color: 'var(--ink-on-dark-2)', fontWeight: 500 }}>· {ago}</span>
+      </span>
     </div>
   );
 }

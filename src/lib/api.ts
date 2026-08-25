@@ -12,6 +12,7 @@ import type {
   HFCBDomain,
   LinkedParties,
   Meta,
+  Metric,
   PortfolioOverview,
   Recommendations,
   Worklist,
@@ -397,6 +398,10 @@ export const api = {
   customers: (q: string) =>
     request<{ count: number; results: CustomerSummary[] }>(`/customers/?q=${encodeURIComponent(q)}`),
   customer: (id: string) => request<CustomerDetail>(`/customers/${id}/`),
+  // Last customer-facing transaction — a separate (sometimes slow) probe so it never
+  // blocks the header render; the header fills the chip in once it resolves.
+  lastTransaction: (id: string) =>
+    request<{ last_transaction: Metric<string | null> }>(`/customers/${id}/last-transaction/`),
   linked: (id: string) => request<LinkedParties>(`/customers/${id}/linked/`),
   overview: (id: string, period: string) =>
     request<CustomerOverview>(`/customers/${id}/overview/?period=${encodeURIComponent(period)}`),
