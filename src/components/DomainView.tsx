@@ -10,6 +10,7 @@ import { LineSeriesChart } from './charts/LineSeriesChart';
 import { BarsChart } from './charts/BarsChart';
 import { GroupedBarChart } from './charts/GroupedBarChart';
 import { PartToWhole } from './charts/PartToWhole';
+import { MeterList } from './charts/MeterList';
 import ui from './ui.module.css';
 
 /** One renderer for every non-core domain. Reads the generic payload the backend
@@ -45,6 +46,7 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
     lead: m.lead,
     tone: m.tone,
     meta: m.meta,
+    spark: m.spark,
   }));
 
   // Charts: full-width kinds span the row; the rest share two columns. If an odd
@@ -75,7 +77,7 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
 }
 
 function isFull(c: DomainChart): boolean {
-  return c.kind === 'lines' || c.kind === 'grouped';
+  return c.kind === 'lines' || c.kind === 'grouped' || c.kind === 'meters';
 }
 
 function ChartRenderer({ chart }: { chart: DomainChart }) {
@@ -88,6 +90,8 @@ function ChartRenderer({ chart }: { chart: DomainChart }) {
       return <GroupedBarChart data={chart.data} seriesNames={chart.seriesNames} fmt={chart.fmt} />;
     case 'donut':
       return <PartToWhole data={chart.data} fmt={chart.fmt} />;
+    case 'meters':
+      return <MeterList data={chart.data} fmt={chart.fmt} />;
   }
 }
 

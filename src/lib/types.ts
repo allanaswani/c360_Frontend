@@ -203,6 +203,9 @@ export interface DomainMetric {
   lead?: boolean;
   tone?: 'pos' | 'neg';
   meta?: string;
+  /** Optional mini-trend rendered as a sparkline under the figure (e.g. daily Whizz
+   *  transactions / value moved). Omitted for snapshot metrics that have no series. */
+  spark?: number[];
 }
 
 export interface ChartLines {
@@ -227,7 +230,13 @@ export interface ChartDonut {
   id: string; title: string; question: string; status: Provenance; fmt: ValueFmt;
   data: { label: string; value: number }[];
 }
-export type DomainChart = ChartLines | ChartBars | ChartGrouped | ChartDonut;
+export interface ChartMeters {
+  kind: 'meters';
+  id: string; title: string; question: string; status: Provenance; fmt: ValueFmt;
+  /** value is a 0–1 completion fraction; paid/total (optional) drive the KES caption. */
+  data: { label: string; value: number; paid?: number; total?: number }[];
+}
+export type DomainChart = ChartLines | ChartBars | ChartGrouped | ChartDonut | ChartMeters;
 
 export interface DomainTable {
   id: string; title: string; status: Provenance; note?: string;

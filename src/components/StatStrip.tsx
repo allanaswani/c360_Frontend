@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Provenance } from '@/lib/types';
 import { ProvenanceDotOnly } from './ProvenanceBadge';
 import { CountUp } from './CountUp';
+import { Sparkline } from './charts/Sparkline';
 import s from './ui.module.css';
 
 export interface Stat {
@@ -14,6 +15,8 @@ export interface Stat {
   // When provided, the value animates (count-up) using this formatter.
   countTo?: number;
   fmt?: (n: number) => string;
+  // Optional mini-trend drawn under the figure.
+  spark?: number[];
 }
 
 /** Headline metric strip. Deliberately NOT five identical icon-in-a-circle cards:
@@ -34,6 +37,7 @@ export function StatStrip({ stats }: { stats: Stat[] }) {
           <div className={`${s.statValue} ${st.lead ? s.statValueLead : ''} tnum ${st.tone === 'pos' ? s.statPos : st.tone === 'neg' ? s.statNeg : ''}`}>
             {st.countTo !== undefined && st.fmt ? <CountUp value={st.countTo} format={st.fmt} /> : st.value}
           </div>
+          {st.spark && st.spark.length > 1 && <Sparkline data={st.spark} />}
           {st.meta && <div className={s.statMeta}>{st.meta}</div>}
         </div>
       ))}
