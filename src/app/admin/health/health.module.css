@@ -10,6 +10,26 @@
 
 .mockNote { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
 
+/* ---- overall status summary ---- */
+.summary { display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 16px 22px; border-radius: var(--r-md); border: 1px solid var(--hairline);
+  border-left: 4px solid var(--ink-3); background: var(--surface); margin-bottom: 16px; }
+.summary_healthy { border-left-color: var(--pos); background: color-mix(in srgb, var(--pos) 6%, var(--surface)); }
+.summary_degraded { border-left-color: var(--gold); background: color-mix(in srgb, var(--gold) 9%, var(--surface)); }
+.summary_down { border-left-color: var(--coral); background: color-mix(in srgb, var(--coral) 8%, var(--surface)); }
+.summaryWord { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.summary_healthy .summaryWord { color: var(--pos); }
+.summary_degraded .summaryWord { color: #a07c00; }
+.summary_down .summaryWord { color: var(--coral); }
+.summaryCounts { display: flex; gap: 18px; flex-wrap: wrap; margin-left: auto; }
+.summaryStat { display: flex; flex-direction: column; align-items: flex-end; }
+.summaryStatN { font-family: var(--font-num, var(--font-display)); font-size: 18px; font-weight: 700; line-height: 1; color: var(--ink-1); }
+.summaryStatL { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); margin-top: 4px; }
+
+.delta { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; }
+.deltaDown { color: var(--coral); }
+.deltaUp { color: var(--ink-3); }
+
 /* ---- freshness card ---- */
 .freshCard { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
   padding: 20px 24px; border-radius: var(--r-md); border: 1px solid var(--hairline); background: var(--surface);
@@ -48,6 +68,8 @@
 .pill_empty { color: #a07c00; background: color-mix(in srgb, var(--gold) 24%, transparent); }
 .pill_stale { color: #a07c00; background: color-mix(in srgb, var(--gold) 24%, transparent); }
 .pill_error { color: var(--coral); background: color-mix(in srgb, var(--coral) 15%, transparent); }
+.pill_warn { color: #a07c00; background: color-mix(in srgb, var(--gold) 24%, transparent); }
+.pill_unknown { color: var(--ink-3); background: color-mix(in srgb, var(--ink-3) 14%, transparent); }
 
 @media (max-width: 620px) {
   .row { flex-wrap: wrap; }

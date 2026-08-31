@@ -1,14 +1,29 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { api, type DataHealth, type HealthCheck } from '@/lib/api';
+import { api, type DataHealth } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
 import { LineSeriesChart } from '@/components/charts/LineSeriesChart';
 import ui from '@/components/ui.module.css';
 import s from './health.module.css';
 
-const STATUS_LABEL: Record<string, string> = { ok: 'OK', empty: 'Empty', error: 'Error', stale: 'Stale' };
+const STATUS_LABEL: Record<string, string> = {
+  ok: 'OK', empty: 'Empty', error: 'Error', stale: 'Stale', warn: 'Warn', unknown: 'Not checked',
+};
+
+/** One overall verdict from every check + freshness: down if anything errored, degraded
+ *  if anything is empty/stale/warn/not-checked, otherwise healthy. */
+function overallStatus(data: DataHealth): { key: 'healthy' | 'degraded' | 'down'; word: string; counts: { ok: number; warn: number; down: number } } {
+  const checks = data.checks ?? [];
+  const ok = checks.filter((c) => c.status === 'ok').length;
+  const down = checks.filter((c) => c.status === 'error').length + (data.freshness?.status === 'error' ? 1 : 0);
+  const warn = checks.filter((c) => c.status === 'empty' || c.status === 'warn' || c.status === 'unknown').length
+    + (data.freshness?.status === 'stale' ? 1 : 0);
+  const key = down > 0 ? 'down' : warn > 0 ? 'degraded' : 'healthy';
+  const word = key === 'down' ? 'Service degraded' : key === 'degraded' ? 'Needs attention' : 'All systems healthy';
+  return { key, word, counts: { ok, warn, down } };
+}
 
 export default function DataHealthPage() {
   const { user } = useAuth();
@@ -44,7 +59,8 @@ export default function DataHealthPage() {
   }
 
   const grouped = groupBy(data?.checks ?? [], (c) => c.group);
-  const anyProblem = (data?.checks ?? []).some((c) => c.status !== 'ok') || data?.freshness?.status === 'stale';
+  const anyProblem = (data?.checks ?? []).some((c) => c.status !== 'ok')
+    || (data?.freshness != null && data.freshness.status !== 'ok');
 
   // Trend data for the native (in-app) monitoring graphs — accrues one point per
   // capture (throttled to ~10 min), so the charts fill in over time.
@@ -90,6 +106,20 @@ export default function DataHealthPage() {
         </div>
       ) : (
         <>
+          {(() => {
+            const o = overallStatus(data);
+            return (
+              <div className={`${s.summary} ${s[`summary_${o.key}`]}`}>
+                <span className={s.summaryWord}>{o.word}</span>
+                <div className={s.summaryCounts}>
+                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.ok}</span><span className={s.summaryStatL}>Healthy</span></div>
+                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.warn}</span><span className={s.summaryStatL}>Attention</span></div>
+                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.down}</span><span className={s.summaryStatL}>Down</span></div>
+                </div>
+              </div>
+            );
+          })()}
+
           {data.freshness && (
             <div className={`${s.freshCard} ${s[`fresh_${data.freshness.status}`] ?? ''}`}>
               <div>
@@ -152,6 +182,9 @@ export default function DataHealthPage() {
                     </div>
                     <div className={s.rowDetail}>
                       {c.detail}
+                      {typeof c.delta_pct === 'number' && c.delta_pct <= -1 && (
+                        <span className={`${s.delta} ${s.deltaDown}`}>▼ {Math.abs(c.delta_pct)}%</span>
+                      )}
                       {typeof c.latency_ms === 'number' && <span className={s.latency}> · {c.latency_ms} ms</span>}
                     </div>
                     <Sparkline values={sparkFor(c.key)} />

@@ -80,7 +80,10 @@ export function RecommendationPanel({ data, custId, layout = 'stack' }:
       )}
 
       {items.length === 0 ? (
-        <EmptyState title="No products to suggest">This customer already holds the products the model would suggest.</EmptyState>
+        <EmptyState title="No strong cross-sell signal">
+          The model and rules don’t see a confident next product for this customer right now —
+          so nothing is suggested rather than a weak or generic match.
+        </EmptyState>
       ) : (
         <div className={row ? s.recGrid : s.recList}>
           {items.map((item, i) => (

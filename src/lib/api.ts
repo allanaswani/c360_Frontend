@@ -246,10 +246,11 @@ export interface HealthCheck {
   label: string;
   group: string;
   table: string;
-  status: 'ok' | 'empty' | 'error';
+  status: 'ok' | 'empty' | 'error' | 'warn' | 'unknown';
   value: number | boolean | null;
   latency_ms?: number;
   detail: string;
+  delta_pct?: number;   // change in row count vs the previous snapshot (drop alarm)
 }
 export interface HealthPoint {
   at: string;
