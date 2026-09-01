@@ -103,8 +103,8 @@ function PortfolioInner() {
               products bars stack on the right so the column heights balance out. */}
           <div className={ui.pfSplit}>
             <div className={ui.pfCol}>
-              <Card title="Segment mix" question={ov.segment_mix.question} status={ov.segment_mix.status}>
-                <BarsChart fmt="kes" data={ov.segment_mix.rows.map((r, i) => ({ label: r.segment, value: r.value, colorRole: i + 1 }))} />
+              <Card title="Segment mix" question={ov.segment_mix.question} status={ov.segment_mix.status} className={ui.pfGrow}>
+                <BarsChart fmt="kes" fill data={ov.segment_mix.rows.map((r) => ({ label: r.segment, value: r.value, colorRole: 1 }))} />
               </Card>
             </div>
             <div className={ui.pfCol}>
@@ -114,7 +114,7 @@ function PortfolioInner() {
               </Card>
               {ov.top_products && ov.top_products.rows.length > 0 && (
                 <Card title="Top deposit products" question={ov.top_products.question} status={ov.top_products.status}>
-                  <BarsChart fmt="kes" data={ov.top_products.rows.map((r, i) => ({ label: r.product, value: r.value, colorRole: i + 1 }))} />
+                  <BarsChart fmt="kes" data={ov.top_products.rows.map((r) => ({ label: r.product, value: r.value, colorRole: 1 }))} />
                 </Card>
               )}
             </div>

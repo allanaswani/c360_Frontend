@@ -6,13 +6,15 @@ import { ChartTooltip } from './ChartTooltip';
 
 interface D { label: string; value: number; colorRole: number }
 
-/** Generic horizontal magnitude bars with value labels and rounded data-ends. */
-export function BarsChart({ data, fmt }: { data: D[]; fmt: 'kes' | 'count' | 'pct' }) {
+/** Generic horizontal magnitude bars with value labels and rounded data-ends.
+ *  `fill` lets the chart grow to its parent's height (used to balance the taller
+ *  neighbouring column) — the natural height becomes a floor so it never collapses. */
+export function BarsChart({ data, fmt, fill = false }: { data: D[]; fmt: 'kes' | 'count' | 'pct'; fill?: boolean }) {
   const rows = [...data].sort((a, b) => b.value - a.value);
-  const height = Math.max(130, rows.length * 34 + 18);
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 52, bottom: 0, left: 4 }} barCategoryGap={9}>
+  const natural = Math.max(130, rows.length * 34 + 18);
+  const chart = (
+    <ResponsiveContainer width="100%" height={fill ? '100%' : natural}>
+      <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 70, bottom: 0, left: 4 }} barCategoryGap={9} maxBarSize={34}>
         <CartesianGrid horizontal={false} />
         <XAxis type="number" hide />
         <YAxis type="category" dataKey="label" tickLine={false} axisLine={false} width={120} tick={{ fontSize: 12, fill: 'var(--ink-2)' }} />
@@ -26,6 +28,9 @@ export function BarsChart({ data, fmt }: { data: D[]; fmt: 'kes' | 'count' | 'pc
       </BarChart>
     </ResponsiveContainer>
   );
+  if (!fill) return chart;
+  // Fill the parent's height (natural height is the floor so it never collapses).
+  return <div style={{ height: '100%', minHeight: natural }}>{chart}</div>;
 }
 
 interface TP { active?: boolean; payload?: { payload: D }[] }
