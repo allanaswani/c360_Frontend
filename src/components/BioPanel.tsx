@@ -1,17 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CustomerBio } from '@/lib/types';
 import { shortDate } from '@/lib/format';
 import s from './ui.module.css';
+
+const BIO_OPEN_KEY = 'c360.bio.open';
 
 /** Bio & identification (backlog item #1) — identification, personal and account
  *  details, sourced live from the core-banking master. Rendered full-width directly
  *  under the hero as one aligned grid. Personal fields are individual-only, so for an
  *  organisation they are simply absent (a real N/A) rather than shown as a bare dash.
- *  Collapsible so a user can fold it away, but open by default. */
+ *  Collapsible and COLLAPSED by default — the identification detail is reference data
+ *  the user reaches for occasionally, not the reason they opened the page, so it stays
+ *  folded until asked for. The open/closed choice is remembered (localStorage) so it
+ *  doesn't spring back open on every customer. First render is always closed to match
+ *  the server; the stored preference is applied on mount to avoid a hydration mismatch. */
 export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(BIO_OPEN_KEY) === '1') setOpen(true);
+    } catch {
+      /* private mode / blocked storage — keep the default */
+    }
+  }, []);
+  const toggle = () => setOpen((o) => {
+    const next = !o;
+    try { localStorage.setItem(BIO_OPEN_KEY, next ? '1' : '0'); } catch { /* ignore */ }
+    return next;
+  });
   if (!bio) return null;
 
   const v = (m: { value: string | null } | undefined) => (m && m.value != null && String(m.value).trim() !== '' ? String(m.value) : null);
@@ -38,7 +56,7 @@ export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
 
   return (
     <div className={`${s.card} ${s.bioCard} fadeUp`}>
-      <button className={s.bioHead} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <button className={s.bioHead} onClick={toggle} aria-expanded={open}>
         <span className={s.bioTitle}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
             <circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" />

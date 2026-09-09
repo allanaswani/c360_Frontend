@@ -6,6 +6,8 @@ import { api, ApiError } from '@/lib/api';
 import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
 import { BioPanel } from '@/components/BioPanel';
+import { CreditBureauPanel } from '@/components/CreditBureauPanel';
+import { CrmPanel } from '@/components/CrmPanel';
 import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
@@ -126,6 +128,22 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       {detail?.header.bio && (
         <div style={{ marginTop: 12 }}>
           <BioPanel bio={detail.header.bio} />
+        </div>
+      )}
+
+      {/* Credit bureau (CRB) — shown only when the customer has a bureau record. Real
+          external feed, point-in-time; the card states its own pull date. */}
+      {detail?.header.credit_bureau && (
+        <div style={{ marginTop: 12 }}>
+          <CreditBureauPanel bureau={detail.header.credit_bureau} />
+        </div>
+      )}
+
+      {/* Subsidiary CRM — property-sales leads and/or insurance servicing. Shown only
+          when the customer has a matched record. */}
+      {detail?.header.crm && (
+        <div style={{ marginTop: 12 }}>
+          <CrmPanel crm={detail.header.crm} />
         </div>
       )}
 

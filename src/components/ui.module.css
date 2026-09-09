@@ -210,6 +210,104 @@
 .bioItem .microlabel { color: var(--ink-3); font-size: 9.5px; }
 .bioVal { font-size: 13.5px; font-weight: 600; color: var(--ink-1); word-break: break-word; }
 
+/* ---------- credit bureau (CRB) panel ---------- */
+.crbCard { padding: 0; overflow: hidden; }
+.crbHead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px var(--s-5); border-bottom: 1px solid var(--hairline);
+}
+.crbTitle { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-1); }
+.crbTitle svg { color: var(--teal); }
+.crbSource { font-size: 11px; color: var(--ink-3); }
+.crbBody {
+  display: grid; grid-template-columns: minmax(160px, 0.9fr) 1.6fr; gap: var(--s-5);
+  padding: 14px var(--s-5) 16px;
+}
+.crbScoreBlock { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.crbScoreRow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.crbScore { font-family: var(--font-num); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.02em; }
+.crbGrade {
+  font-size: 11px; font-weight: 600; color: var(--ink-2);
+  background: var(--surface-2); padding: 3px 8px; border-radius: var(--r-pill);
+}
+.crbMeter { height: 6px; border-radius: var(--r-pill); background: var(--surface-2); overflow: hidden; }
+.crbMeter span { display: block; height: 100%; border-radius: var(--r-pill); }
+.crbBand { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-1); }
+.crbBandDot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.crbBandPd { color: var(--ink-3); font-weight: 500; }
+.crbStats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4);
+  align-content: center; border-left: 1px solid var(--hairline); padding-left: var(--s-5);
+}
+.crbStat { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.crbStat .microlabel { color: var(--ink-3); font-size: 9.5px; }
+.crbStatVal { font-family: var(--font-num); font-size: 19px; font-weight: 700; color: var(--ink-1); }
+.crbStatSub { font-size: 10.5px; color: var(--ink-3); }
+.crbNoHit { padding: 14px var(--s-5) 16px; }
+.crbNoHitMark { font-size: 15px; font-weight: 600; color: var(--ink-2); }
+.crbNoHit p { margin: 4px 0 0; font-size: 12px; color: var(--ink-3); max-width: 46ch; }
+@media (max-width: 620px) {
+  .crbBody { grid-template-columns: 1fr; }
+  .crbStats { border-left: none; padding-left: 0; border-top: 1px solid var(--hairline); padding-top: var(--s-4); }
+}
+
+/* ---------- CRM panel (property funnel + insurance servicing) ---------- */
+.crmCard { padding: 0; overflow: hidden; }
+.crmHead { display: flex; align-items: center; padding: 12px var(--s-5); border-bottom: 1px solid var(--hairline); }
+.crmTitle { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-1); }
+.crmTitle svg { color: var(--teal); }
+.crmBody { display: flex; flex-wrap: wrap; }
+.crmBlock { padding: 16px var(--s-5) 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.crmProperty { flex: 1.7 1 360px; border-right: 1px solid var(--hairline); }
+.crmInsurance { flex: 1 1 260px; }
+/* when the property block wraps below (narrow), keep a divider above insurance */
+@media (max-width: 680px) { .crmProperty { border-right: none; border-bottom: 1px solid var(--hairline); } }
+.crmBlockHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.crmBlockTitle { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.crmCaveat { font-size: 10px; color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent); padding: 2px 8px; border-radius: var(--r-pill); cursor: help; }
+.crmSrc { font-size: 10px; color: var(--ink-3); border: 1px solid var(--hairline-strong); padding: 2px 8px; border-radius: var(--r-pill); cursor: help; }
+
+/* sales funnel — 4 evenly-spaced steps, nodes joined by a progress rail */
+.funnel { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 2px; }
+.funnelStep { position: relative; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+.funnelStep:not(:first-child)::before {
+  content: ''; position: absolute; top: 6px; left: -50%; width: 100%; height: 2px;
+  background: var(--hairline-strong); border-radius: 2px;
+}
+.funnelStep[data-reached]::before { background: var(--teal); }
+.funnelNode {
+  width: 14px; height: 14px; border-radius: 50%; z-index: 1;
+  background: var(--surface); border: 2px solid var(--hairline-strong); box-sizing: border-box;
+}
+.funnelNode[data-reached] { background: var(--teal); border-color: var(--teal); }
+.funnelNode[data-current] { box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 22%, transparent); }
+.funnelLabel { font-size: 10.5px; color: var(--ink-3); text-align: center; }
+.funnelLabel[data-current] { color: var(--ink-1); font-weight: 600; }
+/* closed-lost: rail/nodes go muted, so the funnel reads 'entered but stalled' */
+.funnel[data-kind="lost"] .funnelStep[data-reached]::before { background: var(--hairline-strong); }
+.funnel[data-kind="lost"] .funnelNode[data-reached] { background: var(--ink-3); border-color: var(--ink-3); }
+.funnel[data-kind="lost"] .funnelNode[data-current] { box-shadow: 0 0 0 4px color-mix(in srgb, var(--coral) 20%, transparent); }
+
+.crmMeta { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; font-size: 12.5px; color: var(--ink-2); }
+.crmStageNow { font-weight: 700; color: var(--ink-1); }
+.crmLost { font-weight: 700; color: var(--coral); }
+.crmOk { color: var(--teal); font-weight: 600; }
+.crmDot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-3); opacity: 0.7; }
+
+/* insurance — servicing people + a context line */
+.crmPeople { display: flex; flex-direction: column; gap: 9px; }
+.crmPeople > .microlabel { color: var(--ink-3); font-size: 9.5px; margin-bottom: 1px; }
+.crmPerson { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
+.crmAvatar {
+  grid-row: 1 / span 2; width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--teal) 16%, var(--surface));
+  color: var(--teal); font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+}
+.crmPersonName { font-size: 13.5px; font-weight: 600; color: var(--ink-1); align-self: end; }
+.crmPersonRole { font-size: 10.5px; color: var(--ink-3); align-self: start; }
+.crmContext { font-size: 12px; color: var(--ink-2); padding-top: 2px; border-top: 1px solid var(--hairline); }
+
 /* ---------- search result ID chip ---------- */
 .idHit {
   display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px;

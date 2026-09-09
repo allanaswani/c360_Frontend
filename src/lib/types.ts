@@ -63,6 +63,44 @@ export interface CustomerBio {
   account_open_date: Metric<string | null>;
 }
 
+export interface CreditBureau {
+  no_hit: boolean;
+  score: number | null;
+  grade: string | null;
+  pd: number | null;
+  pd_band: string | null;
+  non_performing: number;
+  arrears_90_days: number;
+  max_arrears_6m: number;
+  enquiries: number;
+  enquiries_90_days: number;
+  as_of: string | null;
+}
+
+export interface PropertyLeadsCrm {
+  lead_count: number;
+  stage: string;
+  stage_index: number;              // 0..3 position on `funnel`
+  stage_kind: 'active' | 'won' | 'lost';
+  funnel: string[];                 // the pipeline step labels
+  followups: number;
+  followups_successful: number;
+  bridge: string;
+}
+
+export interface InsuranceCrm {
+  risk_manager: string | null;
+  agent: string | null;
+  occupation: string | null;
+  branch: string | null;
+  location: string | null;
+}
+
+export interface CustomerCrm {
+  property_leads?: PropertyLeadsCrm | null;
+  insurance?: InsuranceCrm | null;
+}
+
 export interface CustomerHeader {
   cust_id: string;
   /** One plain-language line composed server-side from the facts on this page. */
@@ -80,6 +118,13 @@ export interface CustomerHeader {
     active: Metric<boolean>;
   };
   bio?: CustomerBio;
+  /** TransUnion credit-bureau record, or null when the customer has no bureau record
+   *  (or it couldn't be read). A real external feed but a point-in-time pull, so `as_of`
+   *  is always shown. `no_hit` = on the bureau but no scoreable history (thin file). */
+  credit_bureau?: CreditBureau | null;
+  /** Subsidiary CRM: property-sales leads (phone-matched) + insurance CRM profile
+   *  (national-ID bridged). Null when the customer has neither. */
+  crm?: CustomerCrm | null;
   risk: {
     risk_class: Metric<string | null>;
     crb_status: Metric<string | null>;
