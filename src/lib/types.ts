@@ -120,6 +120,73 @@ export interface LendingHealth {
   collateral?: CollateralHeld | null;
 }
 
+// --- observability / audit --------------------------------------------------
+export interface ObsSeriesPoint {
+  minute: string;
+  count: number;
+  errors: number;
+  client_errors: number;
+  rps: number;
+  avg_ms: number;
+  p95_ms: number;
+  p99_ms: number;
+  max_ms: number;
+}
+
+export interface ObsSummary {
+  requests: number;
+  errors: number;
+  client_errors: number;
+  error_rate_pct: number;
+  rps_now: number;
+  p95_now_ms: number;
+  p99_now_ms: number;
+  uptime_pct: number;
+  active_users: number;
+  instances: number;
+}
+
+export interface ObsTopRoute {
+  route: string;
+  method: string;
+  count: number;
+  avg_ms: number;
+  errors: number;
+}
+
+export interface AuditRow {
+  id: number;
+  ts: string;
+  user_id: number | null;
+  username: string;
+  kind: string;
+  method: string;
+  route: string;
+  path: string;
+  status: number | null;
+  duration_ms: number | null;
+  target: string;
+  ip: string | null;
+  session: string;
+  meta: Record<string, unknown>;
+}
+
+export interface ObsOverview {
+  generated_at: string;
+  window_minutes: number;
+  summary: ObsSummary;
+  series: ObsSeriesPoint[];
+  top_routes: ObsTopRoute[];
+  recent_errors: AuditRow[];
+}
+
+export interface AuditPage {
+  count: number;
+  limit: number;
+  offset: number;
+  results: AuditRow[];
+}
+
 export interface CustomerHeader {
   cust_id: string;
   /** One plain-language line composed server-side from the facts on this page. */

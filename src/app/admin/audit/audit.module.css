@@ -1,0 +1,75 @@
+/* Audit trail — a dense, precise log table. Monospaced where it aids scanning
+   (time, status, ms, ip). Theme-aware. */
+
+.head { margin: 22px 0 14px; }
+.crumbs { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-3); margin-bottom: 6px; }
+.crumb { color: var(--ink-3); text-decoration: none; }
+.crumb:hover { color: var(--teal); }
+.crumbSep { opacity: 0.5; }
+.title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+.sub { font-size: 12.5px; color: var(--ink-3); margin: 4px 0 0; }
+.inlineLink { color: var(--teal); text-decoration: none; font-weight: 600; }
+.inlineLink:hover { text-decoration: underline; }
+
+.filters { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.search {
+  flex: 1 1 240px; min-width: 200px; height: 34px; padding: 0 12px; font-family: inherit; font-size: 13px;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--r-md); color: var(--ink-1);
+}
+.search:focus { outline: none; border-color: var(--teal); }
+.select, .statusInput {
+  height: 34px; padding: 0 10px; font-family: inherit; font-size: 12.5px;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--r-md); color: var(--ink-1);
+}
+.statusInput { width: 78px; font-family: var(--font-num); }
+.rangeTabs { display: inline-flex; background: var(--surface-2); border-radius: var(--r-pill); padding: 3px; }
+.rangeTab { border: none; background: none; font-family: inherit; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ink-3); padding: 5px 12px; border-radius: var(--r-pill); }
+.rangeTabActive { background: var(--surface); color: var(--ink-1); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.spacer { flex: 1; }
+.count { font-family: var(--font-num); font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+.tableCard { padding: 0; overflow: hidden; }
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.table thead th {
+  text-align: left; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+  color: var(--ink-3); padding: 10px var(--s-4); border-bottom: 1px solid var(--hairline); white-space: nowrap;
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.table tbody td { padding: 8px var(--s-4); border-bottom: 1px solid var(--hairline); vertical-align: middle; white-space: nowrap; }
+.table tbody tr:hover td { background: var(--surface-2); }
+.right { text-align: right; }
+.empty { text-align: center; color: var(--ink-3); padding: 28px 0 !important; }
+
+.timeCell { display: flex; flex-direction: column; line-height: 1.25; }
+.time { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink-1); font-weight: 600; }
+.date { font-size: 10px; color: var(--ink-3); }
+.userCell { color: var(--ink-1); font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+
+.kind {
+  display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: var(--r-pill);
+  background: var(--surface-2); color: var(--ink-2); text-transform: lowercase;
+}
+.kind_api { color: var(--teal); background: color-mix(in srgb, var(--teal) 13%, transparent); }
+.kind_click { color: var(--gold); background: color-mix(in srgb, var(--gold) 15%, transparent); }
+.kind_nav { color: var(--slate); background: color-mix(in srgb, var(--slate) 15%, transparent); }
+.kind_auth { color: #6b5bd2; background: color-mix(in srgb, #6b5bd2 15%, transparent); }
+
+.actionCell { max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.method { font-family: var(--font-num); font-size: 10px; color: var(--teal); font-weight: 700; margin-right: 6px; }
+.route { color: var(--ink-1); }
+.status { font-family: var(--font-num); font-weight: 700; font-size: 11.5px; padding: 2px 7px; border-radius: 4px; }
+.s2 { color: var(--teal); background: color-mix(in srgb, var(--teal) 12%, transparent); }
+.s4 { color: var(--gold); background: color-mix(in srgb, var(--gold) 15%, transparent); }
+.s5 { color: var(--coral); background: color-mix(in srgb, var(--coral) 14%, transparent); }
+.targetCell { color: var(--ink-2); max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.ms { font-family: var(--font-num); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ipCell { font-family: var(--font-num); color: var(--ink-3); font-size: 11.5px; }
+
+.pager { display: flex; gap: 10px; justify-content: flex-end; margin: 14px 0 30px; }
+.pageBtn {
+  height: 34px; padding: 0 16px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--r-md); color: var(--ink-1);
+}
+.pageBtn:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+.pageBtn:disabled { opacity: 0.4; cursor: not-allowed; }

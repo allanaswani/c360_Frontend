@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { asset } from '@/lib/asset';
 import { TopBar } from './TopBar';
+import { TelemetryTracker } from './TelemetryTracker';
 import s from './ui.module.css';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <TelemetryTracker />
       <TopBar />
       {children}
     </div>

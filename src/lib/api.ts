@@ -5,6 +5,7 @@
 // an httpOnly cookie); a leaked token's window is small (rotation + blacklist).
 
 import type {
+  AuditPage,
   CustomerDetail,
   CustomerOverview,
   CustomerSummary,
@@ -13,6 +14,7 @@ import type {
   LinkedParties,
   Meta,
   Metric,
+  ObsOverview,
   PortfolioOverview,
   Recommendations,
   Worklist,
@@ -21,7 +23,7 @@ import type {
 // API base. An explicit env var wins; otherwise target the SAME host the app was
 // opened from (so opening the app on a LAN IP like http://192.168.x.y:3000 talks to
 // the backend at http://192.168.x.y:8000, not the browser's own localhost).
-function apiBase(): string {
+export function apiBase(): string {
   if (process.env.NEXT_PUBLIC_API_BASE) return process.env.NEXT_PUBLIC_API_BASE;
   if (typeof window !== 'undefined') {
     return `${window.location.protocol}//${window.location.hostname}:8000/api`;
@@ -29,6 +31,25 @@ function apiBase(): string {
   return 'http://localhost:8000/api';
 }
 const BASE = apiBase();
+
+/** Fire-and-forget telemetry beacon. NOT routed through request() — no throwing, no
+ *  refresh/retry; uses fetch keepalive so a batch flushed on page-hide still sends, and
+ *  carries the Bearer token (which navigator.sendBeacon cannot). Silent on any failure —
+ *  telemetry must never surface an error to the user. */
+export function sendTelemetry(events: unknown[], keepalive = false): void {
+  if (typeof fetch === 'undefined' || !events.length) return;
+  const access = tokens.access();
+  if (!access) return;
+  try {
+    fetch(`${BASE}/telemetry/collect/`, {
+      method: 'POST', keepalive,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${access}` },
+      body: JSON.stringify({ events }),
+    }).catch(() => {});
+  } catch {
+    /* ignore */
+  }
+}
 
 const ACCESS_KEY = 'c360_access';
 const REFRESH_KEY = 'c360_refresh';
@@ -393,6 +414,11 @@ export const api = {
   roles: () => request<Listing<Role>>('/auth/roles/').then(asList),
   userMeta: () => request<{ branches: string[]; segments: string[] }>('/auth/user-meta/'),
   dataHealth: () => request<DataHealth>('/admin/health/'),
+  // --- observability: ops dashboard + audit trail (admin) ---
+  observability: (windowMin: number) =>
+    request<ObsOverview>(`/observability/overview/?window=${windowMin}`),
+  audit: (query: string) =>
+    request<AuditPage>(`/observability/audit/${query ? `?${query}` : ''}`),
   book: () => request<BookSummary>('/book/'),
 
   // --- data ---
