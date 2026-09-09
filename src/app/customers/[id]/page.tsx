@@ -8,6 +8,7 @@ import { CustomerHeader } from '@/components/CustomerHeader';
 import { BioPanel } from '@/components/BioPanel';
 import { CreditBureauPanel } from '@/components/CreditBureauPanel';
 import { CrmPanel } from '@/components/CrmPanel';
+import { LendingPanel } from '@/components/LendingPanel';
 import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
@@ -144,6 +145,13 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       {detail?.header.crm && (
         <div style={{ marginTop: 12 }}>
           <CrmPanel crm={detail.header.crm} />
+        </div>
+      )}
+
+      {/* Credit standing (NPL/watch) + collateral — shown only when the customer has one. */}
+      {detail?.header.lending && (
+        <div style={{ marginTop: 12 }}>
+          <LendingPanel lending={detail.header.lending} />
         </div>
       )}
 

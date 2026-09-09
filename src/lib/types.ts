@@ -101,6 +101,25 @@ export interface CustomerCrm {
   insurance?: InsuranceCrm | null;
 }
 
+export interface Delinquency {
+  status: 'npl' | 'watch';
+  classification: string;        // Loss | Doubtful | Substandard | Watch
+  severity: number;              // 0 (watch) .. 3 (loss)
+  accounts: number;
+  impairment: number;
+  month: string | null;
+}
+
+export interface CollateralHeld {
+  types: { type: string; count: number }[];
+  distinct: number;
+}
+
+export interface LendingHealth {
+  delinquency?: Delinquency | null;
+  collateral?: CollateralHeld | null;
+}
+
 export interface CustomerHeader {
   cust_id: string;
   /** One plain-language line composed server-side from the facts on this page. */
@@ -125,6 +144,9 @@ export interface CustomerHeader {
   /** Subsidiary CRM: property-sales leads (phone-matched) + insurance CRM profile
    *  (national-ID bridged). Null when the customer has neither. */
   crm?: CustomerCrm | null;
+  /** Lending health — delinquency standing (NPL/watch + impairment) and collateral
+   *  held. Null when the customer has neither. Display-only. */
+  lending?: LendingHealth | null;
   risk: {
     risk_class: Metric<string | null>;
     crb_status: Metric<string | null>;
