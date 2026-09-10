@@ -29,16 +29,27 @@
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-/* stat tiles */
-.tiles {
-  display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin-bottom: 14px;
+/* status strip — the headline numbers, in priority order.
+   One joined surface with a weighted first column, not a row of identical boxes:
+   uptime is the question the board exists to answer, so it is read first and read
+   biggest, and each supporting metric carries its own trend line. */
+.statusStrip {
+  display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr 0.9fr;
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-sm);
+  overflow: hidden; margin-bottom: 14px;
 }
-@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1100px) { .statusStrip { grid-template-columns: 1.3fr 1fr 1fr; } }
+@media (max-width: 640px) { .statusStrip { grid-template-columns: 1fr 1fr; } }
 .tile {
-  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-md);
-  padding: 12px 13px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  padding: 13px 16px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  border-left: 1px solid var(--hairline); border-top: 1px solid var(--hairline);
+  margin: -1px 0 0 -1px;
 }
+.tileLead {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--teal) 6%, var(--surface)), var(--surface));
+}
+.tileValLead { font-size: 30px; }
 .tile .microlabel { color: var(--ink-3); font-size: 9.5px; }
 .tileVal {
   font-family: var(--font-num); font-size: 23px; font-weight: 700; color: var(--ink-1);
@@ -90,3 +101,7 @@
 .status4 { color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, transparent); }
 .errRoute { color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
 .errMeta { color: var(--ink-3); font-size: 11px; white-space: nowrap; }
+
+/* A panel header can carry more than one control (a link plus an export). */
+.panelActions { display: inline-flex; align-items: center; gap: 12px; }
+.panelHead { gap: 12px; flex-wrap: wrap; }

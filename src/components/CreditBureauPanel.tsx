@@ -74,8 +74,9 @@ function CrbStat({ label, value, sub, alert }: { label: string; value: number; s
   );
 }
 
-/** PD band → a signal colour. Lower default risk = teal; higher = coral. */
-function bandTone(band: string | null): string {
+/** PD band → a signal colour. Lower default risk = teal; higher = coral. Shared with
+ *  the signal strip so the folded tile and the open panel never disagree on tone. */
+export function bandTone(band: string | null): string {
   switch (band) {
     case 'Very low':
     case 'Low':

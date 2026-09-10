@@ -5,6 +5,7 @@ import { api, type DataHealth } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
 import { LineSeriesChart } from '@/components/charts/LineSeriesChart';
+import { ExportMenu } from '@/components/ExportMenu';
 import ui from '@/components/ui.module.css';
 import s from './health.module.css';
 
@@ -84,6 +85,31 @@ export default function DataHealthPage() {
           </p>
         </div>
         <div className={s.headSide}>
+          {data && (data.checks ?? []).length > 0 && (
+            <ExportMenu
+              title="Data health"
+              subtitle={data.freshness?.as_of ? `Warehouse as of ${data.freshness.as_of}` : 'Warehouse source checks'}
+              count={data.checks.length}
+              source={{
+                kind: 'rows',
+                build: () => ({
+                  title: 'Data health',
+                  subtitle: data.freshness?.as_of ? `Warehouse as of ${data.freshness.as_of}` : undefined,
+                  columns: [
+                    { key: 'group', label: 'Group' },
+                    { key: 'label', label: 'Check' },
+                    { key: 'table', label: 'Table' },
+                    { key: 'status', label: 'Status' },
+                    { key: 'value', label: 'Value', type: 'num' },
+                    { key: 'delta_pct', label: 'Change vs last', type: 'pct' },
+                    { key: 'latency_ms', label: 'Latency', type: 'ms' },
+                    { key: 'detail', label: 'Detail' },
+                  ],
+                  rows: data.checks as unknown as Record<string, unknown>[],
+                }),
+              }}
+            />
+          )}
           <button className={s.refreshBtn} onClick={load} disabled={loading}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 12a9 9 0 1 1-2.6-6.4" /><path d="M21 3v6h-6" />
@@ -145,8 +171,17 @@ export default function DataHealthPage() {
 
           {freshTrend.length >= 2 && (
             <div className={ui.card} style={{ marginTop: 16, padding: 16 }}>
-              <div className={s.trendHead}>Freshness trend</div>
-              <div className={s.trendSub}>Days behind the live warehouse close, over recent checks.</div>
+              <div className={s.trendTop}>
+                <div>
+                  <div className={s.trendHead}>Freshness trend</div>
+                  <div className={s.trendSub}>Days behind the live warehouse close, over recent checks.</div>
+                </div>
+                <ExportMenu
+                  title="Data-health history"
+                  subtitle="Stored snapshots, oldest first"
+                  source={{ kind: 'server', dataset: 'health_history', params: {} }}
+                />
+              </div>
               <LineSeriesChart
                 data={freshTrend}
                 series={[{ name: 'Days behind', dataKey: 'days', colorRole: 1 }]}

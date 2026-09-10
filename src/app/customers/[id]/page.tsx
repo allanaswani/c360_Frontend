@@ -5,10 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
-import { BioPanel } from '@/components/BioPanel';
-import { CreditBureauPanel } from '@/components/CreditBureauPanel';
-import { CrmPanel } from '@/components/CrmPanel';
-import { LendingPanel } from '@/components/LendingPanel';
+import { SignalStrip } from '@/components/SignalStrip';
 import { LinkedParties } from '@/components/LinkedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
@@ -124,34 +121,18 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         <Skeleton height={168} radius={12} />
       )}
 
-      {/* Full identification block docked directly under the hero — one aligned grid,
-          full width, rather than a narrow card tucked in the rail. */}
-      {detail?.header.bio && (
+      {/* Standing signals — bureau score, credit classification, collateral, CRM funnel,
+          servicing RM and identification — as one dense row docked under the hero. Each
+          tile shows its answer on the face and opens its full panel in place; stacking
+          these as four full-width cards buried the score and the RM below the fold. */}
+      {detail && (
         <div style={{ marginTop: 12 }}>
-          <BioPanel bio={detail.header.bio} />
-        </div>
-      )}
-
-      {/* Credit bureau (CRB) — shown only when the customer has a bureau record. Real
-          external feed, point-in-time; the card states its own pull date. */}
-      {detail?.header.credit_bureau && (
-        <div style={{ marginTop: 12 }}>
-          <CreditBureauPanel bureau={detail.header.credit_bureau} />
-        </div>
-      )}
-
-      {/* Subsidiary CRM — property-sales leads and/or insurance servicing. Shown only
-          when the customer has a matched record. */}
-      {detail?.header.crm && (
-        <div style={{ marginTop: 12 }}>
-          <CrmPanel crm={detail.header.crm} />
-        </div>
-      )}
-
-      {/* Credit standing (NPL/watch) + collateral — shown only when the customer has one. */}
-      {detail?.header.lending && (
-        <div style={{ marginTop: 12 }}>
-          <LendingPanel lending={detail.header.lending} />
+          <SignalStrip
+            bio={detail.header.bio}
+            bureau={detail.header.credit_bureau}
+            crm={detail.header.crm}
+            lending={detail.header.lending}
+          />
         </div>
       )}
 

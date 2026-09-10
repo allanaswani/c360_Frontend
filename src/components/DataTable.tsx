@@ -2,7 +2,9 @@ import type { DomainTable, TableBlock } from '@/lib/types';
 import { kesFull, pct, shortDate } from '@/lib/format';
 import s from './ui.module.css';
 
-const HEADERS: Record<string, string> = {
+/** Column labels, shared with the export so a downloaded file reads like the
+ *  table it came from. */
+export const HEADERS: Record<string, string> = {
   product: 'Product', account_no: 'Account', balance: 'Balance', status: 'Status',
   date: 'Date', description: 'Description', channel: 'Channel', amount: 'Amount',
   project: 'Project', unit: 'Unit', value: 'Value', loan_balance: 'Loan balance', ltv: 'LTV',

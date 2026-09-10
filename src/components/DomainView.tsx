@@ -4,7 +4,8 @@ import type { DomainChart, DomainMetric, DomainPayload } from '@/lib/types';
 import { fmtValue } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
-import { DataTable } from './DataTable';
+import { DataTable, HEADERS } from './DataTable';
+import { TableExport } from './ExportMenu';
 import { EmptyState, Skeleton, UnavailableState } from './States';
 import { LineSeriesChart } from './charts/LineSeriesChart';
 import { BarsChart } from './charts/BarsChart';
@@ -67,7 +68,8 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
       </div>
       <div className={ui.chartGrid}>
         {payload.tables.map((t) => (
-          <Card key={t.id} title={t.title} status={t.status} note={t.note}>
+          <Card key={t.id} title={t.title} status={t.status} note={t.note}
+                right={<TableExport title={t.title} block={t} headers={HEADERS} />}>
             <DataTable block={t} />
           </Card>
         ))}
