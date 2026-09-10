@@ -16,7 +16,12 @@ const BIO_OPEN_KEY = 'c360.bio.open';
  *  folded until asked for. The open/closed choice is remembered (localStorage) so it
  *  doesn't spring back open on every customer. First render is always closed to match
  *  the server; the stored preference is applied on mount to avoid a hydration mismatch. */
-export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
+export function BioPanel({ bio, embedded }: {
+  bio: CustomerBio | undefined;
+  /** Rendered inside the signal strip's open tile: the tile is already the toggle and
+   *  already names the section, so drop this card's own header and stay open. */
+  embedded?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     try {
@@ -54,6 +59,19 @@ export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
 
   if (items.length === 0) return null;
 
+  const grid = (
+    <dl className={s.bioGrid}>
+      {items.map((i) => (
+        <div key={i.label} className={s.bioItem}>
+          <dt className="microlabel">{i.label}</dt>
+          <dd className={s.bioVal}>{i.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
+  if (embedded) return grid;
+
   return (
     <div className={`${s.card} ${s.bioCard} fadeUp`}>
       <button className={s.bioHead} onClick={toggle} aria-expanded={open}>
@@ -67,16 +85,7 @@ export function BioPanel({ bio }: { bio: CustomerBio | undefined }) {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
         </span>
       </button>
-      {open && (
-        <dl className={s.bioGrid}>
-          {items.map((i) => (
-            <div key={i.label} className={s.bioItem}>
-              <dt className="microlabel">{i.label}</dt>
-              <dd className={s.bioVal}>{i.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      {open && grid}
     </div>
   );
 }

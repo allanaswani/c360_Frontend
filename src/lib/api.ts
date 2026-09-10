@@ -6,6 +6,7 @@
 
 import type {
   AuditPage,
+  ChangePage,
   CustomerDetail,
   CustomerOverview,
   CustomerSummary,
@@ -419,6 +420,10 @@ export const api = {
     request<ObsOverview>(`/observability/overview/?window=${windowMin}`),
   audit: (query: string) =>
     request<AuditPage>(`/observability/audit/${query ? `?${query}` : ''}`),
+  // Change audit — who altered an account, role, RM allocation or feedback label,
+  // with the before → after diff. The companion to `audit` (which records access).
+  changes: (query: string) =>
+    request<ChangePage>(`/observability/changes/${query ? `?${query}` : ''}`),
   book: () => request<BookSummary>('/book/'),
 
   // --- data ---

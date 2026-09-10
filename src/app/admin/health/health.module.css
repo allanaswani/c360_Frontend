@@ -75,3 +75,8 @@
   .row { flex-wrap: wrap; }
   .rowDetail { text-align: left; flex-basis: 100%; }
 }
+
+/* The trend card's header carries its own export, so the snapshots behind the
+   line can leave the page as numbers. */
+.trendTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+.headSide { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

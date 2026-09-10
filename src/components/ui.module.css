@@ -178,6 +178,109 @@
 .riskChipVal { font-weight: 600; color: #fff; font-size: 14px; }
 .riskChipPending { color: var(--gold); font-weight: 600; font-size: 13px; }
 
+/* ---------- export control ----------
+   One button per table, three formats behind it. Sized to sit inline in a filter
+   bar or a panel header without becoming the loudest thing on the screen. */
+.exportWrap { position: relative; display: inline-flex; }
+.exportBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 11px 7px 10px; border-radius: var(--r-md);
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-2);
+  font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+.exportBtn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--teal) 45%, var(--hairline));
+  color: var(--teal); background: color-mix(in srgb, var(--teal) 5%, var(--surface));
+}
+.exportBtn:disabled { opacity: 0.6; cursor: default; }
+.exportCaret { opacity: 0.55; }
+.exportSpinner {
+  width: 13px; height: 13px; border-radius: 50%; flex: none;
+  border: 2px solid color-mix(in srgb, var(--teal) 25%, transparent);
+  border-top-color: var(--teal); animation: exportSpin 620ms linear infinite;
+}
+@keyframes exportSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .exportSpinner { animation-duration: 2s; } }
+
+.exportMenu {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 40; min-width: 208px;
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--r-md); box-shadow: var(--shadow-md); overflow: hidden;
+  animation: exportIn 130ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes exportIn { from { opacity: 0; transform: translateY(-4px); } }
+.exportMenuHead {
+  padding: 8px 12px; font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ink-3); background: color-mix(in srgb, var(--ink-3) 5%, transparent);
+  border-bottom: 1px solid var(--hairline);
+}
+.exportAll { text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.exportItem {
+  width: 100%; display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding: 9px 12px; background: none; border: none; border-bottom: 1px solid var(--hairline);
+  font-family: inherit; text-align: left; cursor: pointer; color: var(--ink-1);
+}
+.exportItem:last-child { border-bottom: none; }
+.exportItem:hover:not(:disabled) { background: color-mix(in srgb, var(--teal) 7%, transparent); }
+.exportItem:disabled { opacity: 0.5; cursor: default; }
+.exportItemLabel { font-size: 13px; font-weight: 600; }
+.exportItemNote { font-size: 11px; color: var(--ink-3); }
+.exportError {
+  padding: 9px 12px; font-size: 11.5px; color: var(--coral);
+  border-top: 1px solid var(--hairline);
+  background: color-mix(in srgb, var(--coral) 7%, transparent);
+}
+
+/* ---------- signal strip (bureau, standing, collateral, CRM, identification) ----------
+   One dense row docked under the hero. Every tile answers its own question on the face
+   (score, stage, collateral type, servicing RM) so the strip reads without a click; the
+   click opens that tile's full panel inside the same card, so the detail arrives in
+   place instead of as a fifth stacked card below the fold. */
+.sigCard { padding: 0; overflow: hidden; }
+.sigRow { display: flex; flex-wrap: wrap; }
+.sigTile {
+  position: relative; flex: 1 1 170px; min-width: 170px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 11px 28px 12px var(--s-4);
+  background: none; border: none; border-left: 1px solid var(--hairline);
+  font-family: inherit; color: var(--ink-1); text-align: left; cursor: pointer;
+  transition: background 140ms ease;
+}
+.sigTile:first-child { border-left: none; }
+.sigTile:hover { background: color-mix(in srgb, var(--teal) 5%, transparent); }
+.sigTile[data-open='true'] { background: color-mix(in srgb, var(--teal) 8%, transparent); }
+/* The open tile is tied to the panel beneath it by a teal edge, so a wrapped strip still
+   shows which tile the open detail belongs to. */
+.sigTile[data-open='true']::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--teal);
+}
+.sigLabel { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); }
+.sigLabel svg { color: var(--teal); opacity: 0.8; flex: none; }
+.sigVal {
+  display: inline-flex; align-items: baseline; gap: 7px;
+  font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-1);
+}
+.sigValNum {
+  font-family: var(--font-num); font-size: 21px; font-weight: 700; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.sigGrade {
+  font-size: 10.5px; font-weight: 600; padding: 1.5px 7px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ink-3) 15%, transparent); color: var(--ink-2);
+}
+.sigSub { font-size: 11.5px; color: var(--ink-3); line-height: 1.35; }
+.sigChev { position: absolute; right: 10px; top: 13px; color: var(--ink-3); opacity: 0.5; display: inline-flex; transition: transform 160ms ease, opacity 140ms ease; }
+.sigTile:hover .sigChev { opacity: 0.9; }
+.sigTile[data-open='true'] .sigChev { transform: rotate(180deg); opacity: 1; }
+.sigPanel { border-top: 1px solid var(--hairline); }
+/* The panels keep their own heads (they carry the source and pull date) but shed their
+   card frame — inside the strip they are one continuous surface, not a nested card. */
+.sigPanel .card { border: none; box-shadow: none; border-radius: 0; }
+.sigPanel .card:hover { box-shadow: none; transform: none; border-color: transparent; }
+/* The embedded bio grid draws its own top rule; the strip already has one. */
+.sigPanel .bioGrid { border-top: none; }
+
 /* ---------- bio & identification ---------- */
 .bioCard { padding: 0; overflow: hidden; }
 .bioHead {

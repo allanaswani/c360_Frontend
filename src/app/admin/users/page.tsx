@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, type AdminUser, type NewUser, type Role } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
+import { ExportMenu } from '@/components/ExportMenu';
 import ui from '@/components/ui.module.css';
 import s from './admin.module.css';
 
@@ -87,6 +88,49 @@ export default function UsersAdminPage() {
         <input className={s.search} placeholder="Search by name, username or email…"
           value={search} onChange={(e) => setSearch(e.target.value)} />
         {users && <span style={{ color: 'var(--ink-3)', fontSize: 13 }}>{users.length} users</span>}
+        <span style={{ flex: 1 }} />
+        {/* The access register: who holds an account, what role, and which book.
+            Exported from the rows on screen — this list is not paginated. */}
+        {users && users.length > 0 && (
+          <ExportMenu
+            title="Users and access"
+            subtitle={search ? `Filtered by “${search}”` : 'All accounts'}
+            count={users.length}
+            source={{
+              kind: 'rows',
+              build: () => ({
+                title: 'Users and access',
+                subtitle: search ? `Filtered by “${search}”` : 'All accounts',
+                columns: [
+                  { key: 'username', label: 'Username' },
+                  { key: 'full_name', label: 'Name' },
+                  { key: 'email', label: 'Email' },
+                  { key: 'roles', label: 'Roles' },
+                  { key: 'role_tier', label: 'Tier' },
+                  { key: 'branch', label: 'Branch' },
+                  { key: 'segment', label: 'Segment' },
+                  { key: 'sales_code', label: 'Sales code' },
+                  { key: 'status', label: 'Status' },
+                  { key: 'last_login', label: 'Last login', type: 'datetime' },
+                  { key: 'date_joined', label: 'Created', type: 'datetime' },
+                ],
+                rows: users.map((u) => ({
+                  username: u.username,
+                  full_name: [u.first_name, u.last_name].filter(Boolean).join(' '),
+                  email: u.email,
+                  roles: (u.groups ?? []).join(', '),
+                  role_tier: u.role_tier,
+                  branch: u.branch ?? '',
+                  segment: u.segment ?? '',
+                  sales_code: u.sales_code ?? '',
+                  status: u.is_active ? 'Active' : 'Deactivated',
+                  last_login: u.last_login ?? '',
+                  date_joined: u.date_joined ?? '',
+                })),
+              }),
+            }}
+          />
+        )}
       </div>
 
       {error ? (

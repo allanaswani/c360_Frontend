@@ -187,6 +187,50 @@ export interface AuditPage {
   results: AuditRow[];
 }
 
+/** One field that moved, in a recorded change. */
+export interface FieldChange {
+  field: string;
+  label: string;
+  old: string | null;
+  new: string | null;
+}
+
+/** One recorded create / update / delete on something this app can alter —
+ *  an account, a role, an RM's book, a recommendation outcome. */
+export interface ChangeRow {
+  id: string;
+  app_label: string;
+  model: string;
+  model_label: string;
+  object_id: number | string | null;
+  object_label: string;
+  action: 'created' | 'updated' | 'deleted' | string;
+  action_code: '+' | '~' | '-' | string;
+  user: string | null;
+  username: string | null;
+  /** The actor was a portfolio SSO identity with no local account. The name is
+   *  real; it just can't be linked to a user record here. */
+  external_actor: boolean;
+  reason: string;
+  when: string;
+  changes: FieldChange[];
+  /** An update where no tracked field actually differed. */
+  no_op: boolean;
+}
+
+export interface ChangePage {
+  count: number;
+  limit: number;
+  results: ChangeRow[];
+  summary: {
+    by_action: { created: number; updated: number; deleted: number };
+    by_model: { model: string; count: number }[];
+    total: number;
+    actors: number;
+  };
+  models: { model: string; label: string }[];
+}
+
 export interface CustomerHeader {
   cust_id: string;
   /** One plain-language line composed server-side from the facts on this page. */

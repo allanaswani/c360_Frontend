@@ -73,3 +73,119 @@
 }
 .pageBtn:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
 .pageBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- head layout with the export control ---------- */
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.headRight { display: flex; align-items: center; gap: 10px; padding-top: 20px; }
+
+/* ---------- the two trails ----------
+   Activity answers "what was accessed", Changes answers "what was altered". They
+   are different questions with different shapes, so they are tabs rather than one
+   merged list that would serve neither well. */
+.trailTabs { display: flex; gap: 4px; border-bottom: 1px solid var(--hairline); margin-bottom: 14px; }
+.trailTab {
+  display: flex; flex-direction: column; gap: 1px; align-items: flex-start;
+  padding: 8px 14px 10px; background: none; border: none; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; font-family: inherit; cursor: pointer; color: var(--ink-3);
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.trailTab:hover { color: var(--ink-1); }
+.trailTabActive { color: var(--ink-1); border-bottom-color: var(--teal); }
+.trailTabLabel { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; }
+.trailTabNote { font-size: 11px; color: var(--ink-3); }
+.trailBadge {
+  font-family: var(--font-num); font-size: 10.5px; font-weight: 700; padding: 1px 6px;
+  border-radius: var(--r-pill); background: color-mix(in srgb, var(--teal) 14%, transparent);
+  color: var(--teal); font-variant-numeric: tabular-nums;
+}
+
+/* ---------- change summary strip ---------- */
+.summaryStrip {
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-sm); margin-bottom: 12px; overflow: hidden;
+}
+.summaryItem {
+  display: flex; flex-direction: column; gap: 2px; padding: 10px 18px;
+  border-right: 1px solid var(--hairline); min-width: 92px;
+}
+.summaryVal {
+  font-family: var(--font-num); font-size: 20px; font-weight: 700; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums; color: var(--ink-1);
+}
+.summaryVal[data-tone='teal'] { color: var(--teal); }
+.summaryVal[data-tone='coral'] { color: var(--coral); }
+.summaryModels { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 18px; flex: 1; }
+.summaryChip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2);
+  background: var(--surface-2); border-radius: var(--r-pill); padding: 3px 10px;
+}
+.summaryChip b { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink-1); }
+.summaryNone { font-size: 12px; color: var(--ink-3); }
+
+/* ---------- change feed ----------
+   One entry per recorded change; the field diffs sit inside it. A table row would
+   force either a truncated diff or one edit exploded across six rows. */
+.changeFeed { display: flex; flex-direction: column; gap: 8px; margin-bottom: 30px; }
+.change { padding: 0; overflow: hidden; }
+.change[data-action='-'] { border-left: 3px solid var(--coral); }
+.change[data-action='+'] { border-left: 3px solid var(--teal); }
+.change[data-action='~'] { border-left: 3px solid var(--slate); }
+.changeHead {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 16px; border-bottom: 1px solid var(--hairline);
+}
+.changeAction {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink-2);
+}
+.changeAction[data-action='+'] { color: var(--teal); background: color-mix(in srgb, var(--teal) 13%, transparent); }
+.changeAction[data-action='-'] { color: var(--coral); background: color-mix(in srgb, var(--coral) 13%, transparent); }
+.changeModel { font-size: 12px; color: var(--ink-3); }
+.changeObject {
+  font-size: 13.5px; font-weight: 600; color: var(--ink-1);
+  max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.changeSpacer { flex: 1; }
+.changeWho { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.changeExternal {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 1.5px 6px; border-radius: var(--r-pill);
+  color: var(--slate); background: color-mix(in srgb, var(--slate) 15%, transparent);
+}
+.changeWhen {
+  display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2;
+  font-family: var(--font-num); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2);
+}
+.changeDate { font-size: 10px; color: var(--ink-3); }
+
+.diffList { list-style: none; margin: 0; padding: 4px 0; }
+.diffRow {
+  display: grid; grid-template-columns: minmax(120px, 190px) 1fr auto 1fr;
+  align-items: center; gap: 10px; padding: 7px 16px; font-size: 12.5px;
+  border-bottom: 1px solid color-mix(in srgb, var(--hairline) 55%, transparent);
+}
+.diffRow:last-child { border-bottom: none; }
+.diffField { color: var(--ink-3); font-weight: 600; }
+.diffOld {
+  color: var(--ink-3); text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--coral) 55%, transparent);
+  overflow: hidden; text-overflow: ellipsis;
+}
+.diffArrow { color: var(--ink-3); opacity: 0.6; flex: none; }
+.diffNew { color: var(--ink-1); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.changeNote { padding: 9px 16px; font-size: 12px; color: var(--ink-3); }
+.changeReason { padding: 0 16px 10px; font-size: 12px; color: var(--ink-2); font-style: italic; }
+
+.emptyPanel {
+  display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;
+  padding: 40px 24px; color: var(--ink-3); font-size: 12.5px; line-height: 1.6;
+}
+.emptyPanel b { color: var(--ink-1); font-size: 14px; }
+.emptyPanel span { max-width: 52ch; }
+
+@media (max-width: 720px) {
+  .diffRow { grid-template-columns: 1fr; gap: 2px; }
+  .diffArrow { display: none; }
+  .diffOld { text-align: left; }
+}

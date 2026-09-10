@@ -4,7 +4,8 @@ import type { HFCBDomain } from '@/lib/types';
 import { count, kes } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
-import { DataTable } from './DataTable';
+import { DataTable, HEADERS } from './DataTable';
+import { TableExport } from './ExportMenu';
 import { DisbursementBalance } from './charts/DisbursementBalance';
 import { LineSeriesChart } from './charts/LineSeriesChart';
 import { TransactionTrend } from './charts/TransactionTrend';
@@ -129,10 +130,12 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
       </div>
 
       <div className={ui.chartGrid}>
-        <Card title="Product uptake" status={domain.tables.product_uptake.status}>
+        <Card title="Product uptake" status={domain.tables.product_uptake.status}
+              right={<TableExport title="Product uptake" block={domain.tables.product_uptake} headers={HEADERS} />}>
           <DataTable block={domain.tables.product_uptake} />
         </Card>
-        <Card title="Recent transactions" status={domain.tables.recent_transactions.status} note={domain.tables.recent_transactions.note}>
+        <Card title="Recent transactions" status={domain.tables.recent_transactions.status} note={domain.tables.recent_transactions.note}
+              right={<TableExport title="Recent transactions" block={domain.tables.recent_transactions} headers={HEADERS} />}>
           <DataTable block={domain.tables.recent_transactions} />
         </Card>
       </div>
