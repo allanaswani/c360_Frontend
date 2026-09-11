@@ -296,7 +296,15 @@ export interface BookSummary {
 }
 export interface DataHealth {
   data_mode: 'mock' | 'live';
-  freshness: { as_of: string | null; days_behind: number | null; status: 'ok' | 'stale' | 'error'; detail?: string } | null;
+  freshness: {
+    as_of: string | null;
+    days_behind: number | null;
+    status: 'ok' | 'stale' | 'error';
+    detail?: string;
+    /** The lag the backend treats as stale — the same threshold the alert emails
+     *  use, sent so the page cannot describe freshness by a different rule. */
+    stale_after_days?: number;
+  } | null;
   checks: HealthCheck[];
   history?: HealthPoint[];
   note?: string;

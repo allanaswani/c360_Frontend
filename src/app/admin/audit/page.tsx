@@ -237,6 +237,7 @@ function TrailTab({ active, onClick, label, note, badge }: {
 }) {
   return (
     <button role="tab" aria-selected={active} onClick={onClick}
+            aria-label={`${label} trail`}
             className={`${s.trailTab} ${active ? s.trailTabActive : ''}`}>
       <span className={s.trailTabLabel}>
         {label}
@@ -306,9 +307,12 @@ function ActivityRow({ e }: { e: AuditRow }) {
       </td>
       <td className={s.userCell}>{e.username || (e.user_id != null ? `#${e.user_id}` : '—')}</td>
       <td><span className={`${s.kind} ${s['kind_' + e.kind] || ''}`}>{e.kind}</span></td>
+      {/* An API call's action is its route; a click's action is WHERE it happened,
+          and the label of what was clicked belongs in Target. Falling back to the
+          target here printed the same string in both columns for every click. */}
       <td className={s.actionCell}>
         {e.method && <b className={s.method}>{e.method}</b>}
-        <span className={s.route}>{e.route || e.target || '—'}</span>
+        <span className={s.route}>{e.route || e.path || '—'}</span>
       </td>
       <td className={s.right}>
         {e.status != null && (

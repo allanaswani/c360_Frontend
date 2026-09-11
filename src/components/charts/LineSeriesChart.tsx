@@ -9,13 +9,17 @@ interface S { name: string; dataKey: string; colorRole: number }
 /** Generic 1–2 series line/area chart on a shared axis (never dual-axis). Used for
  *  balance trends, activity, and profitability across domains. */
 export function LineSeriesChart({
-  data, series, fmt, xKey = 'period', height = 170,
+  data, series, fmt, xKey = 'period', height = 170, wholeNumbers = false,
 }: {
   data: Record<string, number | string>[];
   series: S[];
   fmt: 'kes' | 'count' | 'pct';
   xKey?: string;
   height?: number;
+  /** Suppress fractional y-ticks for a quantity that only comes in whole units.
+   *  "2.25 days behind a daily bank close" is not a value that can exist, and an
+   *  axis that offers it makes the reader doubt the number that is real. */
+  wholeNumbers?: boolean;
 }) {
   const colors = series.map((s) => seriesColor(s.colorRole));
   const tickFmt = xKey === 'period' ? axisDateFormatter(data, xKey) : (v: unknown) => String(v);
@@ -33,7 +37,9 @@ export function LineSeriesChart({
           </defs>
           <CartesianGrid vertical={false} />
           <XAxis dataKey={xKey} tickFormatter={(v) => tickFmt(v)} tickLine={false} axisLine={false} minTickGap={38} dy={6} />
-          <YAxis tickFormatter={(v) => fmtValue(Number(v), fmt)} tickLine={false} axisLine={false} width={fmt === 'kes' ? 52 : 34} dx={-2} />
+          <YAxis tickFormatter={(v) => fmtValue(Number(v), fmt)} tickLine={false} axisLine={false}
+                 width={fmt === 'kes' ? 52 : 34} dx={-2}
+                 {...(wholeNumbers ? { allowDecimals: false } : {})} />
           <Tooltip cursor={{ stroke: 'var(--hairline-strong)', strokeWidth: 1 }} content={<T series={series} colors={colors} fmt={fmt} xKey={xKey} />} />
           {series.map((s) => (
             <Area key={`a-${s.dataKey}`} type="monotone" dataKey={s.dataKey} stroke="none" fill={`url(#g-${s.dataKey})`} isAnimationActive animationDuration={1000} animationEasing="ease-out" />

@@ -79,9 +79,7 @@ export default function DataHealthPage() {
           <div className="microlabel" style={{ color: 'var(--teal)' }}>Operations</div>
           <h1 className={s.title}>Data health</h1>
           <p className={s.lede}>
-            Live view of the warehouse Customer&nbsp;360 reads from — how fresh it is, and whether each
-            source the app depends on is reachable and populated. This is where a stale date or an emptied
-            table shows up first.
+            How fresh the warehouse is, and whether every source the app reads is reachable and populated.
           </p>
         </div>
         <div className={s.headSide}>
@@ -132,42 +130,40 @@ export default function DataHealthPage() {
         </div>
       ) : (
         <>
+          {/* Verdict, counts and the as-of date on ONE bar. These were two stacked
+              cards, each a single line of content in a tall box — the bank date is
+              part of "is the data healthy", not a separate question. */}
           {(() => {
             const o = overallStatus(data);
+            const f = data.freshness;
             return (
-              <div className={`${s.summary} ${s[`summary_${o.key}`]}`}>
-                <span className={s.summaryWord}>{o.word}</span>
-                <div className={s.summaryCounts}>
-                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.ok}</span><span className={s.summaryStatL}>Healthy</span></div>
-                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.warn}</span><span className={s.summaryStatL}>Attention</span></div>
-                  <div className={s.summaryStat}><span className={s.summaryStatN}>{o.counts.down}</span><span className={s.summaryStatL}>Down</span></div>
+              <div className={`${s.statusBar} ${s[`summary_${o.key}`]}`}>
+                <div className={s.statusVerdict}>
+                  <span className={s.statusDot} data-key={o.key} />
+                  <span className={s.summaryWord}>{o.word}</span>
                 </div>
+                <div className={s.statusCounts}>
+                  <Count n={o.counts.ok} label="Healthy" />
+                  <Count n={o.counts.warn} label="Attention" tone={o.counts.warn ? 'warn' : undefined} />
+                  <Count n={o.counts.down} label="Down" tone={o.counts.down ? 'bad' : undefined} />
+                </div>
+                {f && (
+                  <div className={s.statusFresh}>
+                    <span className="microlabel">Data as of (bank close)</span>
+                    <div className={s.statusFreshRow}>
+                      <span className={s.freshDate}>
+                        {f.as_of
+                          ? new Date(f.as_of).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                          : '—'}
+                      </span>
+                      <StatusPill status={f.status} />
+                    </div>
+                    <span className={s.freshSub}>{freshnessWording(f)}</span>
+                  </div>
+                )}
               </div>
             );
           })()}
-
-          {data.freshness && (
-            <div className={`${s.freshCard} ${s[`fresh_${data.freshness.status}`] ?? ''}`}>
-              <div>
-                <span className="microlabel">Data as of (bank close)</span>
-                <div className={s.freshDate}>
-                  {data.freshness.as_of
-                    ? new Date(data.freshness.as_of).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
-                    : '—'}
-                </div>
-              </div>
-              <div className={s.freshRight}>
-                <StatusPill status={data.freshness.status} />
-                <div className={s.freshSub}>
-                  {data.freshness.days_behind == null
-                    ? (data.freshness.detail ?? 'freshness unknown')
-                    : data.freshness.days_behind <= 1
-                      ? 'Up to date'
-                      : `${data.freshness.days_behind} days behind — the warehouse close hasn’t advanced`}
-                </div>
-              </div>
-            </div>
-          )}
 
           {freshTrend.length >= 2 && (
             <div className={ui.card} style={{ marginTop: 16, padding: 16 }}>
@@ -188,6 +184,7 @@ export default function DataHealthPage() {
                 fmt="count"
                 xKey="t"
                 height={150}
+                wholeNumbers
               />
             </div>
           )}
@@ -232,6 +229,32 @@ export default function DataHealthPage() {
         </>
       )}
     </main>
+  );
+}
+
+/** What to say about the as-of date, keyed off the status the backend decided.
+ *
+ *  A bank close legitimately sits a day or two back, and further over a weekend or a
+ *  public holiday, so a lag is only news once it passes the staleness threshold —
+ *  the same one the alert emails use (C360_ALERT_DATA_STALE_DAYS). */
+function freshnessWording(f: { days_behind: number | null; status: string; detail?: string; stale_after_days?: number }): string {
+  if (f.days_behind == null) return f.detail ?? 'freshness unknown';
+  const days = f.days_behind;
+  const plural = days === 1 ? 'day' : 'days';
+  if (f.status === 'stale') {
+    return `${days} ${plural} behind — past the ${f.stale_after_days ?? 3}-day threshold; the close has stopped advancing`;
+  }
+  if (days <= 0) return 'Up to date — today’s close';
+  if (days === 1) return 'Up to date — yesterday’s close';
+  return `${days} ${plural} behind — within the normal close lag`;
+}
+
+function Count({ n, label, tone }: { n: number; label: string; tone?: 'warn' | 'bad' }) {
+  return (
+    <div className={s.statusStat}>
+      <span className={s.statusStatN} data-tone={tone}>{n}</span>
+      <span className={s.summaryStatL}>{label}</span>
+    </div>
   );
 }
 

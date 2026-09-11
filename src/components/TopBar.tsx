@@ -71,7 +71,10 @@ function UserMenu() {
   const code = user.profile.sales_code;
   return (
     <div className={s.userWrap} onMouseLeave={() => setOpen(false)}>
-      <button className={s.userChip} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      {/* data-track: without it the audit logs the chip's whole inner text —
+          initials, name and role run together as one string. */}
+      <button className={s.userChip} data-track="Account menu"
+              onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className={s.userAvatar}>{initials(user.name)}</span>
         <span className={s.userChipMeta}>
           <span className={s.userChipName}>{user.name}</span>
