@@ -189,3 +189,33 @@
   .diffArrow { display: none; }
   .diffOld { text-align: left; }
 }
+
+/* ---------- activity column widths ----------
+   The table had no column sizing at all, so the browser distributed width by
+   content: Time, Kind, Status, ms and IP each claimed as much as Action, and the
+   two columns that carry the meaning — the route and what was clicked — were
+   squeezed into a fraction of the width and truncated.
+
+   Fixed widths on the narrow, known-size columns (a timestamp and a status code
+   do not vary), and the remaining space split between Action and Target. */
+.activityTable { table-layout: fixed; width: 100%; }
+.colTime   { width: 92px; }
+.colUser   { width: 132px; }
+.colKind   { width: 74px; }
+.colAction { width: auto; min-width: 280px; }
+.colStatus { width: 66px; }
+.colTarget { width: auto; min-width: 200px; }
+.colMs     { width: 62px; }
+.colIp     { width: 108px; }
+
+/* Truncation now belongs to the column, not a per-cell max-width guess. */
+.actionCell, .targetCell, .userCell, .ipCell {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: none;
+}
+.actionCell { color: var(--ink-1); }
+
+@media (max-width: 1180px) {
+  /* Below this the fixed layout starts truncating the route, which is the column
+     worth reading. Let the table scroll horizontally instead. */
+  .activityTable { table-layout: auto; min-width: 1100px; }
+}

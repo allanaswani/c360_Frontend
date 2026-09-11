@@ -248,12 +248,17 @@ function ActivityTable({ data, offset, onOffset }: {
       <Panel flush>
         {!data ? <Skeleton height={300} radius={12} /> : (
           <div className={a.tableWrap}>
-            <table className={a.table}>
+            <table className={`${a.table} ${s.activityTable}`}>
               <thead>
                 <tr>
-                  <th>Time</th><th>User</th><th>Kind</th><th>Action</th>
-                  <th className={a.num}>Status</th><th>Target</th>
-                  <th className={a.num}>ms</th><th>IP</th>
+                  <th className={s.colTime}>Time</th>
+                  <th className={s.colUser}>User</th>
+                  <th className={s.colKind}>Kind</th>
+                  <th className={s.colAction}>Action</th>
+                  <th className={`${a.num} ${s.colStatus}`}>Status</th>
+                  <th className={s.colTarget}>Target</th>
+                  <th className={`${a.num} ${s.colMs}`}>ms</th>
+                  <th className={s.colIp}>IP</th>
                 </tr>
               </thead>
               <tbody>
