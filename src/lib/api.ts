@@ -77,7 +77,37 @@ export const tokens = {
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
   },
+  /** True when the access token's own `exp` has already passed.
+   *
+   *  Read locally, before spending a round trip on a token we can already see is
+   *  dead. This is what rescues a session adopted from the portfolio's cookie: that
+   *  cookie lives seven days in the browser while the access token inside it lasts
+   *  about thirty minutes, so anyone returning after lunch adopts an access token
+   *  that expired hours ago and a refresh token that is still perfectly good. */
+  accessExpired(): boolean {
+    const token = this.access();
+    if (!token) return false;
+    const exp = expiryOf(token);
+    // Unreadable token: let the server judge it rather than discarding a session here.
+    if (exp === null) return false;
+    // A few seconds of slack for clock skew between this machine and the server.
+    return exp <= Date.now() + 5_000;
+  },
 };
+
+/** `exp` from a JWT payload in milliseconds, or null if it can't be read. Never
+ *  throws: a malformed token must not take the app down on boot. */
+function expiryOf(token: string): number | null {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const exp = JSON.parse(json)?.exp;
+    return typeof exp === 'number' ? exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
 
 // --- single sign-on handoff -------------------------------------------------
 // Customer 360 trusts JWTs minted by the HF portfolio (see backend c360/auth/claims.py).
@@ -180,6 +210,14 @@ interface ReqInit {
 }
 
 async function request<T>(path: string, init: ReqInit = {}, retry = true): Promise<T> {
+  // Refresh BEFORE the call when the token we hold has already expired, rather than
+  // sending it and recovering from the rejection. The recovery below only triggers on
+  // a 401; a backend that answers an expired token with anything else — a 500 from a
+  // hiccup in its auth path, say — left the SPA with no route back and bounced a
+  // perfectly valid session to the login screen.
+  if (retry && tokens.accessExpired() && tokens.refresh()) {
+    await tryRefresh();
+  }
   const access = tokens.access();
   const headers: Record<string, string> = { Accept: 'application/json', ...(init.headers ?? {}) };
   if (access) headers.Authorization = `Bearer ${access}`;
