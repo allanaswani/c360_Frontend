@@ -8,6 +8,10 @@ import type { AuditPage, AuditRow, ChangePage, ChangeRow } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 import { Skeleton } from '@/components/States';
 import { ExportMenu } from '@/components/ExportMenu';
+import {
+  AdminHeader, AdminNav, AdminOnly, Empty, Panel, Segmented, Toolbar,
+} from '@/components/admin/AdminChrome';
+import a from '@/components/admin/adminChrome.module.css';
 import ui from '@/components/ui.module.css';
 import s from './audit.module.css';
 
@@ -109,18 +113,6 @@ export default function AuditTrailPage() {
   const setActionFiltered = onFilter(setAction);
   const setModelFiltered = onFilter(setModel);
 
-  if (!user) return null;
-  if (!user.is_admin) {
-    return (
-      <main className={ui.content}>
-        <div className={ui.card}><div style={{ padding: 32 }}>
-          <h2 style={{ marginBottom: 8 }}>Administrators only</h2>
-          <p style={{ color: 'var(--ink-3)' }}>The audit trail is available to administrators.</p>
-        </div></div>
-      </main>
-    );
-  }
-
   const rangeLabel = RANGES.find((r) => r.minutes === range)?.label ?? 'All';
   const exportParams = {
     window: range ?? undefined, q,
@@ -129,27 +121,20 @@ export default function AuditTrailPage() {
 
   return (
     <main className={ui.content}>
-      <div className={s.head}>
-        <div>
-          <div className={s.crumbs}>
-            <Link href="/" className={s.crumb}>Customer 360</Link><span className={s.crumbSep}>/</span>
-            <span>Audit trail</span>
-          </div>
-          <h1 className={s.title}>Audit trail</h1>
-          <p className={s.sub}>
-            Who did what, in real system time ·{' '}
-            <Link href="/admin/observability" className={s.inlineLink}>Monitoring →</Link>
-          </p>
-        </div>
-        <div className={s.headRight}>
+      <AdminOnly what="The audit trail">
+      <AdminHeader
+        title="Audit trail"
+        sub="Who did what, in real system time."
+        actions={(
           <ExportMenu
             title={trail === 'activity' ? 'Activity trail' : 'Change audit'}
             subtitle={`${rangeLabel} · ${q ? `search “${q}” · ` : ''}exported from Customer 360`}
             count={trail === 'activity' ? activity?.count : changes?.count}
             source={{ kind: 'server', dataset: trail === 'activity' ? 'activity' : 'changes', params: exportParams }}
           />
-        </div>
-      </div>
+        )}
+      />
+      <AdminNav current="/admin/audit" />
 
       <div className={s.trailTabs} role="tablist" aria-label="Audit trail">
         <TrailTab active={trail === 'activity'} onClick={() => setTrailFiltered('activity')}
@@ -177,7 +162,7 @@ export default function AuditTrailPage() {
         </div>
       )}
 
-      <div className={s.filters}>
+      <Toolbar trailing={<span className={s.count}>{loading ? '…' : countLabel(trail, activity, changes, offset)}</span>}>
         <input className={s.search}
                placeholder={trail === 'activity' ? 'Search route, user, target…' : 'Search record, user, field…'}
                value={q} onChange={(e) => setQFiltered(e.target.value)} aria-label="Search audit" />
@@ -201,22 +186,16 @@ export default function AuditTrailPage() {
             </select>
           </>
         )}
-        <div className={s.rangeTabs} role="tablist" aria-label="Time range">
-          {RANGES.map((r) => (
-            <button key={r.label} role="tab" aria-selected={range === r.minutes}
-                    className={`${s.rangeTab} ${range === r.minutes ? s.rangeTabActive : ''}`}
-                    onClick={() => setRangeFiltered(r.minutes)}>{r.label}</button>
-          ))}
-        </div>
-        <span className={s.spacer} />
-        <span className={s.count}>{loading ? '…' : countLabel(trail, activity, changes, offset)}</span>
-      </div>
+        <Segmented label="Time range" value={range} onChange={setRangeFiltered}
+                   options={RANGES.map((r) => ({ label: r.label, value: r.minutes }))} />
+      </Toolbar>
 
-      {error && <div className={ui.card}><div style={{ padding: 16, color: 'var(--coral)' }}>{error}</div></div>}
+      {error && <Panel><span style={{ color: 'var(--coral)' }}>{error}</span></Panel>}
 
       {trail === 'activity'
         ? <ActivityTable data={activity} offset={offset} onOffset={setOffset} />
         : <ChangeList data={changes} />}
+      </AdminOnly>
     </main>
   );
 }
@@ -266,27 +245,27 @@ function ActivityTable({ data, offset, onOffset }: {
   const total = data?.count ?? 0;
   return (
     <>
-      <div className={`${ui.card} ${s.tableCard}`}>
+      <Panel flush>
         {!data ? <Skeleton height={300} radius={12} /> : (
-          <div className={s.tableWrap}>
-            <table className={s.table}>
+          <div className={a.tableWrap}>
+            <table className={a.table}>
               <thead>
                 <tr>
                   <th>Time</th><th>User</th><th>Kind</th><th>Action</th>
-                  <th className={s.right}>Status</th><th>Target</th>
-                  <th className={s.right}>ms</th><th>IP</th>
+                  <th className={a.num}>Status</th><th>Target</th>
+                  <th className={a.num}>ms</th><th>IP</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 && (
-                  <tr><td colSpan={8} className={s.empty}>No events match these filters.</td></tr>
+                  <tr><td colSpan={8}><Empty title="No events match these filters" /></td></tr>
                 )}
                 {rows.map((e) => <ActivityRow key={e.id} e={e} />)}
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </Panel>
       <div className={s.pager}>
         <button className={s.pageBtn} disabled={offset === 0}
                 onClick={() => onOffset(Math.max(0, offset - PAGE))}>← Newer</button>
@@ -314,13 +293,13 @@ function ActivityRow({ e }: { e: AuditRow }) {
         {e.method && <b className={s.method}>{e.method}</b>}
         <span className={s.route}>{e.route || e.path || '—'}</span>
       </td>
-      <td className={s.right}>
+      <td className={a.num}>
         {e.status != null && (
           <span className={`${s.status} ${e.status >= 500 ? s.s5 : e.status >= 400 ? s.s4 : s.s2}`}>{e.status}</span>
         )}
       </td>
       <td className={s.targetCell} title={e.target}>{e.target || '—'}</td>
-      <td className={`${s.right} ${s.ms}`}>{e.duration_ms ?? ''}</td>
+      <td className={`${a.num} ${s.ms}`}>{e.duration_ms ?? ''}</td>
       <td className={s.ipCell}>{e.ip || '—'}</td>
     </tr>
   );
@@ -335,15 +314,12 @@ function ChangeList({ data }: { data: ChangePage | null }) {
   if (!data) return <Skeleton height={300} radius={12} />;
   if (data.results.length === 0) {
     return (
-      <div className={`${ui.card} ${s.tableCard}`}>
-        <div className={s.emptyPanel}>
-          <b>No changes recorded in this range.</b>
-          <span>
-            Accounts, roles, RM allocation and recommendation outcomes are the things
-            this app can alter. Everything else it serves is read-only warehouse data.
-          </span>
-        </div>
-      </div>
+      <Panel>
+        <Empty title="No changes recorded in this range">
+          Accounts, roles, RM allocation and recommendation outcomes are the things this
+          app can alter. Everything else it serves is read-only warehouse data.
+        </Empty>
+      </Panel>
     );
   }
   return (

@@ -5,6 +5,7 @@ import { api, ApiError, type AdminUser, type NewUser, type Role } from '@/lib/ap
 import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
 import { ExportMenu } from '@/components/ExportMenu';
+import { AdminHeader, AdminNav, AdminOnly } from '@/components/admin/AdminChrome';
 import ui from '@/components/ui.module.css';
 import s from './admin.module.css';
 
@@ -39,18 +40,6 @@ export default function UsersAdminPage() {
     return () => clearTimeout(t);
   }, [search, user, load]);
 
-  if (!user) return null;
-  if (!user.is_admin) {
-    return (
-      <main className={ui.content}>
-        <div className={ui.card}><div className={s.denied}>
-          <h2 className={s.title} style={{ marginBottom: 8 }}>Administrators only</h2>
-          <p>Managing users requires administrator access. If you need it, contact the Customer&nbsp;360 administrator.</p>
-        </div></div>
-      </main>
-    );
-  }
-
   async function setPassword(u: AdminUser) {
     try {
       const res = await api.setUserPassword(u.id);   // auto-generate
@@ -72,17 +61,18 @@ export default function UsersAdminPage() {
 
   return (
     <main className={ui.content}>
-      <div className={`${s.head} fadeUp`}>
-        <div>
-          <div className="microlabel" style={{ color: 'var(--teal)' }}>Administration</div>
-          <h1 className={s.title}>Users &amp; access</h1>
-          <p className={s.sub}>Provision Customer 360 accounts, assign roles, and reset passwords — no Django admin.</p>
-        </div>
-        <button className={s.primaryBtn} onClick={() => setPanelOpen(true)}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14" /></svg>
-          New user
-        </button>
-      </div>
+      <AdminOnly what="Managing users">
+      <AdminHeader
+        title="Users &amp; access"
+        sub="Provision Customer 360 accounts, assign roles and reset passwords — without the Django admin."
+        actions={(
+          <button className={s.primaryBtn} onClick={() => setPanelOpen(true)}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14" /></svg>
+            New user
+          </button>
+        )}
+      />
+      <AdminNav current="/admin/users" />
 
       <div className={s.toolbar}>
         <input className={s.search} placeholder="Search by name, username or email…"
@@ -165,7 +155,8 @@ export default function UsersAdminPage() {
                   <td>
                     <div className={s.rowActions}>
                       <button className={s.ghostBtn} onClick={() => setPassword(u)}>Reset password</button>
-                      {u.is_active && u.username !== user.username && (
+                      {/* Never offer to deactivate the account you are signed in as. */}
+                      {u.is_active && u.username !== user?.username && (
                         <button className={`${s.ghostBtn} ${s.ghostDanger}`} onClick={() => deactivate(u)}>Deactivate</button>
                       )}
                     </div>
@@ -185,6 +176,7 @@ export default function UsersAdminPage() {
           onClose={() => setPanelOpen(false)}
           onCreated={() => { setPanelOpen(false); load(search); }} />
       )}
+      </AdminOnly>
     </main>
   );
 }
