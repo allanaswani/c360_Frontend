@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { ObsOverview } from '@/lib/types';
@@ -9,14 +9,16 @@ import { Skeleton } from '@/components/States';
 import { ObsChart } from '@/components/charts/ObsChart';
 import { Sparkline } from '@/components/charts/Sparkline';
 import { ExportMenu } from '@/components/ExportMenu';
+import {
+  AdminHeader, AdminNav, AdminOnly, Empty, Panel, SectionLabel, Segmented,
+} from '@/components/admin/AdminChrome';
+import a from '@/components/admin/adminChrome.module.css';
 import ui from '@/components/ui.module.css';
 import s from './observability.module.css';
 
-const WINDOWS: { label: string; minutes: number }[] = [
-  { label: '15m', minutes: 15 },
-  { label: '1h', minutes: 60 },
-  { label: '6h', minutes: 360 },
-  { label: '24h', minutes: 1440 },
+const WINDOWS = [
+  { label: '15m', value: 15 }, { label: '1h', value: 60 },
+  { label: '6h', value: 360 }, { label: '24h', value: 1440 },
 ];
 const REFRESH_MS = 5000;
 
@@ -26,12 +28,12 @@ export default function ObservabilityPage() {
   const [data, setData] = useState<ObsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-  const winRef = useRef(win);
-  winRef.current = win;
-
-  const load = useCallback(async () => {
+  // The window is passed in rather than read from a ref. Writing a ref during
+  // render is a rule violation and, more practically, the poll and the render can
+  // then disagree about which window is on screen.
+  const load = useCallback(async (minutes: number) => {
     try {
-      const d = await api.observability(winRef.current);
+      const d = await api.observability(minutes);
       setData(d);
       setUpdatedAt(new Date());
       setError(null);
@@ -44,175 +46,189 @@ export default function ObservabilityPage() {
   // is hidden (no point polling a board nobody is looking at).
   useEffect(() => {
     if (!user?.is_admin) return;
-    load();
-    const id = setInterval(() => { if (document.visibilityState === 'visible') load(); }, REFRESH_MS);
+    load(win);
+    const id = setInterval(() => { if (document.visibilityState === 'visible') load(win); }, REFRESH_MS);
     return () => clearInterval(id);
   }, [user, win, load]);
 
-  if (!user) return null;
-  if (!user.is_admin) return <AdminOnly />;
-
   const sm = data?.summary;
   const series = data?.series ?? [];
-  const trafficData = series.map((p) => ({ minute: p.minute, requests: p.count, errors: p.errors }));
-  const latencyData = series.map((p) => ({ minute: p.minute, p95: p.p95_ms, p99: p.p99_ms, avg: p.avg_ms }));
-  const errorData = series.map((p) => ({ minute: p.minute, errors: p.errors, client: p.client_errors }));
   const hasTraffic = series.some((p) => p.count > 0);
 
   return (
     <main className={ui.content}>
-      <div className={s.head}>
-        <div>
-          <div className={s.crumbs}>
-            <Link href="/" className={s.crumb}>Customer 360</Link><span className={s.crumbSep}>/</span>
-            <span>Monitoring</span>
-          </div>
-          <h1 className={s.title}>Monitoring</h1>
-          <p className={s.sub}>Live traffic, latency, errors and uptime across all workers · in-app, and scraped at <code>/metrics</code>.</p>
-        </div>
-        <div className={s.headRight}>
-          <div className={s.windowTabs} role="tablist" aria-label="Time window">
-            {WINDOWS.map((w) => (
-              <button key={w.minutes} role="tab" aria-selected={win === w.minutes}
-                      className={`${s.winTab} ${win === w.minutes ? s.winTabActive : ''}`}
-                      onClick={() => setWin(w.minutes)}>{w.label}</button>
-            ))}
-          </div>
-          <div className={s.liveTag} title={updatedAt ? `Last updated ${updatedAt.toLocaleTimeString()}` : 'Connecting…'}>
-            <span className={s.liveDot} data-live={!error || undefined} />
-            {error ? 'Reconnecting' : 'Live'}
-          </div>
-          {/* The per-minute series behind every graph on this page — the numbers,
-              not a picture of them. */}
-          <ExportMenu
-            title="Traffic and latency"
-            subtitle={`Last ${winLabel(win)} · per minute`}
-            count={series.length}
-            source={{ kind: 'server', dataset: 'traffic', params: { window: win } }}
-          />
-        </div>
-      </div>
-
-      {error && !data && (
-        <div className={ui.card}><div style={{ padding: 20, color: 'var(--coral)' }}>Couldn’t load monitoring: {error}</div></div>
-      )}
-
-      {!data ? (
-        <Skeleton height={120} radius={12} />
-      ) : (
-        <>
-          {/* Not eight identical boxes: an ops board is read in priority order, so
-              the two questions that decide whether anyone acts — is it up, is it
-              erroring — lead at full size, and the supporting numbers sit beside
-              them. Each headline carries its own trend, because "1.2%" only means
-              something next to where it was five minutes ago. */}
-          <div className={s.statusStrip}>
-            <Lead
-              label="Uptime"
-              value={`${sm?.uptime_pct ?? 0}%`}
-              tone={(sm?.uptime_pct ?? 100) >= 99 ? 'good' : (sm?.uptime_pct ?? 100) >= 95 ? 'warn' : 'bad'}
-              sub={`${sm?.instances ?? 0} worker${(sm?.instances ?? 0) === 1 ? '' : 's'} live · last ${winLabel(win)}`}
-            />
-            <Metric
-              label="Error rate" value={`${sm?.error_rate_pct ?? 0}%`}
-              tone={(sm?.error_rate_pct ?? 0) >= 5 ? 'bad' : (sm?.error_rate_pct ?? 0) >= 1 ? 'warn' : 'good'}
-              sub={`${fmtNum(sm?.errors ?? 0)} server · ${fmtNum(sm?.client_errors ?? 0)} client`}
-              spark={series.map((p) => p.errors)} sparkColor="var(--coral)"
-            />
-            <Metric
-              label="p95 latency" value={`${fmtNum(sm?.p95_now_ms ?? 0)}`} unit="ms"
-              tone={(sm?.p95_now_ms ?? 0) >= 800 ? 'bad' : (sm?.p95_now_ms ?? 0) >= 400 ? 'warn' : 'good'}
-              sub={`p99 ${fmtNum(sm?.p99_now_ms ?? 0)} ms`}
-              spark={series.map((p) => p.p95_ms)} sparkColor="var(--gold)"
-            />
-            <Metric
-              label="Throughput" value={fmtNum(sm?.rps_now ? sm.rps_now * 60 : 0)} unit="/min"
-              sub={`${fmtNum(sm?.requests ?? 0)} in window`}
-              spark={series.map((p) => p.count)} sparkColor="var(--teal)"
-            />
-            <Metric
-              label="Active users" value={fmtNum(sm?.active_users ?? 0)}
-              sub={sm?.active_users ? 'signed in, this window' : 'nobody in this window'}
-            />
-          </div>
-
-          {!hasTraffic ? (
-            <div className={ui.card}>
-              <div style={{ padding: 28, textAlign: 'center', color: 'var(--ink-3)' }}>
-                No traffic recorded in this window yet. Metrics accrue as requests come in — this board updates in place.
-              </div>
-            </div>
-          ) : (
+      <AdminOnly what="Monitoring">
+        <AdminHeader
+          title="Monitoring"
+          sub={<>Traffic, latency, errors and uptime across every worker · also exposed for scraping at <code>/metrics</code>.</>}
+          actions={(
             <>
-              <div className={s.chartsGrid}>
-                <Panel title="Traffic" note="requests / min">
-                  <ObsChart data={trafficData} xKey="minute" area
-                            series={[{ key: 'requests', color: 'var(--teal)', label: 'Requests' }]} />
-                </Panel>
-                <Panel title="Latency" note="ms per minute">
-                  <ObsChart data={latencyData} xKey="minute" unit="ms"
-                            series={[
-                              { key: 'p99', color: 'var(--coral)', label: 'p99' },
-                              { key: 'p95', color: 'var(--gold)', label: 'p95' },
-                              { key: 'avg', color: 'var(--teal)', label: 'avg' },
-                            ]} />
-                </Panel>
-                <Panel title="Errors" note="responses / min">
-                  <ObsChart data={errorData} xKey="minute" area
-                            series={[
-                              { key: 'errors', color: 'var(--coral)', label: '5xx' },
-                              { key: 'client', color: 'var(--gold)', label: '4xx' },
-                            ]} />
-                </Panel>
-              </div>
-
-              <div className={s.split}>
-                <Panel title="Top routes" note="by volume, this window"
-                       action={<ExportMenu title="Endpoints" subtitle={`Last ${winLabel(win)}`}
-                                           source={{ kind: 'server', dataset: 'routes', params: { window: win } }} />}>
-                  <div className={s.routes}>
-                    <div className={`${s.routeRow} ${s.routeHead}`}>
-                      <span>Route</span><span>Calls</span><span>Avg</span><span>Err</span>
-                    </div>
-                    {(data.top_routes ?? []).map((r) => (
-                      <div key={r.method + r.route} className={s.routeRow}>
-                        <span className={s.routeName}><b className={s.method}>{r.method}</b> {r.route}</span>
-                        <span className={s.num}>{fmtNum(r.count)}</span>
-                        <span className={s.num}>{r.avg_ms}ms</span>
-                        <span className={`${s.num} ${r.errors ? s.numBad : ''}`}>{r.errors}</span>
-                      </div>
-                    ))}
-                  </div>
-                </Panel>
-                <Panel title="Recent errors" note="4xx / 5xx"
-                       action={(
-                         <div className={s.panelActions}>
-                           <Link href="/admin/audit?status=500" className={s.panelLink}>Open audit →</Link>
-                           <ExportMenu title="Error log" subtitle={`Last ${winLabel(win)}`}
-                                       source={{ kind: 'server', dataset: 'errors', params: { window: win } }} />
-                         </div>
-                       )}>
-                  <div className={s.errFeed}>
-                    {(data.recent_errors ?? []).length === 0 && <div className={s.errEmpty}>No errors in this window.</div>}
-                    {(data.recent_errors ?? []).map((e) => (
-                      <div key={e.id} className={s.errRow}>
-                        <span className={`${s.statusPill} ${(e.status ?? 0) >= 500 ? s.status5 : s.status4}`}>{e.status}</span>
-                        <span className={s.errRoute}>{e.method} {e.route}</span>
-                        <span className={s.errMeta}>{e.username || '—'} · {clock(e.ts)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </Panel>
-              </div>
+              <Segmented label="Time window" options={WINDOWS} value={win} onChange={setWin} />
+              <ExportMenu
+                title="Traffic and latency"
+                subtitle={`Last ${winLabel(win)} · per minute`}
+                count={series.length}
+                source={{ kind: 'server', dataset: 'traffic', params: { window: win } }}
+              />
             </>
           )}
-        </>
-      )}
+          meta={(
+            <span className={s.liveTag} title={updatedAt ? `Last updated ${updatedAt.toLocaleTimeString()}` : 'Connecting…'}>
+              <span className={s.liveDot} data-live={!error || undefined} />
+              {error ? 'Reconnecting' : `Live · ${updatedAt ? updatedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '…'}`}
+            </span>
+          )}
+        />
+        <AdminNav current="/admin/observability" />
+
+        {error && !data && (
+          <Panel><div style={{ color: 'var(--coral)' }}>Couldn’t load monitoring: {error}</div></Panel>
+        )}
+
+        {!data ? <Skeleton height={96} radius={12} /> : (
+          <>
+            {/* Read in priority order. Uptime is the question the board exists to
+                answer, so it leads at full size; the rest carry their own trend,
+                because "1.2%" means nothing without where it was five minutes ago. */}
+            <div className={s.statusStrip}>
+              <Lead
+                label="Uptime" value={`${sm?.uptime_pct ?? 0}%`}
+                tone={(sm?.uptime_pct ?? 100) >= 99 ? 'good' : (sm?.uptime_pct ?? 100) >= 95 ? 'warn' : 'bad'}
+                sub={`${sm?.instances ?? 0} worker${(sm?.instances ?? 0) === 1 ? '' : 's'} live · last ${winLabel(win)}`}
+              />
+              <Metric
+                label="Error rate" value={`${sm?.error_rate_pct ?? 0}%`}
+                tone={(sm?.error_rate_pct ?? 0) >= 5 ? 'bad' : (sm?.error_rate_pct ?? 0) >= 1 ? 'warn' : 'good'}
+                sub={`${fmtNum(sm?.errors ?? 0)} server · ${fmtNum(sm?.client_errors ?? 0)} client`}
+                spark={series.map((p) => p.errors)} sparkColor="var(--coral)"
+              />
+              <Metric
+                label="p95 latency" value={fmtNum(sm?.p95_now_ms ?? 0)} unit="ms"
+                tone={(sm?.p95_now_ms ?? 0) >= 800 ? 'bad' : (sm?.p95_now_ms ?? 0) >= 400 ? 'warn' : 'good'}
+                sub={`p99 ${fmtNum(sm?.p99_now_ms ?? 0)} ms`}
+                spark={series.map((p) => p.p95_ms)} sparkColor="var(--gold)"
+              />
+              <Metric
+                label="Throughput" value={fmtNum(sm?.rps_now ? sm.rps_now * 60 : 0)} unit="/min"
+                sub={`${fmtNum(sm?.requests ?? 0)} in window`}
+                spark={series.map((p) => p.count)} sparkColor="var(--teal)"
+              />
+              <Metric
+                label="Active users" value={fmtNum(sm?.active_users ?? 0)}
+                sub={sm?.active_users ? 'signed in, this window' : 'nobody in this window'}
+              />
+            </div>
+
+            {!hasTraffic ? (
+              <Panel>
+                <Empty title="No traffic in this window">
+                  Metrics accrue as requests come in, and this board updates in place — nothing
+                  needs refreshing. If you expected traffic, the app may not be reachable.
+                </Empty>
+              </Panel>
+            ) : (
+              <>
+                <SectionLabel aside={`per minute · last ${winLabel(win)}`}>Trend</SectionLabel>
+                <div className={s.chartsGrid}>
+                  <Panel title="Traffic" note="requests / min">
+                    <ObsChart data={series.map((p) => ({ minute: p.minute, requests: p.count, errors: p.errors }))}
+                              xKey="minute" area
+                              series={[{ key: 'requests', color: 'var(--teal)', label: 'Requests' }]} />
+                  </Panel>
+                  <Panel title="Latency" note="ms">
+                    <ObsChart data={series.map((p) => ({ minute: p.minute, p95: p.p95_ms, p99: p.p99_ms, avg: p.avg_ms }))}
+                              xKey="minute" unit="ms"
+                              series={[
+                                { key: 'p99', color: 'var(--coral)', label: 'p99' },
+                                { key: 'p95', color: 'var(--gold)', label: 'p95' },
+                                { key: 'avg', color: 'var(--teal)', label: 'avg' },
+                              ]} />
+                  </Panel>
+                  <Panel title="Errors" note="responses / min">
+                    <ObsChart data={series.map((p) => ({ minute: p.minute, errors: p.errors, client: p.client_errors }))}
+                              xKey="minute" area
+                              series={[
+                                { key: 'errors', color: 'var(--coral)', label: '5xx' },
+                                { key: 'client', color: 'var(--gold)', label: '4xx' },
+                              ]} />
+                  </Panel>
+                </div>
+
+                <SectionLabel aside="what is being called, and what is failing">Detail</SectionLabel>
+                <div className={s.split}>
+                  <Panel
+                    title="Endpoints" note="by volume" flush
+                    action={<ExportMenu title="Endpoints" subtitle={`Last ${winLabel(win)}`}
+                                        source={{ kind: 'server', dataset: 'routes', params: { window: win } }} />}
+                  >
+                    <div className={a.tableWrap}>
+                      <table className={a.table}>
+                        <thead>
+                          <tr>
+                            <th>Route</th>
+                            <th className={a.num}>Calls</th>
+                            <th className={a.num}>Avg</th>
+                            <th className={a.num}>5xx</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(data.top_routes ?? []).map((r) => (
+                            <tr key={r.method + r.route}>
+                              <td className={s.routeCell}>
+                                <b className={s.method}>{r.method}</b> {r.route}
+                              </td>
+                              <td className={a.num}>{fmtNum(r.count)}</td>
+                              <td className={a.num}>{r.avg_ms} ms</td>
+                              <td className={`${a.num} ${r.errors ? s.numBad : ''}`}>{r.errors || '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Panel>
+
+                  <Panel
+                    title="Recent errors" note="4xx / 5xx" flush
+                    action={(
+                      <div className={s.panelActions}>
+                        <Link href="/admin/audit?status=500" className={s.panelLink}>Open audit →</Link>
+                        <ExportMenu title="Error log" subtitle={`Last ${winLabel(win)}`}
+                                    source={{ kind: 'server', dataset: 'errors', params: { window: win } }} />
+                      </div>
+                    )}
+                  >
+                    {(data.recent_errors ?? []).length === 0 ? (
+                      <Empty title="No errors in this window" />
+                    ) : (
+                      <div className={a.tableWrap}>
+                        <table className={a.table}>
+                          <tbody>
+                            {(data.recent_errors ?? []).map((e) => (
+                              <tr key={e.id}>
+                                <td style={{ width: 52 }}>
+                                  <span className={`${s.statusPill} ${(e.status ?? 0) >= 500 ? s.status5 : s.status4}`}>{e.status}</span>
+                                </td>
+                                <td className={s.errRoute}>{e.method} {e.route}</td>
+                                <td className={s.errMeta}>{e.username || '—'}</td>
+                                <td className={`${s.errMeta} ${a.num}`}>{clock(e.ts)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </Panel>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </AdminOnly>
     </main>
   );
 }
 
-/** The headline the whole board answers first: is the service up? */
+/** The headline the board answers first: is the service up? */
 function Lead({ label, value, sub, tone }: {
   label: string; value: string; sub?: string; tone?: 'good' | 'warn' | 'bad';
 }) {
@@ -238,7 +254,7 @@ function Metric({ label, value, unit, sub, tone, spark, sparkColor }: {
         {value}{unit && <span className={s.tileUnit}>{unit}</span>}
       </span>
       {sub && <span className={s.tileSub}>{sub}</span>}
-      {trend && <Sparkline data={trend} color={sparkColor} width={96} height={20} />}
+      {trend && <Sparkline data={trend} color={sparkColor} width={96} height={18} />}
     </div>
   );
 }
@@ -246,34 +262,6 @@ function Metric({ label, value, unit, sub, tone, spark, sparkColor }: {
 function winLabel(minutes: number): string {
   return minutes >= 60 ? `${minutes / 60}h` : `${minutes}m`;
 }
-
-function Panel({ title, note, action, children }: {
-  title: string; note?: string; action?: React.ReactNode; children: React.ReactNode;
-}) {
-  return (
-    <div className={`${ui.card} ${s.panel}`}>
-      <div className={s.panelHead}>
-        <div><span className={s.panelTitle}>{title}</span>{note && <span className={s.panelNote}>{note}</span>}</div>
-        {action}
-      </div>
-      <div className={s.panelBody}>{children}</div>
-    </div>
-  );
-}
-
-function AdminOnly() {
-  return (
-    <main className={ui.content}>
-      <div className={ui.card}>
-        <div style={{ padding: 32 }}>
-          <h2 style={{ marginBottom: 8 }}>Administrators only</h2>
-          <p style={{ color: 'var(--ink-3)' }}>Monitoring is available to administrators.</p>
-        </div>
-      </div>
-    </main>
-  );
-}
-
 function fmtNum(n: number): string {
   const v = Math.round(n);
   if (v >= 1_000_000) return `${(v / 1e6).toFixed(1)}M`;

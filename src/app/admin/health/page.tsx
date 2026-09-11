@@ -6,6 +6,9 @@ import { useAuth } from '@/lib/auth';
 import { ErrorState, Skeleton } from '@/components/States';
 import { LineSeriesChart } from '@/components/charts/LineSeriesChart';
 import { ExportMenu } from '@/components/ExportMenu';
+import {
+  AdminHeader, AdminNav, AdminOnly, Empty, Panel, SectionLabel,
+} from '@/components/admin/AdminChrome';
 import ui from '@/components/ui.module.css';
 import s from './health.module.css';
 
@@ -45,20 +48,6 @@ export default function DataHealthPage() {
     if (user?.is_admin) load();
   }, [user, load]);
 
-  if (!user) return null;
-  if (!user.is_admin) {
-    return (
-      <main className={ui.content}>
-        <div className={ui.card}>
-          <div style={{ padding: 32 }}>
-            <h2 style={{ marginBottom: 8 }}>Administrators only</h2>
-            <p style={{ color: 'var(--ink-3)' }}>Data health is available to administrators. If you need access, contact the Customer&nbsp;360 administrator.</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   const grouped = groupBy(data?.checks ?? [], (c) => c.group);
   const anyProblem = (data?.checks ?? []).some((c) => c.status !== 'ok')
     || (data?.freshness != null && data.freshness.status !== 'ok');
@@ -74,15 +63,15 @@ export default function DataHealthPage() {
 
   return (
     <main className={ui.content}>
-      <div className={s.head}>
-        <div>
-          <div className="microlabel" style={{ color: 'var(--teal)' }}>Operations</div>
-          <h1 className={s.title}>Data health</h1>
-          <p className={s.lede}>
-            How fresh the warehouse is, and whether every source the app reads is reachable and populated.
-          </p>
-        </div>
-        <div className={s.headSide}>
+      <AdminOnly what="Data health">
+      <AdminHeader
+        title="Data health"
+        sub="How fresh the warehouse is, and whether every source the app reads is reachable and populated."
+        meta={data?.generated_at
+          ? `Checked ${new Date(data.generated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+          : undefined}
+        actions={(
+          <>
           {data && (data.checks ?? []).length > 0 && (
             <ExportMenu
               title="Data health"
@@ -114,20 +103,21 @@ export default function DataHealthPage() {
             </svg>
             {loading ? 'Checking…' : 'Refresh'}
           </button>
-          {data?.generated_at && (
-            <div className={s.stamp}>Checked {new Date(data.generated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
-          )}
-        </div>
-      </div>
+          </>
+        )}
+      />
+      <AdminNav current="/admin/health" />
 
       {error ? (
-        <div className={ui.card} style={{ marginTop: 16 }}><ErrorState title="Couldn't load data health" detail={error} /></div>
+        <Panel><ErrorState title="Couldn't load data health" detail={error} /></Panel>
       ) : !data ? (
-        <Skeleton height={220} radius={12} />
+        <Skeleton height={200} radius={12} />
       ) : data.data_mode !== 'live' ? (
-        <div className={ui.card} style={{ marginTop: 16, padding: 28 }}>
-          <div className={s.mockNote}>{data.note ?? 'Preview (mock) data — connect the live warehouse to see source health.'}</div>
-        </div>
+        <Panel>
+          <Empty title="Source health is measured against the live warehouse">
+            {data.note ?? 'This instance is running on preview (mock) data. Set C360_DATA_MODE=live to see real source health.'}
+          </Empty>
+        </Panel>
       ) : (
         <>
           {/* Verdict, counts and the as-of date on ONE bar. These were two stacked
@@ -165,30 +155,27 @@ export default function DataHealthPage() {
             );
           })()}
 
-          {freshTrend.length >= 2 && (
-            <div className={ui.card} style={{ marginTop: 16, padding: 16 }}>
-              <div className={s.trendTop}>
-                <div>
-                  <div className={s.trendHead}>Freshness trend</div>
-                  <div className={s.trendSub}>Days behind the live warehouse close, over recent checks.</div>
-                </div>
+          {freshTrend.length >= 2 ? (
+            <Panel
+              title="Freshness trend" note="days behind the warehouse close"
+              action={(
                 <ExportMenu
                   title="Data-health history"
                   subtitle="Stored snapshots, oldest first"
                   source={{ kind: 'server', dataset: 'health_history', params: {} }}
                 />
-              </div>
+              )}
+            >
               <LineSeriesChart
                 data={freshTrend}
                 series={[{ name: 'Days behind', dataKey: 'days', colorRole: 1 }]}
                 fmt="count"
                 xKey="t"
-                height={150}
+                height={140}
                 wholeNumbers
               />
-            </div>
-          )}
-          {freshTrend.length < 2 && (
+            </Panel>
+          ) : (
             <div className={s.trendHint}>
               Trend graphs build up as this page is checked over time — one point per check, so come
               back later to see freshness, row-count and latency history.
@@ -203,9 +190,9 @@ export default function DataHealthPage() {
           )}
 
           {Object.entries(grouped).map(([group, checks]) => (
-            <div key={group} className={s.group}>
-              <div className={s.groupHead}>{group}</div>
-              <div className={ui.card} style={{ padding: 0 }}>
+            <div key={group}>
+              <SectionLabel aside={`${checks.length} check${checks.length === 1 ? '' : 's'}`}>{group}</SectionLabel>
+              <div className={s.groupCard}>
                 {checks.map((c) => (
                   <div key={c.key} className={s.row}>
                     <div className={s.rowMain}>
@@ -228,6 +215,7 @@ export default function DataHealthPage() {
           ))}
         </>
       )}
+      </AdminOnly>
     </main>
   );
 }
