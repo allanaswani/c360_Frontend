@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { asset } from '@/lib/asset';
@@ -120,6 +120,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
             </div>
             <Submit busy={busy} label="Continue" busyLabel="Checking…" />
+            <PortfolioSignIn />
             <p className={s.footnote}>Accounts are provisioned by your administrator. Contact them if you can’t sign in.</p>
           </form>
         )}
@@ -214,3 +215,51 @@ function Banner({ kind, text }: { kind: 'error' | 'success'; text: string }) {
     </div>
   );
 }
+
+/**
+ * "I'm already signed in next door."
+ *
+ * Customer 360 normally adopts the portfolio's login cookie, which works when the
+ * user reached both apps at the same address. A cookie is scoped to a HOST, so
+ * somebody who signs in at ceo.hfcb.co.ke and then opens this app at the raw LAN
+ * IP hands over nothing and lands here — signed in to the portfolio, asked to sign
+ * in again. Bookmarking or typing this address does the same thing, which the
+ * launcher's hand-off cannot help with because no launcher was clicked.
+ *
+ * This sends them to the portfolio's /sso/customer-360, which bounces straight
+ * back with the session attached.
+ *
+ * Rendered only when a portfolio is actually reachable from this address, so a
+ * standalone deployment does not show a route to nowhere.
+ */
+function PortfolioSignIn() {
+  const [href, setHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    const explicit = process.env.NEXT_PUBLIC_PORTFOLIO_URL;
+    if (explicit) { setHref(`${explicit.replace(/\/+$/, '')}/sso/customer-360`); return; }
+    if (typeof window === 'undefined') return;
+    const { protocol, hostname, port } = window.location;
+    // Mirrors the portfolio's own derivation, inverted: on the LAN both apps are
+    // ports on one host; behind nginx they share the domain and only the path
+    // differs. Skip it on a local dev box, where there is no portfolio to reach.
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return;
+    const base = port ? `${protocol}//${hostname}:${PORTFOLIO_LAN_PORT}` : `${protocol}//${hostname}`;
+    setHref(`${base}/sso/customer-360`);
+  }, []);
+
+  if (!href) return null;
+  return (
+    <div className={s.ssoRow}>
+      <span className={s.ssoRule} />
+      <a className={s.ssoLink} href={href}>
+        Already signed in to the HF portfolio? Continue with that session
+      </a>
+    </div>
+  );
+}
+
+/** The portfolio frontend's LAN port; it shares the domain publicly, so this only
+ *  applies to an address that carries a port. Override with
+ *  NEXT_PUBLIC_PORTFOLIO_URL for any other deployment. */
+const PORTFOLIO_LAN_PORT = process.env.NEXT_PUBLIC_PORTFOLIO_LAN_PORT || '5400';
