@@ -80,3 +80,40 @@
    line can leave the page as numbers. */
 .trendTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
 .headSide { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- status bar ----------
+   Verdict, counts and the bank-close date on one line. This replaced two stacked
+   full-width cards that each held a single line of content in a tall box — the
+   page opened with about 260px of chrome before the first real check. */
+.statusBar {
+  display: grid; grid-template-columns: minmax(190px, 1fr) auto minmax(230px, auto);
+  align-items: center; gap: var(--s-4);
+  background: var(--surface); border: 1px solid var(--hairline);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-sm);
+  padding: 12px var(--s-5); margin-bottom: 12px;
+}
+.summary_degraded.statusBar { border-left-color: var(--gold); }
+.summary_down.statusBar { border-left-color: var(--coral); }
+.statusVerdict { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+.statusDot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); flex: none; }
+.statusDot[data-key='degraded'] { background: var(--gold); }
+.statusDot[data-key='down'] { background: var(--coral); }
+.statusCounts { display: flex; gap: var(--s-5); }
+.statusStat { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.statusStatN {
+  font-family: var(--font-num); font-size: 19px; font-weight: 700; line-height: 1.05;
+  font-variant-numeric: tabular-nums lining-nums; color: var(--ink-1);
+}
+.statusStatN[data-tone='warn'] { color: var(--gold); }
+.statusStatN[data-tone='bad'] { color: var(--coral); }
+.statusFresh {
+  display: flex; flex-direction: column; gap: 2px; align-items: flex-end; text-align: right;
+  padding-left: var(--s-5); border-left: 1px solid var(--hairline);
+}
+.statusFreshRow { display: inline-flex; align-items: center; gap: 9px; }
+
+@media (max-width: 860px) {
+  .statusBar { grid-template-columns: 1fr; }
+  .statusFresh { align-items: flex-start; text-align: left; padding-left: 0; border-left: none; }
+}
