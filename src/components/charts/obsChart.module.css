@@ -1,0 +1,48 @@
+/* Operations time-series panel. Both themes are first-class: every colour here is a
+   token, and the tooltip/legend surfaces are the app's own, not hard-coded light
+   values that turn into white rectangles in dark mode. */
+
+.wrap { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
+
+/* ---------- legend with statistics ----------
+   The numbers a person actually quotes — last, mean, peak — instead of a colour key
+   that leaves them estimating values off the line. */
+.legend {
+  width: 100%; border-collapse: collapse;
+  font-size: 11.5px; table-layout: auto;
+}
+.legend thead th {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3); text-align: right; padding: 0 0 3px 10px; font-variant-numeric: tabular-nums;
+}
+.legend thead th:first-child { width: 100%; }
+.legend tbody td { padding: 2px 0 2px 10px; border-top: 1px solid var(--hairline); }
+.legendName {
+  display: flex; align-items: center; gap: 7px;
+  color: var(--ink-2); padding-left: 0 !important;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.legendVal {
+  text-align: right; color: var(--ink-1); font-weight: 600;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+.swatch { width: 9px; height: 3px; border-radius: 2px; flex: none; display: inline-block; }
+
+/* ---------- tooltip ---------- */
+.tip {
+  background: var(--surface); border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-md); padding: 8px 10px; font-size: 11.5px;
+  box-shadow: var(--shadow-lg); min-width: 150px;
+}
+.tipTime {
+  color: var(--ink-3); margin-bottom: 5px; padding-bottom: 4px;
+  border-bottom: 1px solid var(--hairline);
+  font-variant-numeric: tabular-nums; font-family: var(--font-num);
+}
+.tipRow { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+.tipLabel { color: var(--ink-2); flex: 1; }
+.tipVal {
+  font-family: var(--font-num); color: var(--ink-1);
+  font-variant-numeric: tabular-nums lining-nums;
+}

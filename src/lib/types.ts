@@ -141,7 +141,12 @@ export interface ObsSummary {
   rps_now: number;
   p95_now_ms: number;
   p99_now_ms: number;
-  uptime_pct: number;
+  /** null when uptime is not being measured (no heartbeats yet). Must never be
+   *  rendered as 0% — that reads as a total outage. */
+  uptime_pct: number | null;
+  uptime_minutes?: number;
+  /** Span uptime was measured over. Below the window = not enough history. */
+  uptime_measured_minutes?: number;
   active_users: number;
   instances: number;
 }

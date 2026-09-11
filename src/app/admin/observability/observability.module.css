@@ -43,8 +43,8 @@
 .tileSub { font-size: 10.5px; color: var(--ink-3); }
 
 /* chart panels */
-.chartsGrid { display: grid; grid-template-columns: 1.3fr 1.3fr 1fr; gap: 12px; margin-bottom: 12px; }
-@media (max-width: 1000px) { .chartsGrid { grid-template-columns: 1fr; } }
+
+@media (max-width: 1000px) {  }
 .split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; }
 @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
 
@@ -76,3 +76,8 @@
 .errRoute { color: var(--ink-1); max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
 .errMeta { color: var(--ink-3); font-size: 11.5px; }
 .panelActions { display: inline-flex; align-items: center; gap: var(--s-3); }
+
+/* Two charts, not three. At a third of the width a time-series is a smear; these
+   are sized to be read, with the legend statistics under each. */
+.chartsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-bottom: var(--s-3); }
+@media (max-width: 1000px) { .chartsGrid { grid-template-columns: 1fr; } }

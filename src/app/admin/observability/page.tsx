@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import type { ObsOverview } from '@/lib/types';
+import type { ObsOverview, ObsSeriesPoint } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 import { Skeleton } from '@/components/States';
 import { ObsChart } from '@/components/charts/ObsChart';
@@ -54,6 +54,11 @@ export default function ObservabilityPage() {
   const sm = data?.summary;
   const series = data?.series ?? [];
   const hasTraffic = series.some((p) => p.count > 0);
+  // The API returns only the minutes that recorded traffic. Handing those straight
+  // to a chart draws a line between two samples an hour apart and calls it a trend.
+  // Expand to every minute in the window, with null where nothing was recorded, so
+  // a gap is drawn as a gap.
+  const plot = densify(series, win, data?.generated_at);
 
   return (
     <main className={ui.content}>
@@ -92,9 +97,13 @@ export default function ObservabilityPage() {
                 because "1.2%" means nothing without where it was five minutes ago. */}
             <div className={s.statusStrip}>
               <Lead
-                label="Uptime" value={`${sm?.uptime_pct ?? 0}%`}
-                tone={(sm?.uptime_pct ?? 100) >= 99 ? 'good' : (sm?.uptime_pct ?? 100) >= 95 ? 'warn' : 'bad'}
-                sub={`${sm?.instances ?? 0} worker${(sm?.instances ?? 0) === 1 ? '' : 's'} live · last ${winLabel(win)}`}
+                label="Uptime"
+                value={sm?.uptime_pct == null ? 'Not measured' : `${sm.uptime_pct}%`}
+                tone={sm?.uptime_pct == null ? undefined
+                  : sm.uptime_pct >= 99 ? 'good' : sm.uptime_pct >= 95 ? 'warn' : 'bad'}
+                sub={sm?.uptime_pct == null
+                  ? 'no heartbeats recorded yet'
+                  : `${sm?.instances ?? 0} worker${(sm?.instances ?? 0) === 1 ? '' : 's'} live · ${uptimeSpan(sm, win)}`}
               />
               <Metric
                 label="Error rate" value={`${sm?.error_rate_pct ?? 0}%`}
@@ -130,27 +139,25 @@ export default function ObservabilityPage() {
               <>
                 <SectionLabel aside={`per minute · last ${winLabel(win)}`}>Trend</SectionLabel>
                 <div className={s.chartsGrid}>
-                  <Panel title="Traffic" note="requests / min">
-                    <ObsChart data={series.map((p) => ({ minute: p.minute, requests: p.count, errors: p.errors }))}
-                              xKey="minute" area
-                              series={[{ key: 'requests', color: 'var(--teal)', label: 'Requests' }]} />
+                  <Panel title="Latency" note="percentiles, ms">
+                    <ObsChart
+                      data={plot} xKey="minute" unit="ms" height={224}
+                      series={[
+                        { key: 'p99', color: 'var(--coral)', label: 'p99' },
+                        { key: 'p95', color: 'var(--gold)', label: 'p95', threshold: P95_LIMIT_MS },
+                        { key: 'avg', color: 'var(--teal)', label: 'avg' },
+                      ]}
+                    />
                   </Panel>
-                  <Panel title="Latency" note="ms">
-                    <ObsChart data={series.map((p) => ({ minute: p.minute, p95: p.p95_ms, p99: p.p99_ms, avg: p.avg_ms }))}
-                              xKey="minute" unit="ms"
-                              series={[
-                                { key: 'p99', color: 'var(--coral)', label: 'p99' },
-                                { key: 'p95', color: 'var(--gold)', label: 'p95' },
-                                { key: 'avg', color: 'var(--teal)', label: 'avg' },
-                              ]} />
-                  </Panel>
-                  <Panel title="Errors" note="responses / min">
-                    <ObsChart data={series.map((p) => ({ minute: p.minute, errors: p.errors, client: p.client_errors }))}
-                              xKey="minute" area
-                              series={[
-                                { key: 'errors', color: 'var(--coral)', label: '5xx' },
-                                { key: 'client', color: 'var(--gold)', label: '4xx' },
-                              ]} />
+                  <Panel title="Traffic & errors" note="responses / min">
+                    <ObsChart
+                      data={plot} xKey="minute" area height={224}
+                      series={[
+                        { key: 'requests', color: 'var(--teal)', label: 'Requests' },
+                        { key: 'client', color: 'var(--gold)', label: '4xx' },
+                        { key: 'errors', color: 'var(--coral)', label: '5xx' },
+                      ]}
+                    />
                   </Panel>
                 </div>
 
@@ -257,6 +264,46 @@ function Metric({ label, value, unit, sub, tone, spark, sparkColor }: {
       {trend && <Sparkline data={trend} color={sparkColor} width={96} height={18} />}
     </div>
   );
+}
+
+/** p95 above this is the level the alert emails fire at (C360_ALERT_P95_MS). Drawn
+ *  on the latency plot so "is this bad" is answered by looking at it. */
+const P95_LIMIT_MS = 2000;
+
+type PlotPoint = {
+  minute: string;
+  requests: number | null; errors: number | null; client: number | null;
+  p95: number | null; p99: number | null; avg: number | null;
+};
+
+/** One row per minute across the window; null for minutes with no sample. */
+function densify(series: ObsSeriesPoint[], windowMinutes: number, generatedAt?: string): PlotPoint[] {
+  const end = generatedAt ? new Date(generatedAt) : new Date();
+  end.setSeconds(0, 0);
+  const byMinute = new Map(series.map((p) => [new Date(p.minute).setSeconds(0, 0), p]));
+  const out: PlotPoint[] = [];
+  for (let i = windowMinutes - 1; i >= 0; i -= 1) {
+    const at = new Date(end.getTime() - i * 60_000);
+    const hit = byMinute.get(at.getTime());
+    out.push({
+      minute: at.toISOString(),
+      requests: hit ? hit.count : null,
+      errors: hit ? hit.errors : null,
+      client: hit ? hit.client_errors : null,
+      p95: hit ? hit.p95_ms : null,
+      p99: hit ? hit.p99_ms : null,
+      avg: hit ? hit.avg_ms : null,
+    });
+  }
+  return out;
+}
+
+/** Say what uptime was measured over. When the app has less history than the
+ *  window, claiming "last 1h" would imply the missing time was downtime. */
+function uptimeSpan(sm: { uptime_measured_minutes?: number } | undefined, win: number): string {
+  const measured = sm?.uptime_measured_minutes;
+  if (measured == null || measured >= win) return `last ${winLabel(win)}`;
+  return `measured over ${winLabel(measured)} of history`;
 }
 
 function winLabel(minutes: number): string {
