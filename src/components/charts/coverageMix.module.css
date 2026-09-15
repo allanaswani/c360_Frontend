@@ -1,0 +1,58 @@
+/* Coverage-first part-to-whole. Replaces a 180px donut plus legend with a headline,
+   one bar and a four-row legend — roughly half the height, and it leads with the
+   finding rather than making the reader derive it from slice sizes. */
+
+.wrap { display: flex; flex-direction: column; gap: var(--s-3); }
+
+.head { display: flex; align-items: baseline; gap: var(--s-2); flex-wrap: wrap; }
+.headline {
+  font-family: var(--font-num); font-size: var(--t-num-lg); font-weight: 700;
+  letter-spacing: -0.02em; color: var(--teal);
+  font-variant-numeric: tabular-nums lining-nums; line-height: 1;
+}
+/* Coverage below half is the story, not a statistic — say it in the colour too. */
+.headline[data-thin] { color: var(--gold); }
+.headlineNote { font-size: var(--t-2xs); color: var(--ink-3); line-height: 1.4; }
+.headlineNote b { color: var(--ink-2); font-weight: 600; }
+
+.bar {
+  display: flex; width: 100%; height: 12px; border-radius: var(--r-pill);
+  overflow: hidden; background: var(--surface-2);
+}
+.seg { height: 100%; min-width: 1px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+/* The unknown remainder is drawn, but hatched and muted: present and to scale,
+   never competing with a real measurement for attention. */
+.segUnknown {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--ink-3) 26%, transparent) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.legendRow {
+  display: grid; grid-template-columns: 10px 1fr auto 46px;
+  align-items: center; gap: var(--s-2); padding: 2px 0;
+  font-size: var(--t-2xs);
+}
+.legendUnknown { border-top: 1px solid var(--hairline); margin-top: 3px; padding-top: 5px; }
+.dot { width: 9px; height: 9px; border-radius: 3px; }
+.dotUnknown {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--ink-3) 40%, transparent) 0 2px,
+    transparent 2px 4px
+  );
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.legendLabel { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.legendVal {
+  font-family: var(--font-num); color: var(--ink-1); font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.legendPct {
+  font-family: var(--font-num); color: var(--ink-3); text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.foot { font-size: var(--t-3xs); color: var(--ink-3); line-height: 1.4; }

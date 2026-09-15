@@ -788,3 +788,33 @@
 }
 @keyframes bootSlide { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
 @media (prefers-reduced-motion: reduce) { .bootPulse::after { animation: none; } }
+
+
+/* Portfolio: three ranked/part-to-whole panels on one row.
+   Replaces pfSplit/pfCol/pfGrow, whose only job was to stack two short panels
+   beside one very tall one so the columns ended level — a layout that existed to
+   compensate for a chart that was too tall. */
+.pfTrio {
+  display: grid; grid-template-columns: 1.15fr 1fr 1fr;
+  gap: var(--s-3); margin-bottom: var(--s-3); align-items: start;
+}
+@media (max-width: 1180px) { .pfTrio { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .pfTrio { grid-template-columns: 1fr; } }
+
+/* Portfolio: the movement readout above the balance-sheet lines. Both series are
+   effectively flat at this scale, so the numbers carry the answer and the chart
+   only shows whether the stability was steady or lumpy. */
+.bookDelta {
+  display: flex; gap: var(--s-6); flex-wrap: wrap;
+  padding: 2px 0 10px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--hairline);
+}
+.bookDeltaItem { display: flex; flex-direction: column; gap: 1px; min-width: 96px; }
+.bookDeltaVal {
+  font-family: var(--font-num); font-weight: 700; font-size: var(--t-num-sm);
+  letter-spacing: -0.01em; color: var(--ink-1); line-height: 1.15;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.bookDeltaPct { font-size: var(--t-3xs); color: var(--ink-3); }
+.bookDeltaPct[data-dir='up'] { color: var(--pos); }
+.bookDeltaPct[data-dir='down'] { color: var(--neg); }
