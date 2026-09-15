@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import s from './obsChart.module.css';
+import { TYPE } from '@/lib/type';
 
 export type ObsSeries = {
   key: string;
@@ -80,11 +81,11 @@ export function ObsChart({
           )}
           <CartesianGrid vertical={false} stroke="var(--hairline)" strokeDasharray="2 4" />
           <XAxis dataKey={xKey} tickFormatter={timeFmt} tickLine={false} axisLine={false}
-                 minTickGap={54} dy={6} tick={{ fontSize: 10, fill: 'var(--ink-3)' }} />
+                 minTickGap={54} dy={6} tick={{ fontSize: TYPE.xxxs, fill: 'var(--ink-3)' }} />
           <YAxis tickLine={false} axisLine={false} width={44} allowDecimals={false}
                  domain={[0, ceiling]}
                  tickFormatter={(v) => `${compact(Number(v))}${unit}`}
-                 tick={{ fontSize: 10, fill: 'var(--ink-3)' }} />
+                 tick={{ fontSize: TYPE.xxxs, fill: 'var(--ink-3)' }} />
           <Tooltip cursor={{ stroke: 'var(--hairline-strong)', strokeWidth: 1 }}
                    content={<ObsTip series={series} unit={unit} />} />
           {series.filter((ser) => ser.threshold != null && ser.threshold <= ceiling).map((ser) => (
@@ -92,7 +93,7 @@ export function ObsChart({
               key={`t-${ser.key}`} y={ser.threshold} stroke={ser.color}
               strokeDasharray="4 4" strokeOpacity={0.55}
               label={{ value: `${ser.label} limit`, position: 'insideTopRight',
-                       fill: 'var(--ink-3)', fontSize: 9.5 }}
+                       fill: 'var(--ink-3)', fontSize: TYPE.micro }}
             />
           ))}
           {series.map((ser) => area ? (

@@ -142,7 +142,7 @@ export function SignalStrip({ bio, bureau, crm, lending }: {
   const active = tiles.find((t) => t.key === open) ?? null;
 
   return (
-    <div className={`${s.card} ${s.sigCard} fadeUp`}>
+    <div className={`${s.card} fadeUp`}>
       <div className={s.sigRow}>
         {tiles.map((t) => (
           <button

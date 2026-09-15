@@ -18,6 +18,7 @@ import { TopMovers } from '@/components/portfolio/TopMovers';
 import { Worklist } from '@/components/portfolio/Worklist';
 import { ModelPerformance } from '@/components/portfolio/ModelPerformance';
 import ui from '@/components/ui.module.css';
+import { TYPE } from '@/lib/type';
 
 const VALID = new Set(['7D', '30D', 'QTD', 'YTD']);
 const RISK_COLORS = ['var(--pos)', 'var(--gold)', 'var(--coral)', 'var(--slate)'];
@@ -84,7 +85,7 @@ function PortfolioInner() {
                 <span className={ui.scopeChip}>{ov.scope.live_sample ? 'Live sample' : ov.scope.whole_book ? 'Whole book' : 'My book'}</span>
                 <span>{count(ov.scope.customers_in_view)} customers · {ov.period.label}</span>
                 {ov.cache.cached && <span className={ui.freshDot} title={`Precomputed ${ov.cache.age_seconds}s ago`}>◷ cached</span>}
-                {ov.scope.sample_note && <span style={{ color: 'var(--ink-3)', fontSize: 12 }} title={ov.scope.sample_note}>ⓘ whole-book roll-up in nightly precompute</span>}
+                {ov.scope.sample_note && <span style={{ color: 'var(--ink-3)', fontSize: TYPE.xs }} title={ov.scope.sample_note}>ⓘ whole-book roll-up in nightly precompute</span>}
               </>
             ) : 'Loading…'}
           </div>

@@ -2,20 +2,20 @@
    tabular sans for every figure/ID, brand palette. Dense, instrument-like. */
 
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.title { font-family: var(--font-display); font-size: 24px; letter-spacing: -0.015em; }
-.sub { color: var(--ink-2); font-size: 13.5px; margin-top: 4px; }
+.title { font-family: var(--font-display); font-size: var(--t-2xl); letter-spacing: -0.015em; }
+.sub { color: var(--ink-2); font-size: var(--t-sm); margin-top: 4px; }
 
 .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
 .search {
   flex: 1; min-width: 220px; max-width: 380px;
-  font-family: var(--font-sans); font-size: 14px; color: var(--ink-1);
+  font-family: var(--font-sans); font-size: var(--t-md); color: var(--ink-1);
   background: var(--surface); border: 1px solid var(--hairline-strong);
   border-radius: var(--r-md); padding: 9px 12px;
 }
 .search:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 16%, transparent); }
 
 .primaryBtn {
-  font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: #fff;
+  font-family: var(--font-sans); font-size: var(--t-md); font-weight: 600; color: #fff;
   background: var(--teal); border: 0; border-radius: var(--r-md); padding: 9px 15px; cursor: pointer;
   display: inline-flex; align-items: center; gap: 7px; transition: background 0.15s;
 }
@@ -23,36 +23,36 @@
 
 /* --- table --- */
 .tableWrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: var(--r-lg); background: var(--surface); }
-.table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 760px; }
+.table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); min-width: 760px; }
 .table thead th {
-  text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  text-align: left; font-size: var(--t-3xs); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
   color: var(--ink-3); padding: 11px 14px; border-bottom: 1px solid var(--hairline); white-space: nowrap;
 }
 .table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr:hover { background: var(--surface-2); }
 .uName { font-weight: 600; color: var(--ink-1); }
-.uSub { font-size: 12px; color: var(--ink-3); }
+.uSub { font-size: var(--t-xs); color: var(--ink-3); }
 .mono { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
 
 .roleChip {
-  display: inline-block; font-size: 11px; font-weight: 600; color: var(--navy);
+  display: inline-block; font-size: var(--t-2xs); font-weight: 600; color: var(--navy);
   background: color-mix(in srgb, var(--teal) 13%, transparent);
   border-radius: var(--r-pill); padding: 2px 8px; margin: 1px 3px 1px 0;
 }
 :global([data-theme="dark"]) .roleChip { color: var(--light-teal); }
-.tierBadge { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: capitalize; }
+.tierBadge { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.04em; text-transform: capitalize; }
 .tier_admin { color: var(--coral); }
 .tier_manager { color: var(--teal); }
 .tier_officer { color: var(--slate); }
 .tier_customer { color: var(--ink-3); }
 
-.statusDot { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; }
+.statusDot { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); }
 .dot { width: 7px; height: 7px; border-radius: 50%; }
 
 .rowActions { display: flex; gap: 6px; justify-content: flex-end; }
 .ghostBtn {
-  font-family: var(--font-sans); font-size: 12px; font-weight: 600; color: var(--ink-2);
+  font-family: var(--font-sans); font-size: var(--t-xs); font-weight: 600; color: var(--ink-2);
   background: transparent; border: 1px solid var(--hairline-strong); border-radius: var(--r-sm);
   padding: 5px 9px; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; white-space: nowrap;
 }
@@ -73,15 +73,15 @@
   width: 34px; height: 34px; border-radius: 9px; flex: none; display: grid; place-items: center;
   color: #fff; background: linear-gradient(135deg, var(--teal), var(--navy));
 }
-.panelTitle { font-family: var(--font-display); font-size: 18px; letter-spacing: -0.01em; line-height: 1.1; }
-.panelTitleSub { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+.panelTitle { font-family: var(--font-display); font-size: var(--t-lg); letter-spacing: -0.01em; line-height: 1.1; }
+.panelTitleSub { font-size: var(--t-xs); color: var(--ink-3); margin-top: 1px; }
 .panelBody { padding: 8px 20px 18px; overflow-y: auto; flex: 1; }
 
 /* form sections */
 .section { padding: 16px 0; border-bottom: 1px solid var(--hairline); }
 .section:last-of-type { border-bottom: 0; }
 .sectionLabel {
-  font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: var(--t-3xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--ink-3); margin-bottom: 12px;
 }
 .reqStar { color: var(--coral); }
@@ -103,16 +103,16 @@
 .roleCardOn .roleCheck { background: var(--teal); border-color: var(--teal); color: #fff; }
 .roleCardBody { flex: 1; min-width: 0; }
 .roleCardTop { display: flex; align-items: center; gap: 8px; }
-.roleCardName { font-family: var(--font-num); font-size: 13.5px; font-weight: 700; color: var(--ink-1); }
+.roleCardName { font-family: var(--font-num); font-size: var(--t-sm); font-weight: 700; color: var(--ink-1); }
 .roleCardTier {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: var(--t-3xs); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   padding: 1px 6px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--ink-2);
 }
-.roleCardDesc { font-size: 12px; color: var(--ink-2); margin-top: 3px; line-height: 1.45; }
+.roleCardDesc { font-size: var(--t-xs); color: var(--ink-2); margin-top: 3px; line-height: 1.45; }
 
 .moreToggle {
   margin-top: 12px; background: transparent; border: 0; cursor: pointer; padding: 0;
-  font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; color: var(--teal);
+  font-family: var(--font-sans); font-size: var(--t-xs); font-weight: 600; color: var(--teal);
   display: inline-flex; align-items: center; gap: 5px;
 }
 .legacyChips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
@@ -122,24 +122,22 @@
 
 .field { margin-bottom: 14px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 5px; }
+.label { display: block; font-size: var(--t-xs); font-weight: 600; color: var(--ink-2); margin-bottom: 5px; }
 .input, .select {
-  width: 100%; font-family: var(--font-sans); font-size: 14px; color: var(--ink-1);
+  width: 100%; font-family: var(--font-sans); font-size: var(--t-md); color: var(--ink-1);
   background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--r-md); padding: 9px 11px;
 }
 .input:focus, .select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 15%, transparent); }
-.hint { font-size: 11.5px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
-
-.rolePick { display: flex; flex-wrap: wrap; gap: 8px; }
+.hint { font-size: var(--t-2xs); color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
 .roleOpt {
   border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); padding: 6px 12px;
-  font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; background: var(--surface);
+  font-size: var(--t-xs); font-weight: 600; color: var(--ink-2); cursor: pointer; background: var(--surface);
   transition: all 0.14s;
 }
 .roleOptOn { border-color: var(--teal); color: var(--teal); background: color-mix(in srgb, var(--teal) 10%, transparent); }
 
 .cancelBtn {
-  font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--ink-2);
+  font-family: var(--font-sans); font-size: var(--t-md); font-weight: 600; color: var(--ink-2);
   background: transparent; border: 1px solid var(--hairline-strong); border-radius: var(--r-md); padding: 9px 15px; cursor: pointer;
 }
 
@@ -149,20 +147,20 @@
   border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
   border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 16px;
 }
-.revealTitle { font-weight: 700; font-size: 13px; color: var(--ink-1); margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
+.revealTitle { font-weight: 700; font-size: var(--t-sm); color: var(--ink-1); margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
 .revealPw {
-  font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 700;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: var(--t-lg); font-weight: 700;
   letter-spacing: 0.02em; color: var(--navy); background: var(--surface); border: 1px dashed var(--hairline-strong);
   border-radius: var(--r-sm); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 :global([data-theme="dark"]) .revealPw { color: var(--light-teal); }
-.copyBtn { font-size: 11px; font-weight: 600; color: var(--teal); background: transparent; border: 0; cursor: pointer; }
-.revealNote { font-size: 12px; color: var(--ink-2); margin-top: 8px; line-height: 1.5; }
+.copyBtn { font-size: var(--t-2xs); font-weight: 600; color: var(--teal); background: transparent; border: 0; cursor: pointer; }
+.revealNote { font-size: var(--t-xs); color: var(--ink-2); margin-top: 8px; line-height: 1.5; }
 
 .formError {
   background: color-mix(in srgb, var(--coral) 10%, transparent);
   border: 1px solid color-mix(in srgb, var(--coral) 32%, transparent);
   color: color-mix(in srgb, var(--coral) 92%, #000);
-  border-radius: var(--r-md); padding: 9px 12px; font-size: 13px; margin-bottom: 14px;
+  border-radius: var(--r-md); padding: 9px 12px; font-size: var(--t-sm); margin-bottom: 14px;
 }
 .denied { text-align: center; padding: 60px 20px; color: var(--ink-2); }

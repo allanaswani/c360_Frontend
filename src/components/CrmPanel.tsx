@@ -15,7 +15,7 @@ export function CrmPanel({ crm }: { crm: CustomerCrm }) {
   if (!p && !ins) return null;
 
   return (
-    <div className={`${s.card} ${s.crmCard} fadeUp`}>
+    <div className={`${s.card} fadeUp`}>
       <div className={s.crmHead}>
         <span className={s.crmTitle}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">

@@ -192,7 +192,7 @@ export default function DataHealthPage() {
           {Object.entries(grouped).map(([group, checks]) => (
             <div key={group}>
               <SectionLabel aside={`${checks.length} check${checks.length === 1 ? '' : 's'}`}>{group}</SectionLabel>
-              <div className={s.groupCard}>
+              <div className={ui.card}>
                 {checks.map((c) => (
                   <div key={c.key} className={s.row}>
                     <div className={s.rowMain}>

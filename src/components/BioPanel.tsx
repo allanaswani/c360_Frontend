@@ -73,7 +73,7 @@ export function BioPanel({ bio, embedded }: {
   if (embedded) return grid;
 
   return (
-    <div className={`${s.card} ${s.bioCard} fadeUp`}>
+    <div className={`${s.card} fadeUp`}>
       <button className={s.bioHead} onClick={toggle} aria-expanded={open}>
         <span className={s.bioTitle}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">

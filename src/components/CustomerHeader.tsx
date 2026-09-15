@@ -3,6 +3,7 @@ import type { CustomerHeader as Header, ValueSummary } from '@/lib/types';
 import { initials, kes, shortDate } from '@/lib/format';
 import { CountUp } from './CountUp';
 import s from './ui.module.css';
+import { TYPE } from '@/lib/type';
 
 /** The customer identity band. Identity + RM are live; risk & KYC are DERIVED from
  *  live data (violet, with the basis on hover); CRB stays "not sourced" (needs an
@@ -45,10 +46,10 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
         </div>
         <div style={{ textAlign: 'right' }}>
           <div className="microlabel" style={{ color: 'var(--ink-on-dark-2)' }}>Relationship value</div>
-          <div className="tnum" style={{ fontFamily: 'var(--font-num)', fontWeight: 700, fontSize: 26, color: '#fff', letterSpacing: '-0.01em' }}>
+          <div className="tnum" style={{ fontFamily: 'var(--font-num)', fontWeight: 700, fontSize: TYPE.xxl, color: '#fff', letterSpacing: '-0.01em' }}>
             <CountUp value={rel} format={(n) => kes(n)} />
           </div>
-          <div style={{ fontSize: 11, color: 'var(--ink-on-dark-2)' }}>as of {shortDate(asOf)}</div>
+          <div style={{ fontSize: TYPE.xxs, color: 'var(--ink-on-dark-2)' }}>as of {shortDate(asOf)}</div>
         </div>
       </div>
 

@@ -2,6 +2,7 @@
 
 import { fmtValue, pct } from '@/lib/format';
 import s from '../ui.module.css';
+import { TYPE } from '@/lib/type';
 
 interface D { label: string; value: number }
 
@@ -24,11 +25,11 @@ export function StackedBar({ data, fmt, colors }: { data: D[]; fmt: 'kes' | 'cou
       <div className={s.stackLegend}>
         {data.map((d, i) => (
           <div key={d.label} className={s.stackLegendRow}>
-            <span className={s.tooltipKey} style={{ fontSize: 12.5 }}>
+            <span className={s.tooltipKey} style={{ fontSize: TYPE.xs }}>
               <span className={s.swatch} style={{ background: colors[i % colors.length] }} />
               {d.label}
             </span>
-            <span className="tnum" style={{ fontSize: 12.5, color: 'var(--ink-2)' }}>
+            <span className="tnum" style={{ fontSize: TYPE.xs, color: 'var(--ink-2)' }}>
               {fmtValue(d.value, fmt)} <span style={{ color: 'var(--ink-3)' }}>· {pct(d.value / total)}</span>
             </span>
           </div>

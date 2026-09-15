@@ -4,6 +4,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { fmtValue, pct } from '@/lib/format';
 import { ChartTooltip } from './ChartTooltip';
 import s from '../ui.module.css';
+import { TYPE } from '@/lib/type';
 
 interface D { label: string; value: number }
 // Validated categorical order; direct labels + 2px gaps carry identity too.
@@ -29,18 +30,18 @@ export function DonutChart({ data, fmt, centerLabel, colors, center }: { data: D
         <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
           <div style={{ textAlign: 'center' }}>
             <div className="microlabel">{center?.label ?? centerLabel ?? 'Total'}</div>
-            <div className="tnum" style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 16, color: 'var(--ink-1)' }}>{center?.value ?? fmtValue(total, fmt)}</div>
+            <div className="tnum" style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: TYPE.md, color: 'var(--ink-1)' }}>{center?.value ?? fmtValue(total, fmt)}</div>
           </div>
         </div>
       </div>
       <div style={{ flex: 1, minWidth: 150 }}>
         {data.map((d, i) => (
           <div key={d.label} className={s.tooltipRow} style={{ marginTop: 7 }}>
-            <span className={s.tooltipKey} style={{ fontSize: 12.5 }}>
+            <span className={s.tooltipKey} style={{ fontSize: TYPE.xs }}>
               <span className={s.swatch} style={{ background: palette[i % palette.length] }} />
               {d.label}
             </span>
-            <span className="tnum" style={{ fontWeight: 600, fontSize: 12.5 }}>{total ? pct(d.value / total) : '—'}</span>
+            <span className="tnum" style={{ fontWeight: 600, fontSize: TYPE.xs }}>{total ? pct(d.value / total) : '—'}</span>
           </div>
         ))}
       </div>

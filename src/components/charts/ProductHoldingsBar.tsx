@@ -3,6 +3,7 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { kes } from '@/lib/format';
 import { ChartTooltip, Legend } from './ChartTooltip';
+import { TYPE } from '@/lib/type';
 
 interface Bar_ { product: string; balance: number; side: 'deposit' | 'loan' }
 const C_DEP = 'var(--series-1)'; // teal
@@ -20,13 +21,13 @@ export function ProductHoldingsBar({ bars }: { bars: Bar_[] }) {
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 56, bottom: 0, left: 4 }} barCategoryGap={8}>
           <CartesianGrid horizontal={false} />
           <XAxis type="number" tickFormatter={(v) => kes(v)} tickLine={false} axisLine={false} hide />
-          <YAxis type="category" dataKey="product" tickLine={false} axisLine={false} width={128} tick={{ fontSize: 12, fill: 'var(--ink-2)' }} />
+          <YAxis type="category" dataKey="product" tickLine={false} axisLine={false} width={128} tick={{ fontSize: TYPE.xs, fill: 'var(--ink-2)' }} />
           <Tooltip cursor={{ fill: 'color-mix(in srgb, var(--teal) 7%, transparent)' }} content={<PHTooltip />} />
           <Bar dataKey="balance" radius={[0, 4, 4, 0]} isAnimationActive>
             {data.map((d, i) => (
               <Cell key={i} fill={d.side === 'deposit' ? C_DEP : C_LOAN} />
             ))}
-            <LabelList dataKey="balance" position="right" formatter={(v) => kes(Number(v))} style={{ fill: 'var(--ink-2)', fontSize: 11, fontWeight: 600 }} />
+            <LabelList dataKey="balance" position="right" formatter={(v) => kes(Number(v))} style={{ fill: 'var(--ink-2)', fontSize: TYPE.xxs, fontWeight: 600 }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
