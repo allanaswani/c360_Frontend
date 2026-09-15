@@ -14,7 +14,7 @@ export function LendingPanel({ lending }: { lending: LendingHealth }) {
   if (!d && !c) return null;
 
   return (
-    <div className={`${s.card} ${s.lendCard} fadeUp`}>
+    <div className={`${s.card} fadeUp`}>
       <div className={s.lendHead}>
         <span className={s.lendTitle}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">

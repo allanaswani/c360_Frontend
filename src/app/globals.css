@@ -61,6 +61,34 @@
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
   --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 44px; --s-9: 64px;
 
+  /* --- type scale ---
+     Twenty-nine hard-coded font sizes had accumulated across the stylesheets —
+     12px next to 12.5px next to 13px, chosen per component — which is why no two
+     screens quite agreed. These are the only sizes; a raw `font-size: Npx` in a
+     module is a bug, not a decision.
+
+     The steps are deliberately TIGHTER than a stock web scale (Tailwind's, say).
+     This is a dense instrument read at arm's length by people scanning for the row
+     that is wrong, and a 1.25 ratio would cost roughly a third of the rows on a
+     screen. Ratio here is ~1.09 through the body range, widening for display. */
+  --t-micro: 9.5px;    /* uppercase key-labels; never sentence text */
+  --t-3xs: 10.5px;     /* dense table headers, chart ticks, badges */
+  --t-2xs: 11.5px;     /* captions, sub-values, chart legends */
+  --t-xs: 12.5px;      /* the workhorse: table cells, secondary body */
+  --t-sm: 13.5px;      /* body, form labels, list rows */
+  --t-md: 15px;        /* card titles, emphasised body */
+  --t-lg: 17px;        /* section headings */
+  --t-xl: 21px;        /* page titles */
+  --t-2xl: 26px;       /* the one headline figure on a screen */
+  --t-3xl: 34px;       /* hero / landing only */
+
+  /* Numerals carry the meaning in this app, so they get their own steps — a
+     figure sits a step above the label next to it and uses tabular lining forms. */
+  --t-num-sm: 15px;
+  --t-num-md: 19px;
+  --t-num-lg: 23px;
+  --t-num-xl: 30px;
+
   /* --- elevation: soft, low, brand-tinted (not default gray box-shadow) --- */
   --shadow-sm: 0 1px 2px rgba(8, 75, 101, 0.05), 0 1px 1px rgba(8, 75, 101, 0.03);
   --shadow-md: 0 2px 8px rgba(8, 75, 101, 0.07), 0 1px 2px rgba(8, 75, 101, 0.04);
@@ -123,7 +151,7 @@ html, body {
   background: var(--bg);
   color: var(--ink-1);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--t-md);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -147,7 +175,7 @@ button { font-family: inherit; }
 
 /* Micro-label: the small uppercase caption used throughout for structure. */
 .microlabel {
-  font-size: 10.5px;
+  font-size: var(--t-3xs);
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -159,7 +187,7 @@ button { font-family: inherit; }
 
 /* Recharts baseline overrides — kill the library defaults the brief calls out. */
 .recharts-cartesian-grid line { stroke: var(--grid); }
-.recharts-cartesian-axis-tick-value { fill: var(--ink-3); font-size: 11px; }
+.recharts-cartesian-axis-tick-value { fill: var(--ink-3); font-size: var(--t-2xs); }
 .recharts-cartesian-axis line, .recharts-cartesian-axis-line { stroke: var(--hairline-strong); }
 .recharts-surface { overflow: visible; }
 .recharts-default-tooltip { display: none !important; }

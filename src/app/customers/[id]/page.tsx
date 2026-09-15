@@ -16,6 +16,7 @@ import { HFCBView } from '@/components/HFCBView';
 import { DomainView } from '@/components/DomainView';
 import { ErrorState, Skeleton } from '@/components/States';
 import ui from '@/components/ui.module.css';
+import { TYPE } from '@/lib/type';
 
 const DOMAIN_LABEL: Record<string, { title: string; sub: string }> = {
   overview: { title: 'Overview', sub: 'Where value sits across domains, and the trend' },
@@ -143,8 +144,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
-              <div style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 2 }}>
+              <div style={{ fontSize: TYPE.md, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
+              <div style={{ fontSize: TYPE.xs, color: 'var(--ink-3)', marginTop: 2 }}>
                 {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub}
                 {meta?.as_of
                   ? ` · balances as of ${shortDate(meta.as_of)}; the period filter drives the trend charts only`

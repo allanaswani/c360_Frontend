@@ -3,6 +3,7 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { fmtValue } from '@/lib/format';
 import { ChartTooltip, Legend } from './ChartTooltip';
+import { TYPE } from '@/lib/type';
 
 interface D { label: string; a: number; b: number }
 const C_A = 'var(--series-1)';
@@ -16,7 +17,7 @@ export function GroupedBarChart({ data, seriesNames, fmt }: { data: D[]; seriesN
       <ResponsiveContainer width="100%" height={Math.max(180, data.length * 58)}>
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 4 }} barGap={4} barCategoryGap={22}>
           <CartesianGrid vertical={false} />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--ink-3)' }} interval={0} height={38} tickFormatter={(v) => trunc(String(v))} />
+          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: TYPE.xxs, fill: 'var(--ink-3)' }} interval={0} height={38} tickFormatter={(v) => trunc(String(v))} />
           <YAxis tickFormatter={(v) => fmtValue(Number(v), fmt)} tickLine={false} axisLine={false} width={52} dx={-2} />
           <Tooltip cursor={{ fill: 'color-mix(in srgb, var(--teal) 6%, transparent)' }} content={<T names={seriesNames} fmt={fmt} />} />
           <Bar dataKey="a" fill={C_A} radius={[4, 4, 0, 0]} maxBarSize={30} isAnimationActive />

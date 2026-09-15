@@ -1,7 +1,7 @@
 /* Monitoring console — dense, precise, Grafana-grade. Numerics are tabular/monospaced;
    colour is reserved for signal (teal ok, gold warn, coral bad). Theme-aware. */
 
-.liveTag { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.liveTag { display: inline-flex; align-items: center; gap: 7px; font-size: var(--t-xs); font-weight: 600; color: var(--ink-2); }
 .liveDot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
 .liveDot[data-live] { background: var(--teal); box-shadow: 0 0 0 0 color-mix(in srgb, var(--teal) 60%, transparent); animation: obspulse 2s infinite; }
 @keyframes obspulse {
@@ -30,17 +30,17 @@
 .tileLead {
   background: linear-gradient(180deg, color-mix(in srgb, var(--teal) 6%, var(--surface)), var(--surface));
 }
-.tileValLead { font-size: 30px; }
-.tile .microlabel { color: var(--ink-3); font-size: 9.5px; }
+.tileValLead { font-size: var(--t-num-xl); }
+.tile .microlabel { color: var(--ink-3); font-size: var(--t-micro); }
 .tileVal {
-  font-family: var(--font-num); font-size: 23px; font-weight: 700; color: var(--ink-1);
+  font-family: var(--font-num); font-size: var(--t-num-lg); font-weight: 700; color: var(--ink-1);
   letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.05;
 }
 .tileVal[data-tone="good"] { color: var(--teal); }
 .tileVal[data-tone="warn"] { color: var(--gold); }
 .tileVal[data-tone="bad"] { color: var(--coral); }
-.tileUnit { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-left: 2px; }
-.tileSub { font-size: 10.5px; color: var(--ink-3); }
+.tileUnit { font-size: var(--t-xs); font-weight: 600; color: var(--ink-3); margin-left: 2px; }
+.tileSub { font-size: var(--t-3xs); color: var(--ink-3); }
 
 /* chart panels */
 
@@ -48,25 +48,25 @@
 .split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; }
 @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
 
-.panelLink { font-size: 11.5px; color: var(--teal); text-decoration: none; font-weight: 600; }
+.panelLink { font-size: var(--t-2xs); color: var(--teal); text-decoration: none; font-weight: 600; }
 .panelLink:hover { text-decoration: underline; }
 
 /* top routes */
 
-.method { font-family: var(--font-num); font-size: 10px; color: var(--teal); font-weight: 700; margin-right: 4px; }
+.method { font-family: var(--font-num); font-size: var(--t-3xs); color: var(--teal); font-weight: 700; margin-right: 4px; }
 .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; min-width: 44px; }
 .numBad { color: var(--coral); font-weight: 700; }
 
 /* recent errors feed */
 
 .statusPill {
-  font-family: var(--font-num); font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  font-family: var(--font-num); font-size: var(--t-2xs); font-weight: 700; padding: 2px 6px; border-radius: 4px;
   min-width: 34px; text-align: center;
 }
 .status5 { color: var(--coral); background: color-mix(in srgb, var(--coral) 14%, transparent); }
 .status4 { color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, transparent); }
 .errRoute { color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
-.errMeta { color: var(--ink-3); font-size: 11px; white-space: nowrap; }
+.errMeta { color: var(--ink-3); font-size: var(--t-2xs); white-space: nowrap; }
 
 /* A panel header can carry more than one control (a link plus an export). */
 .panelActions { display: inline-flex; align-items: center; gap: 12px; }
@@ -74,7 +74,7 @@
 /* Route cell — the method sits tight against the path so the pair reads as one. */
 .routeCell { color: var(--ink-1); max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
 .errRoute { color: var(--ink-1); max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
-.errMeta { color: var(--ink-3); font-size: 11.5px; }
+.errMeta { color: var(--ink-3); font-size: var(--t-2xs); }
 .panelActions { display: inline-flex; align-items: center; gap: var(--s-3); }
 
 /* Two charts, not three. At a third of the width a time-series is a smear; these

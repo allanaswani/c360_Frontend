@@ -3,6 +3,7 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { fmtValue, seriesColor } from '@/lib/format';
 import { ChartTooltip } from './ChartTooltip';
+import { TYPE } from '@/lib/type';
 
 interface D { label: string; value: number; colorRole: number }
 
@@ -17,13 +18,13 @@ export function BarsChart({ data, fmt, fill = false }: { data: D[]; fmt: 'kes' |
       <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 70, bottom: 0, left: 4 }} barCategoryGap={9} maxBarSize={34}>
         <CartesianGrid horizontal={false} />
         <XAxis type="number" hide />
-        <YAxis type="category" dataKey="label" tickLine={false} axisLine={false} width={120} tick={{ fontSize: 12, fill: 'var(--ink-2)' }} />
+        <YAxis type="category" dataKey="label" tickLine={false} axisLine={false} width={120} tick={{ fontSize: TYPE.xs, fill: 'var(--ink-2)' }} />
         <Tooltip cursor={{ fill: 'color-mix(in srgb, var(--teal) 7%, transparent)' }} content={<T fmt={fmt} />} />
         <Bar dataKey="value" radius={[0, 4, 4, 0]} isAnimationActive>
           {rows.map((d, i) => (
             <Cell key={i} fill={seriesColor(d.colorRole)} />
           ))}
-          <LabelList dataKey="value" position="right" formatter={(v) => fmtValue(Number(v), fmt)} style={{ fill: 'var(--ink-2)', fontSize: 11, fontWeight: 600 }} />
+          <LabelList dataKey="value" position="right" formatter={(v) => fmtValue(Number(v), fmt)} style={{ fill: 'var(--ink-2)', fontSize: TYPE.xxs, fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>

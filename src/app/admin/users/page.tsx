@@ -8,6 +8,7 @@ import { ExportMenu } from '@/components/ExportMenu';
 import { AdminHeader, AdminNav, AdminOnly } from '@/components/admin/AdminChrome';
 import ui from '@/components/ui.module.css';
 import s from './admin.module.css';
+import { TYPE } from '@/lib/type';
 
 const TIER_CLASS: Record<string, string> = {
   admin: s.tier_admin, manager: s.tier_manager, officer: s.tier_officer, customer: s.tier_customer,
@@ -77,7 +78,7 @@ export default function UsersAdminPage() {
       <div className={s.toolbar}>
         <input className={s.search} placeholder="Search by name, username or email…"
           value={search} onChange={(e) => setSearch(e.target.value)} />
-        {users && <span style={{ color: 'var(--ink-3)', fontSize: 13 }}>{users.length} users</span>}
+        {users && <span style={{ color: 'var(--ink-3)', fontSize: TYPE.sm }}>{users.length} users</span>}
         <span style={{ flex: 1 }} />
         {/* The access register: who holds an account, what role, and which book.
             Exported from the rows on screen — this list is not paginated. */}

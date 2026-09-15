@@ -9,10 +9,10 @@
    that leaves them estimating values off the line. */
 .legend {
   width: 100%; border-collapse: collapse;
-  font-size: 11.5px; table-layout: auto;
+  font-size: var(--t-2xs); table-layout: auto;
 }
 .legend thead th {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: var(--t-micro); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--ink-3); text-align: right; padding: 0 0 3px 10px; font-variant-numeric: tabular-nums;
 }
 .legend thead th:first-child { width: 100%; }
@@ -32,7 +32,7 @@
 /* ---------- tooltip ---------- */
 .tip {
   background: var(--surface); border: 1px solid var(--hairline-strong);
-  border-radius: var(--r-md); padding: 8px 10px; font-size: 11.5px;
+  border-radius: var(--r-md); padding: 8px 10px; font-size: var(--t-2xs);
   box-shadow: var(--shadow-lg); min-width: 150px;
 }
 .tipTime {

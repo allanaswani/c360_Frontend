@@ -12,31 +12,31 @@
 .headMain { min-width: 0; }
 .eyebrow {
   display: flex; align-items: center; gap: 6px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: var(--t-3xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--teal); margin-bottom: 5px;
 }
 .eyebrowLink { color: var(--ink-3); text-decoration: none; }
 .eyebrowLink:hover { color: var(--teal); }
 .eyebrowSep { color: var(--ink-3); opacity: 0.55; font-weight: 400; }
 .title {
-  font-family: var(--font-display); font-size: 21px; font-weight: 600;
+  font-family: var(--font-display); font-size: var(--t-xl); font-weight: 600;
   letter-spacing: -0.015em; line-height: 1.15; margin: 0; color: var(--ink-1);
 }
-.sub { font-size: 12.5px; line-height: 1.45; color: var(--ink-3); margin: 4px 0 0; max-width: 76ch; }
+.sub { font-size: var(--t-xs); line-height: 1.45; color: var(--ink-3); margin: 4px 0 0; max-width: 76ch; }
 .sub code {
   font-family: var(--font-num); background: var(--surface-2);
-  padding: 1px 5px; border-radius: var(--r-xs); font-size: 11px;
+  padding: 1px 5px; border-radius: var(--r-xs); font-size: var(--t-2xs);
 }
 .headSide { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
 .headActions { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; justify-content: flex-end; }
-.headMeta { font-size: 11px; color: var(--ink-3); display: inline-flex; align-items: center; gap: 7px; }
+.headMeta { font-size: var(--t-2xs); color: var(--ink-3); display: inline-flex; align-items: center; gap: 7px; }
 
 /* ---------- section nav ----------
    The whole section, always. Previously each page mentioned one or two siblings in
    prose, so which screens existed depended on where you happened to land. */
 .nav { display: flex; gap: var(--s-1); margin: 0 0 var(--s-4); border-bottom: 1px solid var(--hairline); }
 .navItem {
-  padding: 9px var(--s-3) 10px; font-size: 13px; font-weight: 600;
+  padding: 9px var(--s-3) 10px; font-size: var(--t-sm); font-weight: 600;
   color: var(--ink-3); text-decoration: none;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
   transition: color 140ms ease, border-color 140ms ease;
@@ -58,7 +58,7 @@
 }
 .segment {
   border: none; background: none; font-family: inherit; cursor: pointer;
-  font-size: 12px; font-weight: 600; color: var(--ink-3);
+  font-size: var(--t-xs); font-weight: 600; color: var(--ink-3);
   padding: 5px 12px; border-radius: var(--r-pill);
   transition: color 120ms ease, background 120ms ease;
 }
@@ -72,7 +72,7 @@
    is where the padding was going. */
 .sectionLabel {
   display: flex; align-items: baseline; gap: var(--s-3);
-  font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  font-size: var(--t-3xs); font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
   color: var(--ink-3); margin: var(--s-4) 0 var(--s-2);
 }
 .sectionLabel::after {
@@ -91,17 +91,17 @@
   padding: 10px var(--s-4) 9px; border-bottom: 1px solid var(--hairline);
 }
 .panelTitleWrap { display: flex; align-items: baseline; gap: var(--s-2); min-width: 0; }
-.panelTitle { font-size: 13px; font-weight: 600; color: var(--ink-1); letter-spacing: -0.005em; }
-.panelNote { font-size: 11px; color: var(--ink-3); }
+.panelTitle { font-size: var(--t-sm); font-weight: 600; color: var(--ink-1); letter-spacing: -0.005em; }
+.panelNote { font-size: var(--t-2xs); color: var(--ink-3); }
 .panelBody { padding: var(--s-3) var(--s-4); flex: 1; min-width: 0; }
 .panelBodyFlush { flex: 1; min-width: 0; }
 
 /* ---------- empty state ---------- */
 .empty {
   display: flex; flex-direction: column; gap: 5px; align-items: center; text-align: center;
-  padding: 30px var(--s-5); color: var(--ink-3); font-size: 12.5px; line-height: 1.55;
+  padding: 30px var(--s-5); color: var(--ink-3); font-size: var(--t-xs); line-height: 1.55;
 }
-.empty b { color: var(--ink-1); font-size: 13.5px; font-weight: 600; }
+.empty b { color: var(--ink-1); font-size: var(--t-sm); font-weight: 600; }
 .empty span { max-width: 56ch; }
 
 /* ---------- access refusal ---------- */
@@ -109,18 +109,18 @@
   background: var(--surface); border: 1px solid var(--hairline);
   border-radius: var(--r-lg); padding: var(--s-7); margin-top: var(--s-6);
 }
-.denied h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0 0 6px; }
-.denied p { font-size: 13px; color: var(--ink-3); margin: 0; max-width: 60ch; }
+.denied h2 { font-family: var(--font-display); font-size: var(--t-num-md); font-weight: 600; margin: 0 0 6px; }
+.denied p { font-size: var(--t-sm); color: var(--ink-3); margin: 0; max-width: 60ch; }
 
 /* ---------- shared dense table ----------
    One table treatment for the whole section. Rows are 30px, not 44px: these screens
    are read by scanning for the row that is wrong, and generous padding means fewer
    rows on screen and more scrolling to find it. */
-.table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.table { width: 100%; border-collapse: collapse; font-size: var(--t-xs); }
 .table thead th {
   position: sticky; top: 0; z-index: 1;
   background: var(--surface-2); color: var(--ink-3);
-  font-size: 9.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  font-size: var(--t-micro); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
   text-align: left; padding: 7px var(--s-4); white-space: nowrap;
   border-bottom: 1px solid var(--hairline);
 }
