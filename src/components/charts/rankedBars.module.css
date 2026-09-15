@@ -1,0 +1,45 @@
+/* Ranked magnitude list. ~26px a row against the 43px a Recharts bar + gap costs,
+   and the value rides the end of its own bar instead of floating in a gutter. */
+
+.list { list-style: none; margin: 0; padding: 2px 0; display: flex; flex-direction: column; }
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(84px, 128px) 1fr 46px;
+  align-items: center; gap: var(--s-3);
+  padding: 3px 0; min-height: 26px;
+}
+/* A row carrying a second fact gets a fourth column for it. */
+.row:has(.meta) { grid-template-columns: minmax(84px, 128px) 1fr 46px 64px; }
+
+.label {
+  font-size: var(--t-2xs); color: var(--ink-2); text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* The bar and its value share a line, so the eye never crosses a gutter to pair them. */
+.track { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+.fill {
+  height: 15px; border-radius: 0 3px 3px 0; flex: none;
+  min-width: 2px; max-width: calc(100% - 64px);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.value {
+  font-family: var(--font-num); font-size: var(--t-2xs); font-weight: 600;
+  color: var(--ink-1); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap;
+}
+
+.share {
+  font-family: var(--font-num); font-size: var(--t-3xs); color: var(--ink-3);
+  font-variant-numeric: tabular-nums lining-nums; text-align: right; white-space: nowrap;
+}
+.meta {
+  font-size: var(--t-3xs); color: var(--ink-3); text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+  .row { grid-template-columns: minmax(70px, 96px) 1fr 42px; }
+  .row:has(.meta) { grid-template-columns: minmax(70px, 96px) 1fr 42px; }
+  .meta { display: none; }
+}

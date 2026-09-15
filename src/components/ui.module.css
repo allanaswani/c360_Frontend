@@ -513,12 +513,30 @@
 /* Model performance (outcome loop) */
 .mpEmpty { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.55; padding: 4px 2px; }
 .mpEmpty b { color: var(--ink-1); }
-.mpWrap { display: flex; flex-direction: column; gap: 16px; }
-.mpTiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.mpWrap { display: flex; flex-direction: column; gap: 10px; }
+
+/* Outcome counts — one compact row, not four boxed tiles. This panel sat in a
+   full-width card holding two lines of text; the counts are the part that has to
+   visibly move the moment an RM logs anything. */
+.mpCounts { display: flex; align-items: flex-end; gap: var(--s-5); flex-wrap: wrap; }
+.mpCount { display: flex; flex-direction: column; gap: 1px; min-width: 52px; }
+.mpCount[data-zero] { opacity: 0.45; }
+.mpCountVal {
+  font-family: var(--font-num); font-weight: 700; font-size: var(--t-num-md);
+  line-height: 1.05; letter-spacing: -0.02em; color: var(--ink-1);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.mpCountVal[data-tone='good'] { color: var(--sea-green); }
+.mpCountVal[data-tone='bad'] { color: var(--coral); }
+.mpCountVal[data-tone='accent'] { color: var(--teal); }
+.mpCountLabel {
+  font-size: var(--t-micro); font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.mpCountRule { width: 1px; align-self: stretch; background: var(--hairline); margin: 2px 0; }
+.mpNote { font-size: var(--t-2xs); color: var(--ink-3); line-height: 1.5; }
+.mpNote b { color: var(--ink-2); font-weight: 600; }
 @media (max-width: 680px) { .mpTiles { grid-template-columns: repeat(2, 1fr); } }
-.mpTile { background: var(--surface-2); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: 11px 13px; display: flex; flex-direction: column; gap: 3px; }
-.mpTileVal { font-family: var(--font-num); font-weight: 700; font-size: var(--t-xl); letter-spacing: -0.01em; color: var(--ink-1); }
-.mpTileSub { font-size: var(--t-2xs); color: var(--ink-3); }
 .mpBands { border-top: 1px solid var(--hairline); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .mpBandsHead { font-size: var(--t-xs); font-weight: 600; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
 .mpBandsHint { font-size: var(--t-2xs); font-weight: 400; color: var(--ink-3); }
@@ -647,7 +665,13 @@
 .wl_cust:hover { color: var(--teal); }
 .wl_id { font-size: var(--t-2xs); color: var(--ink-3); margin-top: 1px; }
 .wl_product { font-weight: 600; color: var(--ink-1); }
-.wl_reason { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Wraps to two lines rather than truncating. A one-line clamp on a column whose
+   content is a phrase means the distinguishing half is always the half cut off. */
+.wl_reason {
+  max-width: 320px; white-space: normal; line-height: 1.35;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 
 /* ---------- layout grids ---------- */
 
@@ -764,3 +788,33 @@
 }
 @keyframes bootSlide { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
 @media (prefers-reduced-motion: reduce) { .bootPulse::after { animation: none; } }
+
+
+/* Portfolio: three ranked/part-to-whole panels on one row.
+   Replaces pfSplit/pfCol/pfGrow, whose only job was to stack two short panels
+   beside one very tall one so the columns ended level — a layout that existed to
+   compensate for a chart that was too tall. */
+.pfTrio {
+  display: grid; grid-template-columns: 1.15fr 1fr 1fr;
+  gap: var(--s-3); margin-bottom: var(--s-3); align-items: start;
+}
+@media (max-width: 1180px) { .pfTrio { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .pfTrio { grid-template-columns: 1fr; } }
+
+/* Portfolio: the movement readout above the balance-sheet lines. Both series are
+   effectively flat at this scale, so the numbers carry the answer and the chart
+   only shows whether the stability was steady or lumpy. */
+.bookDelta {
+  display: flex; gap: var(--s-6); flex-wrap: wrap;
+  padding: 2px 0 10px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--hairline);
+}
+.bookDeltaItem { display: flex; flex-direction: column; gap: 1px; min-width: 96px; }
+.bookDeltaVal {
+  font-family: var(--font-num); font-weight: 700; font-size: var(--t-num-sm);
+  letter-spacing: -0.01em; color: var(--ink-1); line-height: 1.15;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.bookDeltaPct { font-size: var(--t-3xs); color: var(--ink-3); }
+.bookDeltaPct[data-dir='up'] { color: var(--pos); }
+.bookDeltaPct[data-dir='down'] { color: var(--neg); }

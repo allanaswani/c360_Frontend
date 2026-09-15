@@ -59,7 +59,12 @@ export function Worklist({ rows }: { rows: WorklistRow[] }) {
                     ? <span className={s.recPropTag} style={{ marginLeft: 6 }} title="Model-estimated propensity">{Math.round(r.recommendation.score * 100)}%</span>
                     : <span className={s.recDomainTag} style={{ marginLeft: 6 }}>{r.recommendation.domain}</span>}
                 </td>
-                <td className={`${s.wl_reason} ${s.tMuted}`} title={r.recommendation.reason}>{r.recommendation.reason}</td>
+                {/* The SHORT reason. The full sentence opens with the same boilerplate
+                    on every model-generated row, so a truncated column showed every
+                    customer the identical string and the driver never appeared. */}
+                <td className={`${s.wl_reason} ${s.tMuted}`} title={r.recommendation.reason}>
+                  {r.recommendation.reason_short || r.recommendation.reason}
+                </td>
                 <td>
                   {r.recommendation_status !== 'ok' ? (
                     <span className={`${s.badge} ${s.badgePreview}`} title={r.recommendation_status === 'eligibility_hold' ? 'Blocked by the derived risk/KYC gate' : 'No risk/KYC profile available'}><span className={s.badgeDot} style={{ background: 'var(--prov-preview)' }} />Held</span>

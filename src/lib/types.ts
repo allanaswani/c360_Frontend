@@ -366,6 +366,10 @@ export interface HFCBDomain {
 }
 
 export interface RecommendationItem {
+  /** A few words for a table column. The full `reason` opens with the same
+   *  boilerplate on every model-generated row, so truncating it in the worklist
+   *  showed every customer the identical string. */
+  reason_short?: string;
   product: string;
   product_name: string;
   domain: string;
