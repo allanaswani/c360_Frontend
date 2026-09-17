@@ -44,7 +44,22 @@
 }
 :global([data-theme="dark"]) .brandTag { color: var(--light-teal); }
 .topbarRight { display: flex; align-items: center; gap: var(--s-3); }
-.content { flex: 1; padding: var(--s-4) var(--s-5) var(--s-8); max-width: 1420px; width: 100%; margin: 0 auto; }
+/* Page container.
+   Was capped at 1420px, which on the 1920 and 2560 monitors this is actually used
+   on left 250–570px of empty gutter down BOTH sides while the tables inside were
+   truncating columns and the charts were being squeezed into thirds. A prose cap
+   makes sense for prose; this app is tables, charts and dense strips, and those
+   want the pixels.
+   1880 keeps a 2560 screen from stretching a table row to an unscannable width,
+   and on anything narrower the page simply fills it. Individual blocks that DO
+   read as prose set their own ch-based cap (see .custSummary, .sub). */
+.content {
+  flex: 1; width: 100%; margin: 0 auto;
+  padding: var(--s-4) var(--s-5) var(--s-8);
+  max-width: 1880px;
+}
+/* Past the cap the gutters would grow again, so let the padding take the slack. */
+@media (min-width: 2100px) { .content { padding-left: var(--s-7); padding-right: var(--s-7); } }
 
 /* ---------- data-mode pill ---------- */
 .modePill {
@@ -677,7 +692,13 @@
 
 /* customer drilldown: data-first main column + a sticky profile/recs rail, so the
    domain data sits right under the header instead of below stacked full-width chrome */
-.custShell { display: grid; grid-template-columns: minmax(0, 1.72fr) minmax(280px, 1fr); gap: var(--s-4); margin-top: var(--s-3); align-items: start; }
+/* The rail is CAPPED, not fractional. At 1.72fr/1fr a 1880px page gave the rail
+   ~600px — a next-best-product card stretched to twice the width it needs, beside
+   a main column that still had tables to fit. Extra width now goes to the data. */
+.custShell {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: var(--s-4); margin-top: var(--s-3); align-items: start;
+}
 .custRail { position: sticky; top: 70px; display: flex; flex-direction: column; gap: var(--s-3); }
 @media (max-width: 1080px) { .custShell { grid-template-columns: 1fr; } .custRail { position: static; } }
 .topRow { display: grid; grid-template-columns: 1.7fr 1fr; gap: var(--s-3); margin-top: var(--s-3); align-items: stretch; }
@@ -795,11 +816,13 @@
    beside one very tall one so the columns ended level — a layout that existed to
    compensate for a chart that was too tall. */
 .pfTrio {
-  display: grid; grid-template-columns: 1.15fr 1fr 1fr;
+  /* auto-FIT, not fixed tracks: Top deposit products is absent for some books, and
+     three hard columns left its slot as a hole the width of a panel. auto-fit
+     collapses the empty track, so two panels share the row instead of two panels
+     and a gap. */
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: var(--s-3); margin-bottom: var(--s-3); align-items: start;
 }
-@media (max-width: 1180px) { .pfTrio { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 760px) { .pfTrio { grid-template-columns: 1fr; } }
 
 /* Portfolio: the movement readout above the balance-sheet lines. Both series are
    effectively flat at this scale, so the numbers carry the answer and the chart
