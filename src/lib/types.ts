@@ -294,6 +294,35 @@ export interface LinkedParties {
   count: number;
   combined_value?: number;
   members: LinkedMember[];
+  /** Related parties from the curated register — a DIFFERENT question from the
+   *  members above, which are the same legal person under several customer
+   *  numbers. Null when the register is unwired or has nothing visible. */
+  related?: RelatedParties | null;
+}
+
+/** One party related to this customer, and the role between them. */
+export interface RelatedParty {
+  cust_id: string;
+  name: string | null;
+  segment: string | null;
+  branch?: string | null;
+  value?: number;
+  products_held?: number;
+  /** Raw register codes, e.g. ['DIRECTOR','SIGNATORY']. */
+  roles: string[];
+  /** Plain-language equivalents, e.g. ['Director','Signatory']. */
+  role_labels: string[];
+  /** 'outbound' = this customer holds the role at the other party;
+   *  'inbound'  = the other party holds the role here. */
+  direction?: 'outbound' | 'inbound' | string;
+}
+
+export interface RelatedParties {
+  basis: string;
+  count: number;
+  /** Family ties held back from display; reported so the count is never silently short. */
+  withheld_personal: number;
+  members: RelatedParty[];
 }
 
 export interface ValueSummary {

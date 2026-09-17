@@ -841,3 +841,32 @@
 .bookDeltaPct { font-size: var(--t-3xs); color: var(--ink-3); }
 .bookDeltaPct[data-dir='up'] { color: var(--pos); }
 .bookDeltaPct[data-dir='down'] { color: var(--neg); }
+
+/* ---------- related parties ----------
+   Reuses the linked-panel frame; the rows differ because each carries the ROLE
+   between the two parties, which is the whole point of the register. */
+.relList { display: flex; flex-direction: column; gap: 2px; margin-top: var(--s-2); }
+.relRow {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  padding: 7px 6px; border-radius: var(--r-sm); text-decoration: none;
+  transition: background 0.14s;
+}
+.relRow:hover { background: var(--surface-2); }
+.relMain { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.relName {
+  font-size: var(--t-xs); font-weight: 600; color: var(--ink-1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.relUnknown { color: var(--ink-3); font-weight: 500; font-style: italic; }
+.relRoles { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.relRole {
+  font-size: var(--t-micro); font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; padding: 1.5px 6px; border-radius: var(--r-xs);
+  color: var(--teal); background: color-mix(in srgb, var(--teal) 12%, transparent);
+  white-space: nowrap;
+}
+.relFoot {
+  margin: var(--s-2) 0 0; padding-top: var(--s-2);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--t-3xs); color: var(--ink-3); line-height: 1.45;
+}

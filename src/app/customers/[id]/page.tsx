@@ -7,6 +7,7 @@ import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, Linke
 import { CustomerHeader } from '@/components/CustomerHeader';
 import { SignalStrip } from '@/components/SignalStrip';
 import { LinkedParties } from '@/components/LinkedParties';
+import { RelatedParties } from '@/components/RelatedParties';
 import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
 import { shortDate } from '@/lib/format';
@@ -171,6 +172,10 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         <aside className={ui.custRail}>
           {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" /> : <Skeleton height={150} radius={12} />}
           {linked && linked.count > 0 && <LinkedParties data={linked} />}
+          {/* Related parties ride on the same payload. Different question from the
+              panel above: that one is this customer's OTHER customer numbers; this
+              one is other people and companies, and the role between them. */}
+          <RelatedParties data={linked?.related} />
         </aside>
       </div>
     </main>
