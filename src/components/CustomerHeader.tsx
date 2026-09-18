@@ -24,8 +24,16 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
   // even when they also bank with us: those balances live on their bank record,
   // which the notice below links to, not on this one.
   const propertyClient = header.property_client;
-  const heroLabel = propertyClient ? 'Property holding' : 'Relationship value';
-  const heroValue = propertyClient ? propertyClient.units_value : rel;
+  const insuranceClient = header.insurance_client;
+  // Relationship value is a BANK figure. On a record that has no bank side, KES 0 is
+  // true and useless: JACCA Consulting holds a live policy and pays KES 85,422 a year
+  // and their page led with zero. Each universe leads with what it actually holds.
+  const heroLabel = propertyClient ? 'Property holding'
+    : insuranceClient ? 'Annual premium'
+    : 'Relationship value';
+  const heroValue = propertyClient ? propertyClient.units_value
+    : insuranceClient ? insuranceClient.premium
+    : rel;
 
   return (
     <div className={`${s.headerBand} fadeUp`}>
