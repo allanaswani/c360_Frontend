@@ -16,6 +16,7 @@ import type {
   Meta,
   Metric,
   ObsOverview,
+  InsuranceClientList,
   PortfolioOverview,
   PropertyClientList,
   Recommendations,
@@ -542,6 +543,11 @@ export const api = {
   customer: (id: string) => request<CustomerDetail>(`/customers/${id}/`),
   // The the property register property register — a customer list the bank does not own. Separate
   // endpoint because it is a separate universe, not a filter over /customers/.
+  // The insurance arm's client register, including the clients who exist only in
+  // its premium receipts.
+  insuranceClients: (q: string, unbankedOnly: boolean) =>
+    request<InsuranceClientList>(
+      `/insurance-clients/?q=${encodeURIComponent(q)}${unbankedOnly ? '&unbanked=1' : ''}`),
   propertyClients: (q: string, unbankedOnly: boolean) =>
     request<PropertyClientList>(
       `/property-clients/?q=${encodeURIComponent(q)}${unbankedOnly ? '&unbanked=1' : ''}`),

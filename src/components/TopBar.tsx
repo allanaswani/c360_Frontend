@@ -23,6 +23,7 @@ export function TopBar() {
   const onCustomers = pathname === '/' || pathname.startsWith('/customers');
   const onBook = pathname.startsWith('/book');
   const onProperty = pathname.startsWith('/property-clients');
+  const onInsurance = pathname.startsWith('/insurance-clients');
 
   // Where "back to apps" goes — the HFCB app launcher, OUTSIDE this app's
   // /customer-360 basePath. A plain <a> (not next/link) so the prefix isn't added;
@@ -55,6 +56,11 @@ export function TopBar() {
           {meta?.scope?.whole_book && (
             <Link href="/property-clients" className={`${s.navItem} ${onProperty ? s.navItemActive : ''}`}>
               Property clients
+            </Link>
+          )}
+          {meta?.scope?.whole_book && (
+            <Link href="/insurance-clients" className={`${s.navItem} ${onInsurance ? s.navItemActive : ''}`}>
+              Insurance clients
             </Link>
           )}
         </nav>

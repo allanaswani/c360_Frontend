@@ -57,6 +57,56 @@ export interface PropertyClient {
   };
 }
 
+/**
+ * An insurance-arm client. A third universe alongside bank customers and property
+ * clients, and the one with two tiers: most have a record on the insurance register,
+ * a few hundred exist only in its premium receipts because the register never got
+ * them. `receipts_only` marks the second kind — they have a name and a count of
+ * payments and nothing else.
+ */
+export interface InsuranceClient {
+  cust_id: string;
+  name: string | null;
+  segment: string;
+  mobile: string | null;
+  email: string | null;
+  id_no: string | null;
+  insurance: {
+    client_no: string | null;
+    /** Set when this client ALSO banks with us — link to their full profile. */
+    bank_cust_id: string | null;
+    policies: number;
+    active_policies: number;
+    premium: number;
+    sum_insured: number;
+    receipts: number;
+    /** No client record on the register; premiums paid are the only evidence. */
+    receipts_only: boolean;
+    sales_person: string | null;
+    occupation: string | null;
+  };
+}
+
+export interface InsuranceClientCoverage {
+  total: number;
+  banked: number;
+  unbanked: number;
+  receipts_only: number;
+  note: string;
+}
+
+export interface InsuranceClientList {
+  count: number;
+  results: InsuranceClient[];
+  coverage: InsuranceClientCoverage | null;
+  staff_unverified: number;
+  receipts_only: number;
+  basis: string;
+  /** True while browsing: receipt-only clients have no client number to page by, so
+   *  they are reachable by search only and the page must say so. */
+  receipts_only_searchable: boolean;
+}
+
 export interface PropertyClientCoverage {
   total: number;
   banked: number;
@@ -290,6 +340,17 @@ export interface CustomerHeader {
    * broken; with it, the page can say in one line that there is no bank
    * relationship to show — and hand over to the real profile when there is one.
    */
+  /** Present ONLY for an insurance-register client. Same purpose as
+   *  `property_client`: without it a page of zeroes reads as broken. */
+  insurance_client?: {
+    client_no: string | null;
+    bank_cust_id: string | null;
+    policies: number;
+    active_policies: number;
+    premium: number;
+    receipts: number;
+    receipts_only: boolean;
+  };
   property_client?: {
     client_id: number;
     bank_cust_id: string | null;

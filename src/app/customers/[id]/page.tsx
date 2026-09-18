@@ -127,7 +127,9 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
 
       {/* A property client is not a bank customer. Said once, at the top, so the
           empty panels below read as an accurate record rather than a failed load. */}
-      {detail?.header.property_client && <PropertyClientNotice header={detail.header} />}
+      {(detail?.header.property_client || detail?.header.insurance_client) && (
+        <PropertyClientNotice header={detail.header} />
+      )}
 
       {/* Standing signals — bureau score, credit classification, collateral, CRM funnel,
           servicing RM and identification — as one dense row docked under the hero. Each

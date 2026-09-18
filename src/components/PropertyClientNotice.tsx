@@ -21,6 +21,8 @@ import s from './ui.module.css';
  * at it rather than quietly being the worse of the two.
  */
 export function PropertyClientNotice({ header }: { header: CustomerHeader }) {
+  const ins = header.insurance_client;
+  if (ins) return <InsuranceClientNotice header={header} />;
   const h = header.property_client;
   if (!h) return null;
 
@@ -51,6 +53,65 @@ export function PropertyClientNotice({ header }: { header: CustomerHeader }) {
               with us. The banking, bureau and insurance panels below are empty because
               there is nothing there, not because anything failed to load.
               {h.has_pin && ` ${BRAND.property} holds a KRA PIN for them.`}
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
+/**
+ * The same job for an insurance client, with one case the property register does not
+ * have: a client the register never got, whose only evidence is the premiums they
+ * have paid. Saying that plainly is the difference between "we hold nothing on this
+ * person" and "the insurance system holds payments and no client record", and only
+ * the second is true.
+ */
+function InsuranceClientNotice({ header }: { header: CustomerHeader }) {
+  const h = header.insurance_client;
+  if (!h) return null;
+
+  return (
+    <div className={s.hfdiNotice}>
+      <svg className={s.hfdiIcon} width="17" height="17" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" strokeWidth="1.9" aria-hidden="true">
+        <path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z" />
+      </svg>
+      <div className={s.hfdiBody}>
+        <div className={s.hfdiTitle}>
+          {h.bank_cust_id
+            ? 'Insurance client, and a bank customer'
+            : h.receipts_only
+              ? 'Insurance payments on record, no client file'
+              : 'Insurance client, not a bank customer'}
+        </div>
+        <p className={s.hfdiText}>
+          {h.bank_cust_id ? (
+            <>
+              This is their record on the insurance register. Their bank profile holds the
+              deposits, lending and product history this page cannot show.{' '}
+              <Link href={`/customers/${h.bank_cust_id}`} className={s.hfdiLink}>
+                Open the full profile →
+              </Link>
+            </>
+          ) : h.receipts_only ? (
+            <>
+              The insurance system has {count(h.receipts)} premium{' '}
+              {h.receipts === 1 ? 'receipt' : 'receipts'} under this name and no client
+              record at all, so there is no policy detail, no contact details and no
+              identity document to show. Everything below is empty because the record is
+              missing from the insurance extract, not because anything failed to load.
+            </>
+          ) : (
+            <>
+              They hold {count(h.policies)}{' '}
+              {h.policies === 1 ? 'policy' : 'policies'} with the insurance arm
+              {h.policies > 0 && <> ({h.active_policies || 'none'} currently active)</>}
+              {h.receipts > 0 && <>, and {count(h.receipts)} premium receipts</>}, and no
+              account with us. The banking and bureau panels below are empty because there
+              is nothing there, not because anything failed to load.
             </>
           )}
         </p>
