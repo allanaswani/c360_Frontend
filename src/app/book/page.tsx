@@ -93,14 +93,33 @@ export default function BookPage() {
   const liveMeta = (snapshot: number, liveValue: number | undefined, fmt: (n: number) => string) =>
     differs(snapshot, liveValue) ? `live ${fmt(liveValue as number)} at ${asOf}` : undefined;
 
+  // What the RM Portfolio tool shows for this same book, read from the same tables
+  // with the same rules. When two screens disagree, the one the business quotes
+  // should lead; the others stay beneath it so the difference can be reconciled
+  // rather than argued about.
+  const pv = data.portfolio_view ?? null;
+  const depositsShown = pv?.deposits ?? deposits;
+  const loansShown = pv?.loans ?? loans;
+  const customersShown = pv?.customers ?? customers;
+
+  const uploadMeta = (shown: number, upload: number, fmt: (n: number) => string) =>
+    pv && differs(shown, upload) ? `allocation upload ${fmt(upload)}` : undefined;
+
   const stats: Stat[] = [
     { label: 'AUM', lead: true, countTo: aum, fmt: (n) => kes(n), value: kes(aum), meta: 'allocation upload' },
-    { label: 'Customers', countTo: customers, fmt: (n) => count(Math.round(n)), value: count(customers),
-      meta: liveMeta(customers, live?.customers, (n) => count(Math.round(n))) },
-    { label: 'Deposits', countTo: deposits, fmt: (n) => kes(n), value: kes(deposits),
-      meta: liveMeta(deposits, live?.deposits, kes) },
-    { label: 'Loans', countTo: loans, fmt: (n) => kes(n), value: kes(loans),
-      meta: liveMeta(loans, live?.loans, kes) },
+    { label: 'Customers', countTo: customersShown, fmt: (n) => count(Math.round(n)),
+      value: count(customersShown),
+      meta: pv?.customers != null
+        ? uploadMeta(customersShown, customers, (n) => count(Math.round(n)))
+        : liveMeta(customers, live?.customers, (n) => count(Math.round(n))) },
+    { label: 'Deposits', countTo: depositsShown, fmt: (n) => kes(n), value: kes(depositsShown),
+      meta: pv?.deposits != null
+        ? uploadMeta(depositsShown, deposits, kes)
+        : liveMeta(deposits, live?.deposits, kes) },
+    { label: 'Loans', countTo: loansShown, fmt: (n) => kes(n), value: kes(loansShown),
+      meta: pv?.loans != null
+        ? uploadMeta(loansShown, loans, kes)
+        : liveMeta(loans, live?.loans, kes) },
     { label: 'Net contribution', countTo: contribution, fmt: (n) => kes(n), value: kes(contribution), tone: contribution >= 0 ? 'pos' : 'neg' },
     { label: 'Non-performing', countTo: nplCust, fmt: (n) => count(Math.round(n)), value: count(nplCust), tone: nplCust > 0 ? 'neg' : undefined, meta: `${nplShare}% of customers` },
   ];
@@ -122,7 +141,20 @@ export default function BookPage() {
           >
             Allocation upload
           </span>
-          {live && (
+          {pv?.deposits_as_at && (
+            <span
+              className={s.liveChip}
+              title={
+                'Deposits and loans are read from the balance-movement tables keyed on the '
+                + "account's RM code, which is how the RM Portfolio tool reads them, so the two "
+                + 'screens show the same figure. AUM and net contribution come from the '
+                + 'allocation upload, which has no load date.'
+              }
+            >
+              Balances {pv.deposits_as_at}
+            </span>
+          )}
+          {!pv && live && (
             <span className={s.liveChip} title={`Deposits, loans and non-performing status read from the live book at ${shortDate(live.as_of)}.`}>
               Live check {shortDate(live.as_of)}
             </span>

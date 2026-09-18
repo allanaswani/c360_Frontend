@@ -378,6 +378,21 @@ export interface BookSummary {
   /** customer_allocation_base records no load date, so the page must not imply it
    *  knows how current the upload is. */
   snapshot_dated?: boolean;
+  /**
+   * The same book as the RM Portfolio tool reads it: balances from the
+   * balance-movement tables keyed on the account's RM code, and the customer count
+   * from the allocation table that tool uses. These are the figures the business
+   * quotes, so the tiles lead with them. Null when the reporting Postgres is
+   * unreachable, and the page then falls back to the upload.
+   */
+  portfolio_view?: {
+    deposits?: number;
+    deposits_as_at?: string | null;
+    loans?: number;
+    loans_as_at?: string | null;
+    customers?: number | null;
+    basis?: string;
+  } | null;
   segments?: { segment: string; customers: number; aum: number }[];
   top_customers?: BookCustomer[];
 }
