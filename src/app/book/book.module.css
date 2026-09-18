@@ -56,6 +56,28 @@
 .topContribNeg { color: var(--coral); }
 .nplTag { flex: 0 0 auto; font-size: var(--t-micro); font-weight: 800; letter-spacing: 0.05em; color: var(--coral); border: 1px solid var(--coral); border-radius: var(--r-xs); padding: 0 4px; line-height: 1.5; }
 
+/* Markers added when the allocation upload is reconciled against the live book.
+   Deliberately quieter than .nplTag: they report on the data, not on the customer. */
+.fixedTag,
+.closedTag,
+.unverifiedTag {
+  flex: 0 0 auto;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: var(--r-xs);
+  padding: 0 5px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+/* A flag that was cleared. Green would read as "this customer is healthy"; this is
+   a statement about the record, so it stays neutral. */
+.fixedTag { color: var(--slate); border: 1px solid color-mix(in srgb, var(--slate) 55%, transparent); }
+/* Closed is a fact about the account, and the AUM beside it is still the upload's. */
+.closedTag { color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--hairline); }
+/* The one case where we could not check. Gold is the app's preview/unverified hue. */
+.unverifiedTag { color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent); }
+
 /* ---------- non-performing exposure (rail) ---------- */
 .nplWrap { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 .nplBig { display: flex; align-items: baseline; gap: 10px; }

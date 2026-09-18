@@ -318,6 +318,40 @@ export interface HealthPoint {
   days_behind: number | null;
   checks: Record<string, { value: number | null; status: string; latency_ms?: number }>;
 }
+/**
+ * One row of the book, after the allocation snapshot has been checked against the
+ * live warehouse.
+ *
+ * The snapshot is a periodic upload and carries columns nothing else has (AUM, net
+ * contribution, who is allocated to whom). What it cannot be trusted for is anything
+ * that moves daily, which is how two performing customers came to be badged NPL and
+ * a customer who closed in June stayed at the top of a book on KES 9.31M.
+ */
+export interface BookCustomer {
+  cust_id: string;
+  name: string | null;
+  segment: string | null;
+  aum: number;
+  contribution: number;
+  /** Decided by the live loan book when it could be read; see `npl_source`. */
+  npl: boolean;
+  /** 'live' = checked against the loan book today. 'no_live_lending' = no loan to
+   *  classify, so no badge is claimed either way. 'snapshot' = the warehouse could
+   *  not be reached and this is the unverified upload value. */
+  npl_source?: 'live' | 'no_live_lending' | 'snapshot';
+  /** Live classification: Normal / Overdue / Write Off. */
+  live_status?: string | null;
+  live_loans?: number;
+  live_deposits?: number | null;
+  /** False when the live check could not run, so the row is showing snapshot values. */
+  verified?: boolean;
+  /** What the snapshot claimed, kept so a correction can be shown as a correction. */
+  npl_was_snapshot?: boolean;
+  npl_corrected?: boolean;
+  /** No live lending and no deposit balance left. */
+  closed?: boolean;
+}
+
 export interface BookSummary {
   available: boolean;
   detail?: string;
@@ -331,7 +365,7 @@ export interface BookSummary {
   npl_customers?: number;
   npl_aum?: number;
   segments?: { segment: string; customers: number; aum: number }[];
-  top_customers?: { cust_id: string; name: string | null; segment: string | null; aum: number; contribution: number; npl: boolean }[];
+  top_customers?: BookCustomer[];
 }
 export interface DataHealth {
   data_mode: 'mock' | 'live';

@@ -117,7 +117,35 @@ export default function BookPage() {
                     <span className={s.topName}>
                       {c.name ?? `Customer ${c.cust_id}`}
                       {c.segment && <span className={s.topSeg}>{c.segment}</span>}
-                      {c.npl && <span className={s.nplTag}>NPL</span>}
+                      {/* The badge now comes from the live loan book. Where that
+                          contradicts the allocation upload, the row says so rather
+                          than quietly showing a different answer than yesterday. */}
+                      {c.npl && (
+                        <span className={s.nplTag} title={c.live_status ? `Live loan status: ${c.live_status}` : undefined}>
+                          {c.live_status ?? 'NPL'}
+                        </span>
+                      )}
+                      {c.npl_corrected && !c.npl && (
+                        <span
+                          className={s.fixedTag}
+                          title="The allocation upload flagged this customer non-performing. The live loan book does not, so the flag is not shown."
+                        >
+                          NPL cleared
+                        </span>
+                      )}
+                      {c.closed && (
+                        <span
+                          className={s.closedTag}
+                          title="No lending and no deposit balance in the live book. The AUM beside this row comes from the allocation upload, which still carries them."
+                        >
+                          Closed
+                        </span>
+                      )}
+                      {c.verified === false && (
+                        <span className={s.unverifiedTag} title="The live warehouse could not be reached, so this row shows the allocation upload unchecked.">
+                          Unverified
+                        </span>
+                      )}
                     </span>
                     <span className={s.shareTrack}>
                       <span className={`${s.shareFill} ${c.npl ? s.shareFillNpl : ''}`} style={{ width: `${(c.aum / topMax) * 100}%` }} />
