@@ -870,3 +870,34 @@
   border-top: 1px solid var(--hairline);
   font-size: var(--t-3xs); color: var(--ink-3); line-height: 1.45;
 }
+
+/* ---------- HFDI property-client notice ---------- */
+/* Explains an intentionally empty page. Slate, not coral: nothing has gone wrong —
+   this is an accurate record of a person who does not bank with us. */
+.hfdiNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid color-mix(in srgb, var(--slate) 38%, var(--hairline));
+  border-left: 3px solid var(--slate);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--slate) 7%, var(--surface-1));
+}
+.hfdiIcon { flex: none; color: var(--slate); margin-top: 1px; }
+.hfdiBody { min-width: 0; }
+.hfdiTitle {
+  font-size: var(--t-xs);
+  font-weight: 650;
+  color: var(--ink-1);
+  letter-spacing: -0.005em;
+}
+.hfdiText {
+  margin: 3px 0 0;
+  font-size: var(--t-2xs);
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.hfdiLink { color: var(--teal); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.hfdiLink:hover { text-decoration: underline; }

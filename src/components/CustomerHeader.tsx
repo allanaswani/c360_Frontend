@@ -18,6 +18,14 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
   const id = header.identity;
   const risk = header.risk;
   const rel = value.headline.relationship_value.value as number;
+  // On an HFDI record the hero is the property, always. Relationship value is a
+  // BANK figure and this record has no bank side to it — showing KES 0 would read
+  // as "we hold nothing on them" while they own units worth millions. That is true
+  // even when they also bank with us: those balances live on their bank record,
+  // which the notice below links to, not on this one.
+  const hfdi = header.hfdi;
+  const heroLabel = hfdi ? 'Property holding' : 'Relationship value';
+  const heroValue = hfdi ? hfdi.units_value : rel;
 
   return (
     <div className={`${s.headerBand} fadeUp`}>
@@ -33,7 +41,10 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
             <div className={s.custSub}>
               <span><b style={{ color: 'var(--ink-on-dark)' }}>{header.cust_id}</b></span>
               <span>· {String(id.segment.value)}</span>
-              <span>· {String(id.branch.value)} branch</span>
+              {/* An organisation, or a client from a register that has no branches,
+                  legitimately has no branch. Printing it unconditionally rendered
+                  the literal text "null branch". */}
+              {id.branch.value != null && <span>· {String(id.branch.value)} branch</span>}
               {id.rm_name.value && <span>· RM {String(id.rm_name.value)}</span>}
               {id.rm_previous?.value && (
                 <span title="Reassigned from a previous relationship manager" style={{ opacity: 0.75 }}>
@@ -45,9 +56,9 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div className="microlabel" style={{ color: 'var(--ink-on-dark-2)' }}>Relationship value</div>
+          <div className="microlabel" style={{ color: 'var(--ink-on-dark-2)' }}>{heroLabel}</div>
           <div className="tnum" style={{ fontFamily: 'var(--font-num)', fontWeight: 700, fontSize: TYPE.xxl, color: '#fff', letterSpacing: '-0.01em' }}>
-            <CountUp value={rel} format={(n) => kes(n)} />
+            <CountUp value={heroValue} format={(n) => kes(n)} />
           </div>
           <div style={{ fontSize: TYPE.xxs, color: 'var(--ink-on-dark-2)' }}>as of {shortDate(asOf)}</div>
         </div>

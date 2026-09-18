@@ -21,6 +21,7 @@ export function TopBar() {
   const onPortfolio = pathname.startsWith('/portfolio');
   const onCustomers = pathname === '/' || pathname.startsWith('/customers');
   const onBook = pathname.startsWith('/book');
+  const onProperty = pathname.startsWith('/property-clients');
 
   // Where "back to apps" goes — the HFCB app launcher, OUTSIDE this app's
   // /customer-360 basePath. A plain <a> (not next/link) so the prefix isn't added;
@@ -47,6 +48,13 @@ export function TopBar() {
           <Link href="/portfolio" className={`${s.navItem} ${onPortfolio ? s.navItemActive : ''}`}>Portfolio</Link>
           <Link href="/" className={`${s.navItem} ${onCustomers ? s.navItemActive : ''}`}>Customers</Link>
           <Link href="/book" className={`${s.navItem} ${onBook ? s.navItemActive : ''}`}>My book</Link>
+          {/* HFDI's property register — a separate customer universe, and whole-book
+              only, so it is hidden from an RM whose book contains none of it. */}
+          {meta?.scope?.whole_book && (
+            <Link href="/property-clients" className={`${s.navItem} ${onProperty ? s.navItemActive : ''}`}>
+              Property clients
+            </Link>
+          )}
         </nav>
       </div>
       <div className={s.topbarRight}>
