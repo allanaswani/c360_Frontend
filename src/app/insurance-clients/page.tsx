@@ -105,7 +105,7 @@ export default function InsuranceClients() {
                   policies: c.insurance.policies,
                   active_policies: c.insurance.active_policies,
                   premium: c.insurance.premium,
-                  receipts: c.insurance.receipts,
+                  receipts: c.insurance.receipts ?? 'No receipts on file',
                   bank_cust_id: c.insurance.bank_cust_id ?? 'No bank record',
                 })),
               }),
@@ -245,7 +245,17 @@ function ClientRow({ c }: { c: InsuranceClient }) {
       </div>
       <div className={s.rowFig}>
         <span className="microlabel">Receipts</span>
-        <span className={`${s.rowFigVal} tnum`}>{count(c.insurance.receipts)}</span>
+        {/* null means the receipts feed has no row for this client, which is true of
+            54% of the register. A bare 0 read as "this client has never paid" about
+            someone the feed simply does not reach. */}
+        <span
+          className={`${s.rowFigVal} tnum`}
+          title={c.insurance.receipts == null
+            ? 'No premium receipts on file. The receipts feed covers about half the register, so this is not a statement that nothing was paid.'
+            : undefined}
+        >
+          {c.insurance.receipts == null ? '—' : count(c.insurance.receipts)}
+        </span>
       </div>
       <svg className={s.rowChevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg>
     </Link>

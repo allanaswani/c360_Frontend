@@ -79,7 +79,9 @@ export interface InsuranceClient {
     active_policies: number;
     premium: number;
     sum_insured: number;
-    receipts: number;
+    /** Null when the receipts feed has no row for this client (54% of the register).
+     *  Zero would mean rows summing to nothing, which never happens. */
+    receipts: number | null;
     /** No client record on the register; premiums paid are the only evidence. */
     receipts_only: boolean;
     sales_person: string | null;
@@ -92,6 +94,8 @@ export interface InsuranceClientCoverage {
   banked: number;
   unbanked: number;
   receipts_only: number;
+  /** Register clients the premium-receipts feed actually has a row for. */
+  receipts_reach: number | null;
   note: string;
 }
 
