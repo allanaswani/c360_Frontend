@@ -65,6 +65,9 @@ export default function BookPage() {
   const nplCust = data.npl_customers ?? 0;
   const nplAum = data.npl_aum ?? 0;
   const nplShare = customers ? Math.round((nplCust / customers) * 100) : 0;
+  // How many the live check took off the upload's list. Reported rather than
+  // silently absorbed: an RM who saw a wrong flag needs to see it was corrected.
+  const cleared = Math.max(0, (data.npl_snapshot_customers ?? nplCust) - nplCust);
   const nplAumShare = aum ? Math.min(100, Math.round((nplAum / aum) * 100)) : 0;
   const ltd = deposits > 0 ? loans / deposits : null;
 
@@ -185,12 +188,38 @@ export default function BookPage() {
                     </div>
                     <div className={s.nplBar}><div className={s.nplBarFill} style={{ width: `${nplAumShare}%` }} /></div>
                     <div className={s.nplHint}>{nplAumShare}% of book AUM is with non-performing customers.</div>
+                    {/* Where this count came from. The allocation upload is periodic
+                        and was three months stale when it badged two performing
+                        customers, so the count is recounted from the live loan book
+                        wherever the book is small enough to check on a page load. */}
+                    {data.npl_source === 'live' && cleared > 0 && (
+                      <div className={s.nplHint}>
+                        Checked against the loan book today. The allocation upload flagged{' '}
+                        {count(data.npl_snapshot_customers ?? 0)}; {count(cleared)} of those{' '}
+                        {cleared === 1 ? 'is' : 'are'} performing in the live book and{' '}
+                        {cleared === 1 ? 'is' : 'are'} not counted here.
+                      </div>
+                    )}
+                    {data.npl_source === 'snapshot' && (
+                      <div className={s.nplHint}>
+                        From the allocation upload, not checked against the live loan book.
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
                 <div className={s.nplClear}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M20 6L9 17l-5-5" /></svg>
-                  No non-performing customers in this book.
+                  <span>
+                    No non-performing customers in this book.
+                    {data.npl_source === 'live' && cleared > 0 && (
+                      <>
+                        {' '}The allocation upload flagged {count(data.npl_snapshot_customers ?? 0)},
+                        {' '}but the live loan book shows {cleared === 1 ? 'that customer' : 'all of them'}
+                        {' '}performing.
+                      </>
+                    )}
+                  </span>
                 </div>
               )}
             </div>

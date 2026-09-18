@@ -364,6 +364,13 @@ export interface BookSummary {
   contribution?: number;
   npl_customers?: number;
   npl_aum?: number;
+  /** 'live' = recounted from the loan book today; 'snapshot' = the allocation
+   *  upload's own figure, either because the warehouse was unreachable or the book
+   *  is too large to check on a page load. */
+  npl_source?: 'live' | 'snapshot';
+  /** What the upload claimed, so a correction can be reported as a correction. */
+  npl_snapshot_customers?: number;
+  npl_snapshot_aum?: number;
   segments?: { segment: string; customers: number; aum: number }[];
   top_customers?: BookCustomer[];
 }
