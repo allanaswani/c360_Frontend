@@ -32,10 +32,10 @@ export interface Meta {
 }
 
 /**
- * An HFDI property client. A separate universe from `CustomerSummary`: these people
+ * An property client. A separate universe from `CustomerSummary`: these people
  * are on the property arm's register, not the bank's customer master, and most of
  * them hold no bank record at all — which is why they were invisible in this app
- * until now. Their id is namespaced `HFDI-<client_id>` so no bank query can ever
+ * until now. Their id is namespaced `the property register-<client_id>` so no bank query can ever
  * resolve it and attach somebody else's balances.
  */
 export interface PropertyClient {
@@ -45,7 +45,7 @@ export interface PropertyClient {
   mobile: string | null;
   email: string | null;
   id_no: string | null;
-  hfdi: {
+  property_client: {
     client_id: number;
     /** Set when this client ALSO banks with us — link to their full profile. */
     bank_cust_id: string | null;
@@ -285,12 +285,12 @@ export interface CustomerHeader {
   /** One plain-language line composed server-side from the facts on this page. */
   summary?: string;
   /**
-   * Present ONLY when this record is an HFDI property client rather than a bank
+   * Present ONLY when this record is an property client rather than a bank
    * customer. Without it a page full of zeroes and "not sourced" badges reads as
    * broken; with it, the page can say in one line that there is no bank
    * relationship to show — and hand over to the real profile when there is one.
    */
-  hfdi?: {
+  property_client?: {
     client_id: number;
     bank_cust_id: string | null;
     units: number;

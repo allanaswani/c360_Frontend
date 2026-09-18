@@ -18,14 +18,14 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
   const id = header.identity;
   const risk = header.risk;
   const rel = value.headline.relationship_value.value as number;
-  // On an HFDI record the hero is the property, always. Relationship value is a
+  // On an the property register record the hero is the property, always. Relationship value is a
   // BANK figure and this record has no bank side to it — showing KES 0 would read
   // as "we hold nothing on them" while they own units worth millions. That is true
   // even when they also bank with us: those balances live on their bank record,
   // which the notice below links to, not on this one.
-  const hfdi = header.hfdi;
-  const heroLabel = hfdi ? 'Property holding' : 'Relationship value';
-  const heroValue = hfdi ? hfdi.units_value : rel;
+  const propertyClient = header.property_client;
+  const heroLabel = propertyClient ? 'Property holding' : 'Relationship value';
+  const heroValue = propertyClient ? propertyClient.units_value : rel;
 
   return (
     <div className={`${s.headerBand} fadeUp`}>
@@ -150,7 +150,7 @@ function LastTxnChip({ metric, loading, asOf }: {
   const color = months >= 36 ? 'var(--coral)' : months >= 12 ? 'var(--gold)' : undefined;
   const ago = months < 1 ? 'this month' : months < 12 ? `${months} mo ago` : `${years} yr${years > 1 ? 's' : ''} ago`;
   const title = color
-    ? `Account is marked Active, but its last customer-facing transaction was ${shortDate(val)} — ${ago}.`
+    ? `Account is marked Active, but its last customer-facing transaction was ${shortDate(val)}, ${ago}.`
     : `Last customer-facing transaction ${shortDate(val)}.`;
   return (
     <div className={s.riskChip} title={title}>

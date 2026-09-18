@@ -345,7 +345,7 @@ function ChangeEntry({ row }: { row: ChangeRow }) {
         <span className={s.changeWho}>
           {row.username ?? 'system'}
           {row.external_actor && (
-            <span className={s.changeExternal} title="Signed in with a portfolio token — no local account to link to.">
+            <span className={s.changeExternal} title="Signed in with a portfolio token, so there is no local account to link to.">
               portfolio
             </span>
           )}

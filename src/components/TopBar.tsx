@@ -138,7 +138,7 @@ function UserMenu() {
 function DataModePill({ mode, asOf }: { mode: 'mock' | 'live'; asOf: string }) {
   const live = mode === 'live';
   return (
-    <span className={s.modePill} title={live ? 'Connected to the live warehouse' : 'Preview data — swap C360_DATA_MODE=live to connect the warehouse'}>
+    <span className={s.modePill} title={live ? 'Connected to the live warehouse' : 'Preview data. Set C360_DATA_MODE=live to connect the warehouse'}>
       <span className={s.modeDot} style={{ background: live ? 'var(--prov-live)' : 'var(--prov-preview)' }} />
       {live ? 'Live data' : 'Preview data'}
       <span style={{ color: 'var(--ink-3)', fontWeight: 500 }}>· {new Date(asOf).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>

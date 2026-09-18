@@ -5,7 +5,7 @@ import type { CustomerCrm, PropertyLeadsCrm, InsuranceCrm } from '@/lib/types';
 import { initials } from '@/lib/format';
 import s from './ui.module.css';
 
-/** Subsidiary CRM — property-sales leads (HFDI) and the insurance CRM profile (HFBI).
+/** Subsidiary CRM — property-sales leads (the property register) and the insurance CRM profile (HFBI).
  *  Property reads as the sales FUNNEL the customer is moving through (not a lone chip),
  *  with follow-up engagement beneath; insurance is a people-forward servicing view.
  *  Rendered only for customers who have one or the other. Property is phone-matched
@@ -40,7 +40,7 @@ function PropertyBlock({ p }: { p: PropertyLeadsCrm }) {
     <section className={`${s.crmBlock} ${s.crmProperty}`}>
       <header className={s.crmBlockHead}>
         <span className={s.crmBlockTitle}>Property sales</span>
-        <span className={s.crmCaveat} title="These leads are linked to this customer by phone number, so the match is indicative — not guaranteed.">matched by phone</span>
+        <span className={s.crmCaveat} title="These leads are linked to this customer by phone number, so the match is indicative rather than guaranteed.">matched by phone</span>
       </header>
 
       <div className={s.funnel} data-kind={p.stage_kind} role="img"

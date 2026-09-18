@@ -49,7 +49,7 @@ export function SignalStrip({ bio, bureau, crm, lending }: {
         </span>
       ),
       sub: bureau.no_hit
-        ? 'Thin file — no scoreable history'
+        ? 'Thin file, no scoreable history'
         : bureau.pd_band
           ? `${bureau.pd_band} default risk`
           : 'Scored on the bureau',
@@ -69,7 +69,7 @@ export function SignalStrip({ bio, bureau, crm, lending }: {
       value: <span className={s.sigVal} style={{ color: tone }}>{npl ? delinquency.classification : 'Watch list'}</span>,
       sub: npl
         ? `Non-performing${delinquency.month ? ` · ${delinquency.month}` : ''}`
-        : 'Early warning — not yet non-performing',
+        : 'Early warning, not yet non-performing',
       panel: <LendingPanel lending={{ delinquency }} />,
     });
   }

@@ -48,7 +48,7 @@ function StandingBlock({ d }: { d: Delinquency }) {
           {isNpl ? d.classification : 'Watch list'}
         </span>
         <span className={s.lendStatusNote}>
-          {isNpl ? 'Non-performing' : 'Early-warning — not yet non-performing'}
+          {isNpl ? 'Non-performing' : 'Early warning, not yet non-performing'}
           {d.month ? ` · ${d.month}` : ''}
         </span>
       </div>

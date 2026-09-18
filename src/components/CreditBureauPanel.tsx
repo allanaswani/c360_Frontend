@@ -31,7 +31,7 @@ export function CreditBureauPanel({ bureau }: { bureau: CreditBureau }) {
       {bureau.no_hit ? (
         <div className={s.crbNoHit}>
           <div className={s.crbNoHitMark}>No score on file</div>
-          <p>On the bureau, but with no scoreable credit history — a thin file, not a low score.</p>
+          <p>On the bureau, but with no scoreable credit history. A thin file, not a low score.</p>
         </div>
       ) : (
         <div className={s.crbBody}>

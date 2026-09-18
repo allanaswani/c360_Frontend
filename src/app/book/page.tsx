@@ -93,7 +93,7 @@ export default function BookPage() {
         <h1 className={s.title}>{data.whole_book ? 'Whole book' : 'My book'}</h1>
         <div className={s.headMeta}>
           {data.sales_code && <span>Sales code {data.sales_code}</span>}
-          <span className={s.snapChip} title="Every figure on this page is rolled up from the allocation base — a periodic management upload, not the live deposit/loan ledger. It refreshes when a new allocation file is loaded.">Allocation snapshot</span>
+          <span className={s.snapChip} title="Every figure on this page is rolled up from the allocation base, a periodic management upload rather than the live deposit/loan ledger. It refreshes when a new allocation file is loaded.">Allocation snapshot</span>
         </div>
       </div>
       <StatStrip stats={stats} />
@@ -107,7 +107,7 @@ export default function BookPage() {
               Top customers by AUM
               <span className={s.count}>{top.length ? `top ${top.length}` : ''}</span>
             </div>
-            <div className={s.cardSub}>Where the book&apos;s value concentrates — largest relationships first. Open any to drill in.</div>
+            <div className={s.cardSub}>Where the book&apos;s value concentrates. Largest relationships first, and you can open any of them to drill in.</div>
             <div className={s.topList}>
               {top.map((c, i) => (
                 <Link key={c.cust_id} href={`/customers/${c.cust_id}`} className={s.topRow}>
@@ -172,7 +172,7 @@ export default function BookPage() {
           <div className={ui.card}>
             <div className={s.cardPad}>
               <div className={s.cardTitle}>Balance-sheet mix{ltd != null && <span className={s.count}>{ltd.toFixed(2)}× loan-to-deposit</span>}</div>
-              <div className={s.cardSub}>Deposits (funding) against loans (lending) — {kes(bsTotal)} of balances.</div>
+              <div className={s.cardSub}>Deposits (funding) against loans (lending), across {kes(bsTotal)} of balances.</div>
               {bsTotal > 0 ? (
                 <>
                   <div className={s.bsBar}>

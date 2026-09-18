@@ -52,7 +52,7 @@ export function CoverageMix({ slices, unknownLabel = 'Unclassified', unit = 'cus
       <div className={s.head}>
         <span className={s.headline} data-thin={coverage < 50 || undefined}>{pct(coverage)}</span>
         <span className={s.headlineNote}>
-          of the book is graded — {fmt(knownTotal)} of {fmt(total)} {unit}
+          of the book is graded, {fmt(knownTotal)} of {fmt(total)} {unit}
           {gap > 0 && <> · <b>{pct(gap)} ungraded</b></>}
         </span>
       </div>

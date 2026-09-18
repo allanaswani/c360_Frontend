@@ -13,7 +13,7 @@
  * ## What is deliberately NOT in here
  *
  * Code identifiers keep their existing spelling: the `hfcb` domain key in the API,
- * the `HFCBDomain` type, the `hfdi_client_data` warehouse table, the `HFDI-` id
+ * the `HFCBDomain` type, the `hfdi_client_data` warehouse table, the `the property register-` id
  * prefix, the `hfdi_admin` role. Those are contracts with the backend, the
  * warehouse and the portfolio's JWT claims. Renaming them would break the wire
  * format to rename something no user ever sees, and the two kinds of name drift
@@ -28,8 +28,8 @@
 /** The banking entity — core banking, the app's own brand lockup. */
 export const BANK = 'HFCB';
 
-/** The property development arm, whose register the property-clients page lists. */
-export const PROPERTY = 'HFDI';
+/** The property arm, whose register the property-clients page lists. */
+export const PROPERTY = 'HFCB Properties';
 
 /** The bancassurance arm behind the insurance CRM panel. */
 export const INSURANCE = 'HFBI';
@@ -61,7 +61,7 @@ export const BRAND = {
   /** Browser tab / metadata title. */
   appTitle: `Customer 360 · ${BANK}`,
   appDescription:
-    `Everything ${BANK} knows about a customer — portfolio health and next best product, in one instrument.`,
+    `Everything ${BANK} knows about a customer. Portfolio health and next best product, in one instrument.`,
   /** The tag beside the wordmark in the top bar and on the sign-in screen. */
   tag: BANK,
   /** Alt text for the mark. The image FILE keeps its name; only the label moves. */

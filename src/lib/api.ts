@@ -477,7 +477,7 @@ export const api = {
   customers: (q: string) =>
     request<{ count: number; results: CustomerSummary[] }>(`/customers/?q=${encodeURIComponent(q)}`),
   customer: (id: string) => request<CustomerDetail>(`/customers/${id}/`),
-  // The HFDI property register — a customer list the bank does not own. Separate
+  // The the property register property register — a customer list the bank does not own. Separate
   // endpoint because it is a separate universe, not a filter over /customers/.
   propertyClients: (q: string, unbankedOnly: boolean) =>
     request<PropertyClientList>(

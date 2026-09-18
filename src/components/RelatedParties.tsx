@@ -52,7 +52,7 @@ export function RelatedParties({ data }: { data: Related | null | undefined }) {
             key={m.cust_id}
             href={`/customers/${m.cust_id}`}
             className={s.relRow}
-            title={`${m.role_labels.join(' · ')} — the register files this relationship on ${
+            title={`${m.role_labels.join(' · ')}. The register files this relationship on ${
               m.direction === 'outbound' ? "this customer's record" : 'theirs'
             }`}
           >
@@ -89,7 +89,7 @@ export function RelatedParties({ data }: { data: Related | null | undefined }) {
         // count on screen has to be reconcilable with the register itself.
         <p className={s.relFoot}>
           {data.withheld_personal} family {data.withheld_personal === 1 ? 'relationship is' : 'relationships are'} on
-          the register and not shown here — personal ties are outside what this screen is for.
+          the register and not shown here. Personal ties are outside what this screen is for.
         </p>
       )}
     </div>

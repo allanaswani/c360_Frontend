@@ -7,11 +7,11 @@ import { BRAND } from '@/lib/brand';
 import s from './ui.module.css';
 
 /**
- * The line that stops an HFDI property client's page reading as a broken one.
+ * The line that stops an property client's page reading as a broken one.
  *
  * These records come from the property arm's register, not the bank's customer
  * master. Most of them have no bank relationship at all, so the deposits, loans,
- * bureau, CRM and lending panels below are all legitimately empty — and a screen of
+ * bureau, CRM and lending panels below are all legitimately empty, and a screen of
  * zeroes and "not sourced" badges with no explanation looks like a page that failed
  * to load. This says what is actually true: there is nothing to show because there
  * is nothing there, and here is what we do hold.
@@ -20,8 +20,8 @@ import s from './ui.module.css';
  * real profile is richer than anything this register can offer, so the page points
  * at it rather than quietly being the worse of the two.
  */
-export function HfdiNotice({ header }: { header: CustomerHeader }) {
-  const h = header.hfdi;
+export function PropertyClientNotice({ header }: { header: CustomerHeader }) {
+  const h = header.property_client;
   if (!h) return null;
 
   return (
@@ -32,13 +32,13 @@ export function HfdiNotice({ header }: { header: CustomerHeader }) {
       </svg>
       <div className={s.hfdiBody}>
         <div className={s.hfdiTitle}>
-          {h.bank_cust_id ? 'Property client — also a bank customer' : 'Property client — not a bank customer'}
+          {h.bank_cust_id ? 'Property client, and a bank customer' : 'Property client, not a bank customer'}
         </div>
         <p className={s.hfdiText}>
           {h.bank_cust_id ? (
             <>
-              This is their record on {BRAND.property}&rsquo;s property register. Their bank profile has the
-              deposits, lending and product history this page cannot show.{' '}
+              This is their record on the {BRAND.property} register. Their bank profile
+              holds the deposits, lending and product history this page cannot show.{' '}
               <Link href={`/customers/${h.bank_cust_id}`} className={s.hfdiLink}>
                 Open the full profile →
               </Link>
@@ -47,9 +47,9 @@ export function HfdiNotice({ header }: { header: CustomerHeader }) {
             <>
               They hold {count(h.units)} {h.units === 1 ? 'unit' : 'units'} worth{' '}
               <b className="tnum">{kes(h.units_value)}</b>
-              {h.projects.length > 0 && <> in {h.projects.join(', ')}</>}, and no account with
-              the bank — so the banking, bureau and insurance panels below are empty because
-              there is genuinely nothing there, not because anything failed to load.
+              {h.projects.length > 0 && <> in {h.projects.join(', ')}</>}, and no account
+              with us. The banking, bureau and insurance panels below are empty because
+              there is nothing there, not because anything failed to load.
               {h.has_pin && ` ${BRAND.property} holds a KRA PIN for them.`}
             </>
           )}

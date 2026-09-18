@@ -45,7 +45,7 @@ export default function UsersAdminPage() {
   async function setPassword(u: AdminUser) {
     try {
       const res = await api.setUserPassword(u.id);   // auto-generate
-      window.prompt(`New password for ${u.username} — copy and share securely:`, res.password);
+      window.prompt(`New password for ${u.username}. Copy and share it securely:`, res.password);
     } catch (e) {
       alert(e instanceof ApiError ? e.message : 'Could not reset password.');
     }
@@ -66,7 +66,7 @@ export default function UsersAdminPage() {
       <AdminOnly what="Managing users">
       <AdminHeader
         title="Users &amp; access"
-        sub="Provision Customer 360 accounts, assign roles and reset passwords — without the Django admin."
+        sub="Provision Customer 360 accounts, assign roles and reset passwords without going through the Django admin."
         actions={(
           <button className={s.primaryBtn} onClick={() => setPanelOpen(true)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14" /></svg>

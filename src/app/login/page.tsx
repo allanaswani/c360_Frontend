@@ -91,7 +91,7 @@ export default function LoginPage() {
         <div className={s.brandMid}>
           <h1 className={s.brandHeadline}>Everything the bank knows about a customer.</h1>
           <p className={s.brandLede}>
-            Holdings, value and the next best product — across every product line, in one
+            Holdings, value and the next best product, across every product line, in one
             instrument, for any customer you serve.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function LoginPage() {
               <label className={s.label} htmlFor="otp">Sign-in code</label>
               <input id="otp" className={`${s.input} ${s.otpInput}`} value={otp} inputMode="numeric" maxLength={6} autoFocus
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="••••••" />
-              {devOtp && <div className={s.devHint}>Dev mode — your code is <b>{devOtp}</b> (also printed in the server log).</div>}
+              {devOtp && <div className={s.devHint}>Dev mode. Your code is <b>{devOtp}</b>, also printed in the server log.</div>}
             </div>
             <Submit busy={busy} label="Sign in" busyLabel="Verifying…" disabled={otp.length < 6} />
           </form>
@@ -169,7 +169,7 @@ export default function LoginPage() {
               <label className={s.label} htmlFor="rcode">Reset code</label>
               <input id="rcode" className={`${s.input} ${s.otpInput}`} value={resetCode} inputMode="numeric" maxLength={6} autoFocus
                 onChange={(e) => setResetCode(e.target.value.replace(/\D/g, ''))} placeholder="••••••" />
-              {devOtp && <div className={s.devHint}>Dev mode — your code is <b>{devOtp}</b>.</div>}
+              {devOtp && <div className={s.devHint}>Dev mode. Your code is <b>{devOtp}</b>.</div>}
             </div>
             <div className={s.field}>
               <label className={s.label} htmlFor="npw">New password</label>
@@ -254,7 +254,7 @@ function PortfolioSignIn() {
     <div className={s.ssoRow}>
       <span className={s.ssoRule} />
       <a className={s.ssoLink} href={href}>
-        Already signed in to the HF portfolio? Continue with that session
+        Already signed in to the {BRAND.bank} portfolio? Continue with that session
       </a>
     </div>
   );

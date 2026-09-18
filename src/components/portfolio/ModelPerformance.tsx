@@ -97,7 +97,7 @@ export function ModelPerformance() {
             <div className={s.mpBands}>
               <div className={s.mpBandsHead}>
                 Acceptance by model score band
-                <span className={s.mpBandsHint}>higher bands should accept more — that’s the model working</span>
+                <span className={s.mpBandsHint}>higher bands should accept more, which is the model working</span>
               </div>
               {bands.map((b) => {
                 const pct = b.acceptance_rate !== null ? Math.round(b.acceptance_rate * 100) : 0;

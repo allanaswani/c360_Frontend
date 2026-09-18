@@ -13,18 +13,18 @@ import p from './propertyClients.module.css';
 import ui from '@/components/ui.module.css';
 
 /**
- * The HFDI property-client register.
+ * The the property register property-client register.
  *
  * A customer list the bank does not own. Customer 360's universe has always been
- * `dim_customer` — the core-banking master — and most of HFDI's property buyers are
- * not in it, so they had no page, no search result and no existence in this app at
- * all. That is how a company holding six units and KES 50M of property came to be
- * "not on Customer 360".
+ * `dim_customer`, the core-banking master, and most property buyers are not in it.
+ * They had no page, no search result and no existence in this app at all. That is
+ * how a company holding six units and KES 50M of property came to be "not on
+ * Customer 360".
  *
  * The page is built around the number that justifies it: how much of the register
- * the bank actually has a relationship with. The rest — the unbanked filter, the
- * ordering by holding value — follows from that being a sales list rather than a
- * directory.
+ * the bank actually has a relationship with. Everything else follows from this
+ * being a sales list rather than a directory, including the unbanked filter and
+ * the ordering by holding value.
  */
 export default function PropertyClients() {
   const [q, setQ] = useState('');
@@ -47,7 +47,7 @@ export default function PropertyClients() {
   }, [q, unbanked]);
 
   const held = useMemo(
-    () => (data?.results ?? []).reduce((a, r) => a + (r.hfdi.units_value ?? 0), 0),
+    () => (data?.results ?? []).reduce((a, r) => a + (r.property_client.units_value ?? 0), 0),
     [data],
   );
 
@@ -70,13 +70,13 @@ export default function PropertyClients() {
     <main className={ui.content}>
       <div className={p.head}>
         <div>
-          <div className="microlabel" style={{ color: 'var(--teal)' }}>{BRAND.property} · property register</div>
+          <div className="microlabel" style={{ color: 'var(--teal)' }}>{BRAND.property} · client register</div>
           <h1 className={s.title}>Property clients</h1>
           <p className={s.lede}>
-            Everyone who has bought an HF property, whether or not they bank with us. These
-            come from {BRAND.property}&rsquo;s own register, so most of them have no core-banking record
-            and no full 360 profile — which is exactly what makes the ones marked{' '}
-            <span className={p.prospectChip}>No bank record</span> worth a call.
+            Everyone who has bought through {BRAND.property}, whether or not they bank with
+            us. Most of them hold no account here, so there is no full 360 profile to open.
+            The ones marked <span className={p.prospectChip}>No bank record</span> are the
+            ones worth a call.
           </p>
         </div>
         {data && data.results.length > 0 && (
@@ -87,7 +87,7 @@ export default function PropertyClients() {
             source={{
               kind: 'rows',
               build: () => ({
-                title: unbanked ? 'Property clients — no bank record' : 'Property clients',
+                title: unbanked ? 'Property clients with no bank record' : 'Property clients',
                 columns: [
                   { key: 'cust_id', label: 'Client ref', type: 'text' as const },
                   { key: 'name', label: 'Name', type: 'text' as const },
@@ -106,13 +106,13 @@ export default function PropertyClients() {
                   id_no: c.id_no,
                   mobile: c.mobile,
                   email: c.email,
-                  units: c.hfdi.units,
-                  units_value: c.hfdi.units_value,
-                  paid_pct: c.hfdi.paid_pct == null ? null : Math.round(c.hfdi.paid_pct * 100),
-                  projects: c.hfdi.projects.join(', '),
+                  units: c.property_client.units,
+                  units_value: c.property_client.units_value,
+                  paid_pct: c.property_client.paid_pct == null ? null : Math.round(c.property_client.paid_pct * 100),
+                  projects: c.property_client.projects.join(', '),
                   // Blank would read as "we checked and they don't bank with us" for
                   // both cases; this says which it is.
-                  bank_cust_id: c.hfdi.bank_cust_id ?? 'No bank record',
+                  bank_cust_id: c.property_client.bank_cust_id ?? 'No bank record',
                 })),
               }),
             }}
@@ -185,8 +185,9 @@ export default function PropertyClients() {
           {data.staff_unverified > 0 && (
             <>
               {' '}· HF-staff screening could not be run on {count(data.staff_unverified)} of these
-              rows: the rule needs an employer, segment or employee number, and the
-              {' '}{BRAND.property} register carries none of them for a client with no bank record.
+              rows. The rule needs an employer, segment or employee number, and the
+              {' '}{BRAND.property} register carries none of those for a client with no
+              bank record.
             </>
           )}
         </p>
@@ -196,7 +197,7 @@ export default function PropertyClients() {
 }
 
 function ClientRow({ c }: { c: PropertyClient }) {
-  const banked = c.hfdi.bank_cust_id;
+  const banked = c.property_client.bank_cust_id;
   // A client who also banks with us has a real 360 profile, which is richer than
   // anything this register holds — send the RM there, not to the thin page.
   const href = banked ? `/customers/${banked}` : `/customers/${c.cust_id}`;
@@ -213,29 +214,29 @@ function ClientRow({ c }: { c: PropertyClient }) {
           {c.mobile && <> · <span className="tnum">{c.mobile}</span></>}
           {' '}
           {banked
-            ? <span className={p.bankChip} title={`Also a bank customer — ${banked}`}>Bank customer</span>
+            ? <span className={p.bankChip} title={`Also a bank customer (${banked})`}>Bank customer</span>
             : <span className={p.prospectChip}>No bank record</span>}
-          {c.hfdi.projects.length > 0 && (
-            <span className={p.projects} title={c.hfdi.projects.join(', ')}>
-              {' '}· {c.hfdi.projects.join(', ')}
+          {c.property_client.projects.length > 0 && (
+            <span className={p.projects} title={c.property_client.projects.join(', ')}>
+              {' '}· {c.property_client.projects.join(', ')}
             </span>
           )}
         </div>
       </div>
       <div className={s.rowFig}>
         <span className="microlabel">Holding</span>
-        <span className={`${s.rowFigVal} tnum`}>{kes(c.hfdi.units_value)}</span>
+        <span className={`${s.rowFigVal} tnum`}>{kes(c.property_client.units_value)}</span>
       </div>
       <div className={s.rowFig}>
         <span className="microlabel">Units</span>
-        <span className={`${s.rowFigVal} tnum`}>{count(c.hfdi.units)}</span>
+        <span className={`${s.rowFigVal} tnum`}>{count(c.property_client.units)}</span>
       </div>
       <div className={s.rowFig}>
         <span className="microlabel">Paid</span>
         {/* Genuinely unknown when the client holds no unit yet — an honest dash with
             a reason, not a 0% that would read as "they have paid nothing". */}
-        <span className={`${s.rowFigVal} tnum`} title={c.hfdi.paid_pct == null ? 'No unit on the register yet' : undefined}>
-          {c.hfdi.paid_pct == null ? '—' : pct(c.hfdi.paid_pct)}
+        <span className={`${s.rowFigVal} tnum`} title={c.property_client.paid_pct == null ? 'No unit on the register yet' : undefined}>
+          {c.property_client.paid_pct == null ? '—' : pct(c.property_client.paid_pct)}
         </span>
       </div>
       <svg className={s.rowChevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg>

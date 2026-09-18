@@ -177,15 +177,16 @@ export default function DataHealthPage() {
             </Panel>
           ) : (
             <div className={s.trendHint}>
-              Trend graphs build up as this page is checked over time — one point per check, so come
-              back later to see freshness, row-count and latency history.
+              Trend graphs build up as this page is checked over time, one point per
+              check. Come back later to see freshness, row-count and latency history.
             </div>
           )}
 
           {anyProblem && (
             <div className={s.alertLine}>
-              Some sources need attention — rows marked <b>Empty</b> mean the table has no data loaded (a
-              pipeline issue upstream), not a Customer&nbsp;360 fault.
+              Some sources need attention. Rows marked <b>Empty</b> mean the table has no
+              data loaded, which is a pipeline issue upstream rather than a
+              Customer&nbsp;360 fault.
             </div>
           )}
 
@@ -230,11 +231,11 @@ function freshnessWording(f: { days_behind: number | null; status: string; detai
   const days = f.days_behind;
   const plural = days === 1 ? 'day' : 'days';
   if (f.status === 'stale') {
-    return `${days} ${plural} behind — past the ${f.stale_after_days ?? 3}-day threshold; the close has stopped advancing`;
+    return `${days} ${plural} behind, past the ${f.stale_after_days ?? 3}-day threshold. The close has stopped advancing`;
   }
-  if (days <= 0) return 'Up to date — today’s close';
-  if (days === 1) return 'Up to date — yesterday’s close';
-  return `${days} ${plural} behind — within the normal close lag`;
+  if (days <= 0) return 'Up to date with today’s close';
+  if (days === 1) return 'Up to date with yesterday’s close';
+  return `${days} ${plural} behind, within the normal close lag`;
 }
 
 function Count({ n, label, tone }: { n: number; label: string; tone?: 'warn' | 'bad' }) {

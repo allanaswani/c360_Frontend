@@ -5,7 +5,7 @@ import s from './ui.module.css';
 
 // All four domains are live in the app. HFCB reads real core-banking queries;
 // Whizz / Properties / Bancassurance run on preview data from their verified
-// source systems (Kocela MySQL, HFDI CRM, insurance_policies) until the pipelines
+// source systems (Kocela MySQL, the property register CRM, insurance_policies) until the pipelines
 // are wired — flagged with a Preview dot, never hidden behind a "coming soon".
 const DOMAINS = [
   { key: 'overview', label: 'Overview', preview: false },

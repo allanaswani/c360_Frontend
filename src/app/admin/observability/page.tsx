@@ -131,8 +131,9 @@ export default function ObservabilityPage() {
             {!hasTraffic ? (
               <Panel>
                 <Empty title="No traffic in this window">
-                  Metrics accrue as requests come in, and this board updates in place — nothing
-                  needs refreshing. If you expected traffic, the app may not be reachable.
+                  Metrics accrue as requests come in and this board updates in place, so
+                  nothing needs refreshing. If you expected traffic, the app may not be
+                  reachable.
                 </Empty>
               </Panel>
             ) : (

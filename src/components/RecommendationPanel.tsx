@@ -68,11 +68,11 @@ export function RecommendationPanel({ data, custId, layout = 'stack' }:
               <>
                 <b>{data.eligibility.note ?? 'Held by the eligibility gate.'}</b>{' '}
                 Generated from live product signals but blocked by the derived risk/KYC gate
-                (risk {String(data.eligibility.risk_class)} · KYC {String(data.eligibility.kyc_status)}) — shown, not cleared to pitch.
+                (risk {String(data.eligibility.risk_class)}, KYC {String(data.eligibility.kyc_status)}). Shown, but not cleared to pitch.
               </>
             ) : (
               <>
-                <b>Held pending eligibility data.</b> Generated from live product signals, but no risk/KYC profile is available for this customer — shown for preview, not yet cleared to pitch.
+                <b>Held pending eligibility data.</b> Generated from live product signals, but no risk/KYC profile is available for this customer. Shown for preview, not yet cleared to pitch.
               </>
             )}
           </span>
