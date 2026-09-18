@@ -6,7 +6,7 @@ import { api, type BookSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { StatStrip, type Stat } from '@/components/StatStrip';
 import { ErrorState, Skeleton } from '@/components/States';
-import { count, initials, kes } from '@/lib/format';
+import { count, initials, kes, shortDate } from '@/lib/format';
 import ui from '@/components/ui.module.css';
 import s from './book.module.css';
 
@@ -81,11 +81,26 @@ export default function BookPage() {
   const depPct = bsTotal > 0 ? (deposits / bsTotal) * 100 : 0;
   const loanPct = bsTotal > 0 ? (loans / bsTotal) * 100 : 0;
 
+  // The same figures read from the live book. Present only when the book was small
+  // enough to total on a page load and the warehouse answered.
+  const live = data.live ?? null;
+  // Only worth showing a second number when it actually differs. 2% absorbs rounding
+  // and intra-day movement; beyond that the two tools genuinely disagree and the RM
+  // needs to see it here rather than discover it by comparing screens.
+  const differs = (a: number, b: number | undefined) =>
+    b !== undefined && a > 0 && Math.abs(a - b) / Math.max(a, 1) > 0.02;
+  const asOf = live ? shortDate(live.as_of) : null;
+  const liveMeta = (snapshot: number, liveValue: number | undefined, fmt: (n: number) => string) =>
+    differs(snapshot, liveValue) ? `live ${fmt(liveValue as number)} at ${asOf}` : undefined;
+
   const stats: Stat[] = [
-    { label: 'AUM', lead: true, countTo: aum, fmt: (n) => kes(n), value: kes(aum), meta: 'allocation snapshot' },
-    { label: 'Customers', countTo: customers, fmt: (n) => count(Math.round(n)), value: count(customers) },
-    { label: 'Deposits', countTo: deposits, fmt: (n) => kes(n), value: kes(deposits) },
-    { label: 'Loans', countTo: loans, fmt: (n) => kes(n), value: kes(loans) },
+    { label: 'AUM', lead: true, countTo: aum, fmt: (n) => kes(n), value: kes(aum), meta: 'allocation upload' },
+    { label: 'Customers', countTo: customers, fmt: (n) => count(Math.round(n)), value: count(customers),
+      meta: liveMeta(customers, live?.customers, (n) => count(Math.round(n))) },
+    { label: 'Deposits', countTo: deposits, fmt: (n) => kes(n), value: kes(deposits),
+      meta: liveMeta(deposits, live?.deposits, kes) },
+    { label: 'Loans', countTo: loans, fmt: (n) => kes(n), value: kes(loans),
+      meta: liveMeta(loans, live?.loans, kes) },
     { label: 'Net contribution', countTo: contribution, fmt: (n) => kes(n), value: kes(contribution), tone: contribution >= 0 ? 'pos' : 'neg' },
     { label: 'Non-performing', countTo: nplCust, fmt: (n) => count(Math.round(n)), value: count(nplCust), tone: nplCust > 0 ? 'neg' : undefined, meta: `${nplShare}% of customers` },
   ];
@@ -96,7 +111,22 @@ export default function BookPage() {
         <h1 className={s.title}>{data.whole_book ? 'Whole book' : 'My book'}</h1>
         <div className={s.headMeta}>
           {data.sales_code && <span>Sales code {data.sales_code}</span>}
-          <span className={s.snapChip} title="Every figure on this page is rolled up from the allocation base, a periodic management upload rather than the live deposit/loan ledger. It refreshes when a new allocation file is loaded.">Allocation snapshot</span>
+          <span
+            className={s.snapChip}
+            title={
+              'AUM, net contribution and the allocation itself come from the allocation upload, '
+              + 'which is periodic and carries no load date, so this page cannot say how current '
+              + 'those figures are. Deposits, loans, customer count and the non-performing flags '
+              + 'are checked against the live book.'
+            }
+          >
+            Allocation upload
+          </span>
+          {live && (
+            <span className={s.liveChip} title={`Deposits, loans and non-performing status read from the live book at ${shortDate(live.as_of)}.`}>
+              Live check {shortDate(live.as_of)}
+            </span>
+          )}
         </div>
       </div>
       <StatStrip stats={stats} />

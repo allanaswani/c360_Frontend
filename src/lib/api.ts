@@ -371,6 +371,13 @@ export interface BookSummary {
   /** What the upload claimed, so a correction can be reported as a correction. */
   npl_snapshot_customers?: number;
   npl_snapshot_aum?: number;
+  /** The same deposit/loan/customer figures read from the live book, for comparison
+   *  with the upload's. Null when the book is too large to total on a page load or
+   *  the warehouse could not be reached. */
+  live?: { deposits: number; loans: number; customers: number; as_of: string } | null;
+  /** customer_allocation_base records no load date, so the page must not imply it
+   *  knows how current the upload is. */
+  snapshot_dated?: boolean;
   segments?: { segment: string; customers: number; aum: number }[];
   top_customers?: BookCustomer[];
 }

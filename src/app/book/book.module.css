@@ -54,6 +54,18 @@
 .topContrib { font-size: var(--t-3xs); color: var(--ink-3); white-space: nowrap; }
 .topContribPos { color: var(--pos); }
 .topContribNeg { color: var(--coral); }
+/* Says the live check ran and when. Teal is the app's 'live' provenance hue. */
+.liveChip {
+  font-size: var(--t-3xs);
+  font-weight: 600;
+  color: var(--teal);
+  background: color-mix(in srgb, var(--teal) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--teal) 38%, transparent);
+  border-radius: var(--r-pill);
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
 .nplTag { flex: 0 0 auto; font-size: var(--t-micro); font-weight: 800; letter-spacing: 0.05em; color: var(--coral); border: 1px solid var(--coral); border-radius: var(--r-xs); padding: 0 4px; line-height: 1.5; }
 
 /* Markers added when the allocation upload is reconciled against the live book.
