@@ -1,4 +1,5 @@
 'use client';
+import { BRAND } from '@/lib/brand';
 
 import s from './ui.module.css';
 
@@ -8,7 +9,8 @@ import s from './ui.module.css';
 // are wired — flagged with a Preview dot, never hidden behind a "coming soon".
 const DOMAINS = [
   { key: 'overview', label: 'Overview', preview: false },
-  { key: 'hfcb', label: 'HFCB', preview: false },
+  // The KEY is the API's domain id and never changes; the LABEL is brand copy.
+  { key: 'hfcb', label: BRAND.bank, preview: false },
   { key: 'whizz', label: 'Whizz', preview: true },
   { key: 'properties', label: 'Properties', preview: true },
   { key: 'bancassurance', label: 'Bancassurance', preview: true },

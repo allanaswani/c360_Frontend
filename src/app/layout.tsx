@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BRAND } from '@/lib/brand';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
 import { AppShell } from '@/components/AppShell';
@@ -9,8 +10,8 @@ import { asset } from '@/lib/asset';
 // No web-font fetch: Cambria ships with the org's Windows/Office estate.
 
 export const metadata: Metadata = {
-  title: 'Customer 360 · HFCB',
-  description: 'Everything HFCB knows about a customer — portfolio health and next best product, in one instrument.',
+  title: BRAND.appTitle,
+  description: BRAND.appDescription,
   icons: { icon: asset('/favicon.png') },
 };
 

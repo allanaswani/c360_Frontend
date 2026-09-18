@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import type { CustomerSummary } from '@/lib/types';
 import { ErrorState, Skeleton } from '@/components/States';
 import { count, initials, kes } from '@/lib/format';
+import { BRAND } from '@/lib/brand';
 import s from './home.module.css';
 import ui from '@/components/ui.module.css';
 
@@ -34,7 +35,7 @@ export default function Home() {
           <div className="microlabel" style={{ color: 'var(--teal)' }}>Relationship intelligence</div>
           <h1 className={s.title}>Find a customer</h1>
           <p className={s.lede}>
-            Everything HFCB knows about a customer, in one place — holdings, value, and the next
+            Everything {BRAND.bank} knows about a customer, in one place — holdings, value, and the next
             product to pitch. Search by name, customer ID, or ID document to open a full 360.
           </p>
         </div>

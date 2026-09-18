@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { CustomerHeader } from '@/lib/types';
 import { count, kes } from '@/lib/format';
+import { BRAND } from '@/lib/brand';
 import s from './ui.module.css';
 
 /**
@@ -36,7 +37,7 @@ export function HfdiNotice({ header }: { header: CustomerHeader }) {
         <p className={s.hfdiText}>
           {h.bank_cust_id ? (
             <>
-              This is their record on HFDI&rsquo;s property register. Their bank profile has the
+              This is their record on {BRAND.property}&rsquo;s property register. Their bank profile has the
               deposits, lending and product history this page cannot show.{' '}
               <Link href={`/customers/${h.bank_cust_id}`} className={s.hfdiLink}>
                 Open the full profile →
@@ -49,7 +50,7 @@ export function HfdiNotice({ header }: { header: CustomerHeader }) {
               {h.projects.length > 0 && <> in {h.projects.join(', ')}</>}, and no account with
               the bank — so the banking, bureau and insurance panels below are empty because
               there is genuinely nothing there, not because anything failed to load.
-              {h.has_pin && ' HFDI holds a KRA PIN for them.'}
+              {h.has_pin && ` ${BRAND.property} holds a KRA PIN for them.`}
             </>
           )}
         </p>

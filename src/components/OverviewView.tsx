@@ -1,4 +1,5 @@
 'use client';
+import { DOMAIN_KEY } from '@/lib/brand';
 
 import type { CustomerOverview, DomainSnapshot } from '@/lib/types';
 import { kes } from '@/lib/format';
@@ -11,7 +12,10 @@ import ui from './ui.module.css';
 
 // Domain identity colours (fixed) for the value-by-domain donut.
 const DOMAIN_COLOR: Record<string, string> = {
-  HFCB: 'var(--series-1)',
+  // Keyed by the API's by-domain LABEL, which is brand copy - so it is read from
+  // the brand module, not typed, or a rename silently stops matching and the
+  // domain loses its colour.
+  [DOMAIN_KEY.bank]: 'var(--series-1)',
   Whizz: 'var(--series-2)',
   Properties: 'var(--series-3)',
   Bancassurance: 'var(--coral)',

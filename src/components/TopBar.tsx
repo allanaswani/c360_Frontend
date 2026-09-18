@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { asset } from '@/lib/asset';
+import { BRAND } from '@/lib/brand';
 import type { Meta } from '@/lib/types';
 import { initials } from '@/lib/format';
 import { ThemeToggle } from './ThemeToggle';
@@ -32,23 +33,24 @@ export function TopBar() {
   return (
     <header className={s.topbar}>
       <div className={s.brand}>
-        <a href={appsHome} className={s.backHome} title="Back to HFCB apps" aria-label="Back to HFCB apps">
+        <a href={appsHome} className={s.backHome} title={`Back to ${BRAND.bank} apps`} aria-label={`Back to ${BRAND.bank} apps`}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 18l-6-6 6-6" /></svg>
           <span className={s.backHomeLabel}>Apps</span>
         </a>
         <Link href="/portfolio" className={s.brandLink}>
-          {/* Official HFCB mark on a white tile — brand-correct on light and dark */}
+          {/* Official mark on a white tile — brand-correct on light and dark. The image
+              FILE keeps its historical name; only the label comes from the brand module. */}
           <span className={s.logoTile}>
-            <img src={asset('/hfcb-mark.png')} alt="HFCB" width={21} height={20} />
+            <img src={asset('/hfcb-mark.png')} alt={BRAND.markAlt} width={21} height={20} />
           </span>
           <span className={s.brandName}>Customer <b>360</b></span>
-          <span className={s.brandTag}>HFCB</span>
+          <span className={s.brandTag}>{BRAND.tag}</span>
         </Link>
         <nav className={s.nav}>
           <Link href="/portfolio" className={`${s.navItem} ${onPortfolio ? s.navItemActive : ''}`}>Portfolio</Link>
           <Link href="/" className={`${s.navItem} ${onCustomers ? s.navItemActive : ''}`}>Customers</Link>
           <Link href="/book" className={`${s.navItem} ${onBook ? s.navItemActive : ''}`}>My book</Link>
-          {/* HFDI's property register — a separate customer universe, and whole-book
+          {/* The property register — a separate customer universe, and whole-book
               only, so it is hidden from an RM whose book contains none of it. */}
           {meta?.scope?.whole_book && (
             <Link href="/property-clients" className={`${s.navItem} ${onProperty ? s.navItemActive : ''}`}>

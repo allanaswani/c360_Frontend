@@ -7,6 +7,7 @@ import type { PropertyClient, PropertyClientList } from '@/lib/types';
 import { ErrorState, Skeleton } from '@/components/States';
 import { ExportMenu } from '@/components/ExportMenu';
 import { count, initials, kes, pct } from '@/lib/format';
+import { BRAND } from '@/lib/brand';
 import s from '../home.module.css';
 import p from './propertyClients.module.css';
 import ui from '@/components/ui.module.css';
@@ -69,11 +70,11 @@ export default function PropertyClients() {
     <main className={ui.content}>
       <div className={p.head}>
         <div>
-          <div className="microlabel" style={{ color: 'var(--teal)' }}>HFDI · property register</div>
+          <div className="microlabel" style={{ color: 'var(--teal)' }}>{BRAND.property} · property register</div>
           <h1 className={s.title}>Property clients</h1>
           <p className={s.lede}>
             Everyone who has bought an HF property, whether or not they bank with us. These
-            come from HFDI&rsquo;s own register, so most of them have no core-banking record
+            come from {BRAND.property}&rsquo;s own register, so most of them have no core-banking record
             and no full 360 profile — which is exactly what makes the ones marked{' '}
             <span className={p.prospectChip}>No bank record</span> worth a call.
           </p>
@@ -81,7 +82,7 @@ export default function PropertyClients() {
         {data && data.results.length > 0 && (
           <ExportMenu
             title="Property clients"
-            subtitle={unbanked ? 'Clients with no bank record' : 'HFDI property register'}
+            subtitle={unbanked ? 'Clients with no bank record' : `${BRAND.property} property register`}
             count={data.results.length}
             source={{
               kind: 'rows',
@@ -148,7 +149,7 @@ export default function PropertyClients() {
           </svg>
           <input
             className={s.search}
-            placeholder="Search by name, national ID, company registration, or HFDI client number…"
+            placeholder={`Search by name, national ID, company registration, or ${BRAND.property} client number…`}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             autoFocus
@@ -184,8 +185,8 @@ export default function PropertyClients() {
           {data.staff_unverified > 0 && (
             <>
               {' '}· HF-staff screening could not be run on {count(data.staff_unverified)} of these
-              rows: the rule needs an employer, segment or employee number, and the HFDI
-              register carries none of them for a client with no bank record.
+              rows: the rule needs an employer, segment or employee number, and the
+              {' '}{BRAND.property} register carries none of them for a client with no bank record.
             </>
           )}
         </p>

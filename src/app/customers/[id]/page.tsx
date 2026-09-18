@@ -19,10 +19,11 @@ import { DomainView } from '@/components/DomainView';
 import { ErrorState, Skeleton } from '@/components/States';
 import ui from '@/components/ui.module.css';
 import { TYPE } from '@/lib/type';
+import { BRAND } from '@/lib/brand';
 
 const DOMAIN_LABEL: Record<string, { title: string; sub: string }> = {
   overview: { title: 'Overview', sub: 'Where value sits across domains, and the trend' },
-  hfcb: { title: 'HFCB · Core banking', sub: 'Deposits, lending and channel activity' },
+  hfcb: { title: `${BRAND.bank} · Core banking`, sub: 'Deposits, lending and channel activity' },
   whizz: { title: 'Whizz · Digital', sub: 'Mobile wallet and digital lending' },
   properties: { title: 'Properties', sub: 'Real-estate holdings and loan-to-value' },
   bancassurance: { title: 'Bancassurance', sub: 'Insurance policies and premiums' },
@@ -124,7 +125,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         <Skeleton height={168} radius={12} />
       )}
 
-      {/* An HFDI property client is not a bank customer. Said once, at the top, so the
+      {/* A property client is not a bank customer. Said once, at the top, so the
           empty panels below read as an accurate record rather than a failed load. */}
       {detail?.header.hfdi && <HfdiNotice header={detail.header} />}
 

@@ -1,4 +1,5 @@
 'use client';
+import { BRAND } from '@/lib/brand';
 
 import type { CustomerCrm, PropertyLeadsCrm, InsuranceCrm } from '@/lib/types';
 import { initials } from '@/lib/format';
@@ -83,7 +84,7 @@ function InsuranceBlock({ ins }: { ins: InsuranceCrm }) {
     <section className={`${s.crmBlock} ${s.crmInsurance}`}>
       <header className={s.crmBlockHead}>
         <span className={s.crmBlockTitle}>Insurance</span>
-        <span className={s.crmSrc} title="HFBI insurance CRM, matched by national ID.">HFBI</span>
+        <span className={s.crmSrc} title={`${BRAND.insurance} insurance CRM, matched by national ID.`}>{BRAND.insurance}</span>
       </header>
 
       {people.length > 0 && (

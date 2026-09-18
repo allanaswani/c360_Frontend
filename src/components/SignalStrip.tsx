@@ -1,4 +1,5 @@
 'use client';
+import { BRAND } from '@/lib/brand';
 
 import { useState } from 'react';
 import type { CustomerBio, CreditBureau, CustomerCrm, LendingHealth } from '@/lib/types';
@@ -114,9 +115,9 @@ export function SignalStrip({ bio, bureau, crm, lending }: {
       key: 'insurance',
       label: 'Insurance · serviced by',
       icon: <path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87M7 10a4 4 0 108 0 4 4 0 00-8 0zM3 21v-2a4 4 0 013-3.87" />,
-      value: <span className={s.sigVal}>{person ?? 'HFBI profile'}</span>,
+      value: <span className={s.sigVal}>{person ?? `${BRAND.insurance} profile`}</span>,
       sub: person
-        ? (insurance.risk_manager ? 'Relationship manager · HFBI' : 'Agent · HFBI')
+        ? (insurance.risk_manager ? `Relationship manager · ${BRAND.insurance}` : `Agent · ${BRAND.insurance}`)
         : [insurance.branch, insurance.location].filter(Boolean).join(' · ') || 'On the insurance CRM',
       panel: <CrmPanel crm={{ insurance }} />,
     });
