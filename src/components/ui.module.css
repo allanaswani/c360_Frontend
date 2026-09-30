@@ -501,6 +501,13 @@
 .recDomainTag { font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); border: 1px solid var(--hairline-strong); border-radius: var(--r-xs); padding: 1px 5px; }
 .recReason { font-size: var(--t-xs); color: var(--ink-2); margin-top: 4px; line-height: 1.45; }
 .recRule { font-size: var(--t-2xs); color: var(--ink-3); margin-top: 5px; }
+/* The facts behind an activity-based suggestion, so an RM can check before calling. */
+.recEvidence {
+  margin: 5px 0 0; padding: 0 0 0 10px; list-style: none;
+  border-left: 2px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  font-size: var(--t-2xs); color: var(--ink-2); line-height: 1.45;
+}
+.recEvidence li + li { margin-top: 2px; }
 /* ML propensity: a tag + a slim meter so the model's confidence is legible at a glance */
 .recPropTag {
   font-family: var(--font-num); font-variant-numeric: tabular-nums;

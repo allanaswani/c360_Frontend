@@ -119,6 +119,11 @@ function RecCard({ item, index, row, canLog, outcome, onRecord }: {
           {pct !== null && <span className={s.recPropTag} title="Model-estimated propensity to take this product">{pct}% fit</span>}
         </div>
         <div className={s.recReason}>{item.reason}</div>
+        {item.evidence && item.evidence.length > 0 && (
+          <ul className={s.recEvidence}>
+            {item.evidence.map((e) => <li key={e}>{e}</li>)}
+          </ul>
+        )}
         {pct !== null && (
           <div className={s.recMeter} aria-hidden>
             <span className={s.recMeterFill} style={{ width: `${Math.max(4, pct)}%` }} />
@@ -127,7 +132,9 @@ function RecCard({ item, index, row, canLog, outcome, onRecord }: {
         <div className={s.recRule}>
           {isMl
             ? <>Model {item.rule_id.replace('ml.', '')} · propensity {pct}%</>
-            : <>Rule {item.rule_id} · {item.score === null ? 'score n/a (rules)' : `score ${item.score}`}</>}
+            : item.basis === 'activity'
+              ? <>From their transactions · rule {item.rule_id}</>
+              : <>Rule {item.rule_id} · {item.score === null ? 'score n/a (rules)' : `score ${item.score}`}</>}
         </div>
 
         {canLog && (

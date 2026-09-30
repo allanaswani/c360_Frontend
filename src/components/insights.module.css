@@ -1,0 +1,72 @@
+/* Products held strip + the customer insights section (HFCB tab). Built on the same
+   tokens as ui.module.css so the new panels read as part of the page, not a bolt-on. */
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+@media (max-width: 1100px) { .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px)  { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.tile { padding: 10px 14px 11px; border-left: 1px solid var(--hairline); min-width: 0; }
+.tile:first-child { border-left: none; }
+.tileLabel {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--t-2xs); color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mark { width: 8px; height: 8px; border-radius: 50%; flex: none; border: 1.5px solid var(--hairline-strong); }
+.markHeld { background: var(--teal); border-color: var(--teal); }
+.tileValue {
+  margin-top: 3px; font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: var(--t-num-sm); font-weight: 600; color: var(--ink-1);
+}
+.tileValueNone { font-family: var(--font-sans); font-size: var(--t-xs); font-weight: 500; color: var(--ink-3); }
+.tileSub { font-size: var(--t-2xs); color: var(--ink-3); margin-top: 1px; }
+
+.loanRow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 8px 14px; border-top: 1px solid var(--hairline); grid-column: 1 / -1;
+  font-size: var(--t-2xs); color: var(--ink-3);
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: var(--r-pill);
+  font-size: var(--t-2xs); font-weight: 600; color: var(--ink-1);
+  background: color-mix(in srgb, var(--teal) 11%, transparent);
+}
+.chipWarn { color: #8a5a00; background: color-mix(in srgb, var(--gold) 22%, transparent); }
+.chipNeg { color: var(--coral); background: color-mix(in srgb, var(--coral) 12%, transparent); }
+.chipPos { color: var(--pos); background: color-mix(in srgb, var(--pos) 12%, transparent); }
+
+/* Facts list (customer file) */
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+.factLabel { font-size: var(--t-2xs); color: var(--ink-3); }
+.factValue { font-size: var(--t-sm); color: var(--ink-1); margin-top: 1px; }
+
+/* Opportunities from activity */
+.opps { display: flex; flex-direction: column; gap: 10px; }
+.opp { padding: 10px 12px; border: 1px solid var(--hairline); border-radius: var(--r-md); }
+.oppHead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.oppName { font-size: var(--t-sm); font-weight: 600; color: var(--ink-1); }
+.oppDomain { font-size: var(--t-2xs); color: var(--ink-3); }
+.oppReason { font-size: var(--t-xs); color: var(--ink-2); margin-top: 3px; line-height: 1.45; }
+.oppEvidence {
+  margin: 6px 0 0; padding: 0 0 0 10px; list-style: none;
+  border-left: 2px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  font-size: var(--t-2xs); color: var(--ink-2); line-height: 1.45;
+}
+.watch {
+  margin-top: 10px; padding: 8px 10px; border-radius: var(--r-md);
+  font-size: var(--t-xs); color: #8a5a00; background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+.muted { font-size: var(--t-2xs); color: var(--ink-3); margin-top: 8px; line-height: 1.45; }
+
+/* Facility table cells */
+.bar { height: 5px; border-radius: 3px; background: var(--grid); overflow: hidden; margin-top: 4px; }
+.barFill { height: 100%; background: var(--teal); border-radius: 3px; }
+.past td { color: var(--ink-3); }

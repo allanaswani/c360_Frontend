@@ -530,6 +530,11 @@ export interface RecommendationItem {
   rule_id: string;
   score: number | null;
   eligible: boolean | null;
+  /** The facts behind an activity-based suggestion ("Salary credited 3 times …"). */
+  evidence?: string[];
+  /** What the suggestion rests on: the customer's transactions, the model, or what
+   *  they hold. */
+  basis?: 'activity' | 'model' | 'holdings';
 }
 
 // ---- Generic non-core domain payload (Whizz / Properties / Bancassurance) ----
@@ -551,6 +556,8 @@ export interface DomainMetric {
 export interface ChartLines {
   kind: 'lines';
   id: string; title: string; question: string; status: Provenance; fmt: ValueFmt;
+  /** Caveat shown under the title (e.g. "approved per loan, not a limit"). */
+  note?: string;
   series: { name: string; dataKey: string; colorRole: number }[];
   data: Record<string, number | string>[];
 }
@@ -592,6 +599,9 @@ export interface DomainPayload {
   charts: DomainChart[];
   tables: DomainTable[];
   empty_reason?: string;
+  /** A domain-level caveat shown above the tiles, e.g. that part of the domain could not
+   *  be loaded while the rest is shown. */
+  note?: string;
   /** True when the domain's SOURCE couldn't be read (error, or the source table is
    *  empty/unreachable) — as opposed to the customer genuinely holding none. The UI
    *  renders this as an honest "couldn't load" state with a retry, never as empty. */
@@ -660,4 +670,93 @@ export interface Recommendations {
   };
   items: RecommendationItem[];
   withheld: RecommendationItem[];
+}
+
+// ---- Customer insights (/customers/:id/insights/) ----
+/** live = read today; none = the source answered and the customer has nothing there;
+ *  unavailable = the source could not be read. Never render "unavailable" as "none". */
+export type InsightStatus = 'live' | 'none' | 'unavailable';
+export interface InsightBlock<T> { status: InsightStatus; data: T | null }
+
+export interface ProductHeadline { key: string; label: string; held: boolean; accounts: number; balance: number }
+export interface ProductGroup { key: string; label: string; side: 'deposit' | 'loan'; accounts: number; balance: number; products: string[] }
+export interface ProductAccount {
+  category: string; product: string | null; account_no: string | null; balance: number;
+  status: string; side: 'deposit' | 'loan'; opened?: string | null;
+}
+export interface ProductMix {
+  headline: ProductHeadline[];
+  deposits: ProductGroup[];
+  loans: ProductGroup[];
+  loan_types: string[];
+  holds_mortgage: boolean;
+  accounts: ProductAccount[];
+  liquid_balance: number;
+  as_of: string;
+}
+
+export interface Facility {
+  agreement: string; type: string; limit: number; outstanding: number;
+  issued: string | null; used_pct: number | null; active: boolean;
+}
+export interface MobileLoans {
+  loans_taken: number; first_issued: string | null; latest_issued: string | null;
+  latest_amount: number; highest_amount: number; total_approved: number; outstanding: number;
+  history: { period: string; amount: number; outstanding: number }[];
+}
+export interface Facilities {
+  facilities: Facility[]; active_count: number; past_count: number;
+  sanctioned_total: number; outstanding_total: number; mobile: MobileLoans | null; as_of: string;
+}
+
+export interface ActivityCategory { key: string; label: string; count: number; value: number }
+export interface ActivityOpportunity {
+  rule_id: string; product: string; product_name: string; domain: string;
+  reason: string; reason_short: string; evidence: string[]; base_score: number;
+}
+export interface Activity {
+  from: string; to: string; window_days: number;
+  categories: ActivityCategory[];
+  opportunities: ActivityOpportunity[];
+  opportunities_note: string | null;
+  watch: string[];
+}
+
+export interface CustomerProfileFacts {
+  aml_risk: string | null; aml_tone: 'pos' | 'neg' | 'warn' | null; pep: boolean;
+  fields: { key: string; label: string; value: string }[];
+  cards: { active: number; blocked: number };
+}
+
+export interface RevenueMonth { period: string; interest_income: number; nfi: number; interest_expense: number; net: number }
+export interface Revenue {
+  year: number; first_month: number; last_month: number;
+  months: RevenueMonth[];
+  totals: { interest_income: number; nfi: number; interest_expense: number; net: number };
+}
+
+export interface CustomerInsights {
+  cust_id: string;
+  as_of: string;
+  products: InsightBlock<ProductMix>;
+  facilities: InsightBlock<Facilities>;
+  activity: InsightBlock<Activity>;
+  profile: InsightBlock<CustomerProfileFacts>;
+  revenue: InsightBlock<Revenue>;
+}
+
+// ---- Whole-book activity call list (/portfolio/activity-prospects/) ----
+export interface ActivityProspect {
+  cust_id: string; name: string | null; segment: string; branch: string | null;
+  rm_name: string | null; liquid_balance: number; strength: number;
+  rule_id: string; product: string; product_name: string; domain: string;
+  reason: string; reason_short: string; evidence: string[];
+}
+export interface ActivityProspects {
+  from?: string; to?: string;
+  rules: { rule_id: string; product_name: string; reason_short: string; customers: number }[];
+  results: ActivityProspect[];
+  unavailable?: boolean;
+  detail?: string;
+  cache?: { cached: boolean; age_seconds: number };
 }

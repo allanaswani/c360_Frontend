@@ -1,6 +1,7 @@
 'use client';
 
-import type { HFCBDomain } from '@/lib/types';
+import type { CustomerInsights as InsightsData, HFCBDomain } from '@/lib/types';
+import { CustomerInsights } from './CustomerInsights';
 import { count, kes } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
@@ -23,7 +24,11 @@ const CHANNEL_COLOR: Record<string, string> = {
   'Whizz / M-Pesa': 'var(--series-1)', Online: 'var(--series-4)', Cheque: 'var(--series-5)',
 };
 
-export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
+export function HFCBView({ domain, insights }: {
+  domain: HFCBDomain | null;
+  /** null while loading; undefined when the insights request failed outright. */
+  insights?: InsightsData | null;
+}) {
   if (!domain) return <HFCBSkeleton />;
 
   const m = domain.metrics;
@@ -59,7 +64,11 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
       value: (m.npl_status.value as string | null) ?? 'Not sourced',
       tone: m.npl_status.value === 'Non-performing' ? 'neg' : m.npl_status.value === 'Performing' ? 'pos' : undefined,
     },
-    { label: 'Revenue', countTo: m.revenue.value as number, fmt: (n) => kes(n), value: kes(m.revenue.value as number), status: m.revenue.status },
+    {
+      label: 'Revenue', status: m.revenue.status, meta: 'net, this year',
+      value: isNum(m.revenue.value) ? kes(m.revenue.value) : 'Not on record',
+      ...(isNum(m.revenue.value) ? { countTo: m.revenue.value, fmt: (n: number) => kes(n) } : {}),
+    },
   ];
 
   const balance = domain.charts.balance_trend;
@@ -72,6 +81,16 @@ export function HFCBView({ domain }: { domain: HFCBDomain | null }) {
     <div className="fadeUp">
       <StatStrip stats={stats} />
       <StatStrip stats={eco} />
+
+      {insights === undefined ? (
+        <div className={`${ui.card}`} style={{ padding: 8, marginTop: 12 }}>
+          <EmptyState title="Products, facilities and activity could not be loaded">
+            Reload the page to try again. The figures above are unaffected.
+          </EmptyState>
+        </div>
+      ) : (
+        <CustomerInsights data={insights} />
+      )}
 
       <div className={ui.chartGrid}>
         <Card

@@ -20,6 +20,8 @@ import type {
   PortfolioOverview,
   PropertyClientList,
   Recommendations,
+  CustomerInsights,
+  ActivityProspects,
   Worklist,
 } from './types';
 
@@ -563,6 +565,8 @@ export const api = {
   domain: (id: string, domain: string, period: string) =>
     request<DomainPayload>(`/customers/${id}/domains/${domain}/?period=${encodeURIComponent(period)}`),
   recommendations: (id: string) => request<Recommendations>(`/customers/${id}/recommendations/`),
+  insights: (id: string) => request<CustomerInsights>(`/customers/${id}/insights/`),
+  activityProspects: () => request<ActivityProspects>('/portfolio/activity-prospects/'),
   // recommendation outcome-logging (the feedback loop)
   recFeedbackList: (custId: string) =>
     request<{ results: RecFeedback[] }>(`/recommendations/feedback/?cust_id=${encodeURIComponent(custId)}`),

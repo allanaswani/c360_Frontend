@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
-import type { PortfolioOverview, Worklist as WorklistT } from '@/lib/types';
+import type { ActivityProspects, PortfolioOverview, Worklist as WorklistT } from '@/lib/types';
 import { count, kes } from '@/lib/format';
 import { Card } from '@/components/Card';
 import { PeriodFilter } from '@/components/PeriodFilter';
@@ -16,6 +16,7 @@ import { LineSeriesChart } from '@/components/charts/LineSeriesChart';
 import { MultiLineChart } from '@/components/charts/MultiLineChart';
 import { TopMovers } from '@/components/portfolio/TopMovers';
 import { Worklist } from '@/components/portfolio/Worklist';
+import { ActivityCallList } from '@/components/portfolio/ActivityCallList';
 import { ModelPerformance } from '@/components/portfolio/ModelPerformance';
 import ui from '@/components/ui.module.css';
 import { TYPE } from '@/lib/type';
@@ -39,6 +40,7 @@ function PortfolioInner() {
 
   const [ov, setOv] = useState<PortfolioOverview | null>(null);
   const [wl, setWl] = useState<WorklistT | null>(null);
+  const [act, setAct] = useState<ActivityProspects | null>(null);
   const [error, setError] = useState<{ code: number; msg: string } | null>(null);
 
   const setPeriod = useCallback((p: string) => {
@@ -60,6 +62,10 @@ function PortfolioInner() {
   useEffect(() => {
     let live = true;
     api.worklist().then((d) => live && setWl(d)).catch(() => live && setWl(null));
+    api.activityProspects().then((d) => live && setAct(d)).catch(() => live && setAct({
+      rules: [], results: [], unavailable: true,
+      detail: 'The call list could not be loaded. Reload the page to try again.',
+    }));
     return () => { live = false; };
   }, []);
 
@@ -178,6 +184,14 @@ function PortfolioInner() {
       <div style={{ marginTop: 12 }}>
         <Card title="Cross-sell worklist" question="Who should my RMs call this week, and why?">
           {wl ? <Worklist rows={wl.results} /> : <Skeleton height={200} radius={8} />}
+        </Card>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <Card title="Activity call list" question="Whose transactions point to a product they do not hold?"
+              status={act && !act.unavailable ? 'live' : undefined}
+              note="From the last 90 days of customer-facing transactions and the accounts held at the latest close. Refreshed every six hours.">
+          {act ? <ActivityCallList data={act} /> : <Skeleton height={200} radius={8} />}
         </Card>
       </div>
 

@@ -3,9 +3,10 @@
 import { use, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
-import type { CustomerDetail, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
+import type { CustomerDetail, CustomerInsights as InsightsData, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
 import { SignalStrip } from '@/components/SignalStrip';
+import { ProductStrip } from '@/components/ProductStrip';
 import { PropertyClientNotice } from '@/components/PropertyClientNotice';
 import { LinkedParties } from '@/components/LinkedParties';
 import { RelatedParties } from '@/components/RelatedParties';
@@ -51,6 +52,10 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   // Last customer-facing transaction — loaded from its own (sometimes slow) endpoint so
   // it never blocks the header; the chip shows 'Checking…' until this resolves.
   const [lastTxn, setLastTxn] = useState<{ value: string | null; note?: string } | null>(null);
+  // Products held, facilities, activity, revenue and the customer file. Its own request
+  // (several warehouse reads) so it never holds up the header; cached server-side.
+  const [insights, setInsights] = useState<InsightsData | null>(null);
+  const [insightsFailed, setInsightsFailed] = useState(false);
   const [error, setError] = useState<{ code: number; msg: string } | null>(null);
   // Bumped to force a re-fetch of the active domain payload (the "Retry" affordance
   // on an unavailable domain, so an RM can recover without reloading the whole page).
@@ -72,6 +77,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     setDetail(null);
     setLinked(null);
     setLastTxn(null);
+    setInsights(null);
+    setInsightsFailed(false);
     Promise.all([api.customer(id), api.recommendations(id), api.meta()])
       .then(([d, r, m]) => {
         if (!live) return;
@@ -84,6 +91,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     // never blocks the page. Last-transaction can be a multi-second warehouse probe.
     api.linked(id).then((l) => live && setLinked(l)).catch(() => live && setLinked(null));
     api.lastTransaction(id).then((x) => live && setLastTxn(x.last_transaction)).catch(() => { /* chip stays hidden-safe */ });
+    api.insights(id).then((x) => live && setInsights(x)).catch(() => live && setInsightsFailed(true));
     return () => { live = false; };
   }, [id]);
 
@@ -146,6 +154,14 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         </div>
       )}
 
+      {/* Current / savings / fixed deposit / … held or not, and loan types. Bank
+          customers only: a property or insurance client holds no bank account. */}
+      {detail && !detail.header.property_client && !detail.header.insurance_client && (
+        <div style={{ marginTop: 12 }}>
+          <ProductStrip block={insightsFailed ? { status: 'unavailable', data: null } : insights ? insights.products : null} />
+        </div>
+      )}
+
       <div className={ui.custShell}>
         {/* main column — the domain data, brought up right under the header */}
         <div>
@@ -168,7 +184,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
             {tab === 'overview' ? (
               <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
             ) : tab === 'hfcb' ? (
-              <HFCBView domain={hfcb} />
+              <HFCBView domain={hfcb} insights={insightsFailed ? undefined : insights} />
             ) : (
               <DomainView payload={other} onRetry={() => setReloadTick((n) => n + 1)} />
             )}

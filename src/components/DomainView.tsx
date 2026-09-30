@@ -13,6 +13,7 @@ import { GroupedBarChart } from './charts/GroupedBarChart';
 import { PartToWhole } from './charts/PartToWhole';
 import { MeterList } from './charts/MeterList';
 import ui from './ui.module.css';
+import { TYPE } from '@/lib/type';
 
 /** One renderer for every non-core domain. Reads the generic payload the backend
  *  emits, so adding a domain is a backend change only. Whole domain is preview. */
@@ -58,10 +59,14 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
 
   return (
     <div className="fadeUp">
+      {payload.note && (
+        <div style={{ fontSize: TYPE.xs, color: 'var(--ink-3)', margin: '0 0 8px' }}>{payload.note}</div>
+      )}
       <StatStrip stats={stats} />
       <div className={ui.chartGrid}>
         {payload.charts.map((c, i) => (
-          <Card key={c.id} className={isFull(c) || i === lastLoneHalf ? ui.spanFull : ''} title={c.title} question={c.question} status={c.status}>
+          <Card key={c.id} className={isFull(c) || i === lastLoneHalf ? ui.spanFull : ''} title={c.title} question={c.question} status={c.status}
+                note={c.kind === 'lines' ? c.note : undefined}>
             <ChartRenderer chart={c} />
           </Card>
         ))}
