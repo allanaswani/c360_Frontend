@@ -14,12 +14,15 @@ export const HEADERS: Record<string, string> = {
   project: 'Project', unit: 'Unit', value: 'Value', loan_balance: 'Loan balance', ltv: 'LTV',
   paid_pct: 'Paid', mortgage: 'Mortgage',
   policy: 'Policy', premium: 'Premium', monthly: 'Monthly', sum_insured: 'Sum insured',
-  account: 'Account',
+  account: 'Account', insurer: 'Insurer', end: 'Ends', matched_by: 'Matched by', claims: 'Claims',
+  paid: 'Paid to date', outstanding: 'Still to pay', last_payment: 'Last payment', mode: 'Paid by',
 };
-const NUMERIC = new Set(['balance', 'amount', 'value', 'loan_balance', 'ltv', 'paid_pct', 'premium', 'monthly', 'sum_insured']);
-const KES_COLS = new Set(['balance', 'value', 'loan_balance', 'premium', 'monthly', 'sum_insured']);
+const NUMERIC = new Set(['balance', 'amount', 'value', 'loan_balance', 'ltv', 'paid_pct', 'premium', 'monthly',
+                         'sum_insured', 'paid', 'outstanding', 'claims']);
+const KES_COLS = new Set(['balance', 'value', 'loan_balance', 'premium', 'monthly', 'sum_insured', 'paid', 'outstanding']);
+const DATE_COLS = new Set(['date', 'end', 'last_payment']);
 // Columns worth a dropdown filter when they hold a handful of distinct values.
-const FILTERABLE = ['channel', 'account', 'status', 'product'];
+const FILTERABLE = ['channel', 'account', 'status', 'product', 'description', 'insurer', 'mode', 'unit', 'project'];
 const SEARCH_FROM = 8;     // rows before a search box earns its place
 const SCROLL_FROM = 12;    // rows before the body scrolls under a sticky header
 
@@ -71,7 +74,7 @@ export function DataTable({ block, flow = false, sumColumns = [], maxHeight = 44
   }, [rows, filters, q, sort, block.columns]);
 
   const toggle = (col: string) => setSort((cur) =>
-    !cur || cur.col !== col ? { col, dir: NUMERIC.has(col) || col === 'date' ? -1 : 1 }
+    !cur || cur.col !== col ? { col, dir: NUMERIC.has(col) || DATE_COLS.has(col) ? -1 : 1 }
       : cur.dir === -1 ? { col, dir: 1 } : null);
 
   const showTools = rows.length > SEARCH_FROM || filterCols.length > 0;
@@ -167,6 +170,7 @@ function Totals({ rows, flow, sumColumns }: { rows: Row[]; flow: boolean; sumCol
 
 function compare(a: unknown, b: unknown, col: string): number {
   if (NUMERIC.has(col)) return Number(a) - Number(b);
+  // ISO dates sort correctly as text.
   return String(a).localeCompare(String(b), undefined, { numeric: true });
 }
 
@@ -179,6 +183,6 @@ function renderCell(col: string, val: string | number | undefined) {
     const n = Number(val);
     return <span style={{ color: n < 0 ? 'var(--neg)' : 'var(--pos)' }}>{kesFull(n)}</span>;
   }
-  if (col === 'date') return shortDate(String(val));
+  if (DATE_COLS.has(col)) return shortDate(String(val));
   return String(val);
 }

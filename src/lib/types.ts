@@ -572,8 +572,9 @@ export interface ChartBars {
 export interface ChartGrouped {
   kind: 'grouped';
   id: string; title: string; question: string; status: Provenance; fmt: ValueFmt;
-  seriesNames: [string, string];
-  data: { label: string; a: number; b: number }[];
+  /** One name draws a single series (b is then absent). */
+  seriesNames: [string] | [string, string];
+  data: { label: string; a: number; b?: number }[];
 }
 export interface ChartDonut {
   kind: 'donut';
@@ -591,6 +592,10 @@ export type DomainChart = ChartLines | ChartBars | ChartGrouped | ChartDonut | C
 export interface DomainTable {
   id: string; title: string; status: Provenance; note?: string;
   columns: string[]; rows: Record<string, string | number>[];
+  /** amount is a signed money movement: totals read in, out and net. */
+  flow?: boolean;
+  /** Columns whose sum over the shown rows is meaningful. */
+  sum_columns?: string[];
 }
 
 export interface DomainPayload {

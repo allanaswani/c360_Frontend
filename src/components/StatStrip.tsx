@@ -25,7 +25,10 @@ export interface Stat {
 export function StatStrip({ stats }: { stats: Stat[] }) {
   // First (lead) column a touch wider; the rest equal. Adapts to any count so a
   // 4-metric domain never leaves a trailing empty column.
-  const cols = stats.map((st, i) => (st.lead || i === 0 ? '1.4fr' : '1fr')).join(' ');
+  // Beyond six tiles one row crushes them (Whizz with mobile loans has ten), so wrap.
+  const cols = stats.length > 6
+    ? 'repeat(auto-fill, minmax(170px, 1fr))'
+    : stats.map((st, i) => (st.lead || i === 0 ? '1.4fr' : '1fr')).join(' ');
   return (
     <div className={s.statStrip} style={{ gridTemplateColumns: cols }}>
       {stats.map((st, i) => (

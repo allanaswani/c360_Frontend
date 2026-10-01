@@ -42,7 +42,8 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
   const stats: Stat[] = payload.metrics.map((m: DomainMetric) => ({
     label: m.label,
     value: fmtValue(m.value, m.unit),
-    countTo: m.value,
+    // A figure the source does not state arrives as null: show the dash, don't animate it.
+    countTo: m.value ?? undefined,
     fmt: (n: number) => fmtValue(m.unit === 'count' ? Math.round(n) : n, m.unit),
     status: m.status,
     lead: m.lead,
@@ -75,7 +76,7 @@ export function DomainView({ payload, onRetry }: { payload: DomainPayload | null
         {payload.tables.map((t) => (
           <Card key={t.id} title={t.title} status={t.status} note={t.note}
                 right={<TableExport title={t.title} block={t} headers={HEADERS} />}>
-            <DataTable block={t} />
+            <DataTable block={t} flow={t.flow} sumColumns={t.sum_columns} />
           </Card>
         ))}
       </div>
