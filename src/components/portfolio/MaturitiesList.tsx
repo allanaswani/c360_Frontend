@@ -8,6 +8,7 @@ import { count, fmtValue, kesFull, shortDate } from '@/lib/format';
 import { ChartTooltip } from '../charts/ChartTooltip';
 import { TableExport } from '../ExportMenu';
 import { EmptyState, UnavailableState } from '../States';
+import { useTableSort } from '../useTableSort';
 import s from '../ui.module.css';
 import t from '../table.module.css';
 
@@ -15,16 +16,17 @@ import t from '../table.module.css';
 export function MaturitiesList({ data }: { data: Maturities }) {
   const [branch, setBranch] = useState('');
   const branches = useMemo(() => [...new Set(data.results.map((r) => r.branch).filter(Boolean) as string[])].sort(), [data.results]);
+  const rows = useMemo(() => data.results.filter((r) => !branch || r.branch === branch), [data.results, branch]);
+  const { shown, th, search } = useTableSort(rows, MAT_COLS, matSearch);
   if (data.unavailable) {
     return <UnavailableState title="The maturity list could not be built">{data.detail ?? 'Try again shortly.'}</UnavailableState>;
   }
   if (!data.count) {
     return <EmptyState title={`No deposits mature in the next ${data.days ?? 30} days`} />;
   }
-  const rows = data.results.filter((r) => !branch || r.branch === branch);
   const exportBlock = {
     columns: ['matures', 'name', 'cust_id', 'product', 'account_no', 'balance', 'branch', 'rm_name'],
-    rows: rows.map((r) => ({ matures: r.matures, name: r.name ?? '', cust_id: r.cust_id, product: r.product,
+    rows: shown.map((r) => ({ matures: r.matures, name: r.name ?? '', cust_id: r.cust_id, product: r.product,
                              account_no: r.account_no ?? '', balance: r.balance, branch: r.branch ?? '', rm_name: r.rm_name ?? '' })),
   };
   return (
@@ -60,12 +62,13 @@ export function MaturitiesList({ data }: { data: Maturities }) {
         </div>
       )}
       <div className={t.tools}>
+        {search}
         <select className={t.filter} value={branch} onChange={(e) => setBranch(e.target.value)} aria-label="Filter by branch">
           <option value="">All branches</option>
           {branches.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
         <span className={t.count}>
-          {rows.length} shown{data.results.length < (data.count ?? 0) ? `, earliest ${data.results.length} of ${data.count} listed` : ''}
+          {shown.length} shown{data.results.length < (data.count ?? 0) ? `, earliest ${data.results.length} of ${data.count} listed` : ''}
         </span>
         <TableExport title="Deposits maturing" block={exportBlock}
                      headers={{ matures: 'Matures', name: 'Customer', cust_id: 'Customer no', product: 'Product',
@@ -74,10 +77,13 @@ export function MaturitiesList({ data }: { data: Maturities }) {
       <div className={`${s.tableWrap} ${t.scroll}`} style={{ maxHeight: 460 }}>
         <table className={`${s.table} ${t.sticky}`}>
           <thead>
-            <tr><th>Matures</th><th>Customer</th><th>Product</th><th>Branch</th><th>RM</th><th className={s.tRight}>Balance</th></tr>
+            <tr>
+              {th('matures', 'Matures')}{th('name', 'Customer')}{th('product', 'Product')}{th('branch', 'Branch')}
+              {th('rm', 'RM')}{th('balance', 'Balance', { numeric: true, className: s.tRight })}
+            </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {shown.map((r) => (
               <tr key={`${r.cust_id}-${r.account_no}`}>
                 <td>{shortDate(r.matures)}<div className={s.wl_id}>{r.days_left === 0 ? 'today' : `in ${r.days_left} days`}</div></td>
                 <td>
@@ -96,3 +102,11 @@ export function MaturitiesList({ data }: { data: Maturities }) {
     </div>
   );
 }
+
+type MatRow = Maturities['results'][number];
+// Module-level so the sort hook's memo is stable across renders.
+const MAT_COLS: Record<string, (r: MatRow) => string | number | null | undefined> = {
+  matures: (r) => r.matures, name: (r) => r.name, product: (r) => r.product, branch: (r) => r.branch,
+  rm: (r) => r.rm_name, balance: (r) => r.balance,
+};
+const matSearch = (r: MatRow) => [r.name, r.cust_id, r.account_no, r.branch, r.rm_name, r.product];

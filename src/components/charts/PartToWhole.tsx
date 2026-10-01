@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { DonutChart } from './DonutChart';
 import { StackedBar } from './StackedBar';
+import { MAX_CATEGORIES, OTHER_COLOR } from '@/lib/format';
 import s from '../ui.module.css';
 
 interface D { label: string; value: number }
@@ -20,9 +21,16 @@ export function PartToWhole({
   defaultView?: 'donut' | 'bar';
 }) {
   const [view, setView] = useState<'donut' | 'bar'>(defaultView);
+  // More slices than the palette has colours: keep the largest six, fold the rest
+  // into a grey "Other" - never a repeated colour. A slice keeps the colour it was
+  // given, so folding never repaints the survivors.
+  const palette = colors ?? DEFAULT;
+  const folded = fold(data, palette);
+  data = folded.data;
+  colors = folded.colors;
   // For share-based charts the "total" is 100%, so surface the top slice instead.
   const top = fmt === 'pct' ? [...data].sort((a, b) => b.value - a.value)[0] : undefined;
-  const donutColors = colors ?? DEFAULT;
+
 
   return (
     <div>
@@ -32,12 +40,25 @@ export function PartToWhole({
       {view === 'donut'
         ? <DonutChart data={data} fmt={fmt} colors={colors} centerLabel={centerLabel}
                       center={top ? { label: 'Top', value: top.label } : undefined} />
-        : <StackedBar data={data} fmt={fmt} colors={donutColors} />}
+        : <StackedBar data={data} fmt={fmt} colors={colors} />}
     </div>
   );
 }
 
-const DEFAULT = ['var(--series-1)', 'var(--series-2)', 'var(--coral)', 'var(--series-3)', 'var(--series-5)'];
+function fold(data: D[], palette: string[]): { data: D[]; colors: string[] } {
+  const withColor = data.map((d, i) => ({ d, c: palette[i % palette.length] }));
+  if (data.length <= MAX_CATEGORIES) return { data, colors: withColor.map((x) => x.c) };
+  const sorted = [...withColor].sort((a, b) => b.d.value - a.d.value);
+  const keep = sorted.slice(0, MAX_CATEGORIES - 1);
+  const rest = sorted.slice(MAX_CATEGORIES - 1);
+  return {
+    data: [...keep.map((x) => x.d), { label: `Other (${rest.length})`, value: rest.reduce((t, x) => t + x.d.value, 0) }],
+    colors: [...keep.map((x) => x.c), OTHER_COLOR],
+  };
+}
+
+// The validated palette in fixed order; coral (status) no longer stands in as a category.
+const DEFAULT = ['var(--cat-1)', 'var(--cat-2)', 'var(--cat-3)', 'var(--cat-4)', 'var(--cat-5)', 'var(--cat-6)', 'var(--cat-7)'];
 
 function ViewToggle({ view, onChange }: { view: 'donut' | 'bar'; onChange: (v: 'donut' | 'bar') => void }) {
   return (

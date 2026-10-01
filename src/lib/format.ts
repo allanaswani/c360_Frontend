@@ -85,10 +85,16 @@ export function fmtValue(value: number | null | undefined, fmt: 'kes' | 'count' 
 }
 
 /** Map a chart series colorRole (1-based) to a brand series token. */
+/** Slot ``role`` of the validated categorical palette (7 colours). A chart with more
+ *  categories than that must fold the rest into "Other" (see foldCategories) rather
+ *  than reuse a colour - two series in one colour cannot be told apart. */
 export function seriesColor(role: number): string {
-  const n = ((role - 1) % 5) + 1;
+  const n = ((role - 1) % 7) + 1;
   return `var(--series-${n})`;
 }
+
+export const OTHER_COLOR = 'var(--cat-other)';
+export const MAX_CATEGORIES = 7;
 
 export function initials(name: string): string {
   return name

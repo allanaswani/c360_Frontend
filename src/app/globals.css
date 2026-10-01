@@ -17,12 +17,18 @@
   --light-teal: #46ABBD;
   --ink-black: #000000;
 
-  /* --- chart series (validated; coral reserved for status only) --- */
-  --series-1: var(--teal);
-  --series-2: var(--gold);
-  --series-3: var(--slate);
-  --series-4: var(--navy);
-  --series-5: var(--light-teal);
+  /* --- chart series: the validated categorical palette below, in its fixed order.
+     The old set (teal/gold/slate/navy/light-teal) failed the dataviz validator -
+     gold and navy outside the lightness band, slate/navy/light-teal reading as grey -
+     and in dark mode slots 1, 4 and 5 were the same colour. Coral stays reserved for
+     status. Each slot resolves through --cat-N, so dark mode follows automatically. --- */
+  --series-1: var(--cat-1);
+  --series-2: var(--cat-2);
+  --series-3: var(--cat-3);
+  --series-4: var(--cat-4);
+  --series-5: var(--cat-5);
+  --series-6: var(--cat-6);
+  --series-7: var(--cat-7);
 
   /* --- categorical palette for multi-category charts (call-list rules, timeline
      kinds). Run through the dataviz validator 2026-10-01 against #ffffff: lightness,
@@ -125,8 +131,6 @@
   --ink-on-dark-2: #8fb3bd;
   --grid: #143039;
   --chart-surface: #0c2531;
-  --series-4: var(--light-teal);
-  --series-1: var(--light-teal);
   --pos: #45b389;
   /* validated against the dark card surface #0c2531 - all checks pass */
   --cat-1: #1996A9; --cat-2: #d95926; --cat-3: #9085e9; --cat-4: #c98500;
@@ -144,7 +148,7 @@
     --ink-1: #eaf3f5; --ink-2: #a9c6cf; --ink-3: #6f929d;
     --ink-on-dark: #eaf3f5; --ink-on-dark-2: #8fb3bd;
     --grid: #143039; --chart-surface: #0c2531;
-    --series-4: var(--light-teal); --series-1: var(--light-teal); --pos: #45b389;
+    --pos: #45b389;
     /* validated against the dark card surface #0c2531 - all checks pass */
     --cat-1: #1996A9; --cat-2: #d95926; --cat-3: #9085e9; --cat-4: #c98500;
     --cat-5: #3987e5; --cat-6: #d55181; --cat-7: #008300; --cat-other: #5f7882;

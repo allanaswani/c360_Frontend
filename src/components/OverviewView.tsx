@@ -15,10 +15,10 @@ const DOMAIN_COLOR: Record<string, string> = {
   // Keyed by the API's by-domain LABEL, which is brand copy - so it is read from
   // the brand module, not typed, or a rename silently stops matching and the
   // domain loses its colour.
-  [DOMAIN_KEY.bank]: 'var(--series-1)',
-  Whizz: 'var(--series-2)',
-  Properties: 'var(--series-3)',
-  Bancassurance: 'var(--coral)',
+  [DOMAIN_KEY.bank]: 'var(--cat-1)',
+  Whizz: 'var(--cat-2)',
+  Properties: 'var(--cat-3)',
+  Bancassurance: 'var(--cat-4)',   // was the status coral, which reads as a warning
 };
 
 /** Level 2 overview — where value sits across domains, whether it's growing, and
@@ -28,7 +28,7 @@ export function OverviewView({ overview, onOpenDomain }: { overview: CustomerOve
 
   const slices = overview.value_by_domain.slices;
   const data = slices.map((s) => ({ label: s.domain, value: s.value }));
-  const colors = slices.map((s) => DOMAIN_COLOR[s.domain] ?? 'var(--series-4)');
+  const colors = slices.map((s) => DOMAIN_COLOR[s.domain] ?? 'var(--cat-other)');
 
   return (
     <div className="fadeUp">

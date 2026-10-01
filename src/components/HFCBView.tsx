@@ -19,11 +19,13 @@ import { EmptyState, Skeleton } from './States';
 import ui from './ui.module.css';
 
 // Fixed channel identity colours (were bespoke to the channel donut).
+// One fixed colour per channel from the validated palette. Mobile and Whizz / M-Pesa
+// used to share teal (two channels, one colour), and Agent wore the status coral.
 const CHANNEL_COLOR: Record<string, string> = {
-  Mobile: 'var(--series-1)', Branch: 'var(--series-2)', Agent: 'var(--coral)',
-  ATM: 'var(--series-3)', Internet: 'var(--series-5)',
-  // Live channels from fact_dep_trx_recording (transaction count by channel).
-  'Whizz / M-Pesa': 'var(--series-1)', Online: 'var(--series-4)', Cheque: 'var(--series-5)',
+  'Whizz / M-Pesa': 'var(--cat-1)', 'M-Pesa, till & PesaLink': 'var(--cat-2)',
+  Branch: 'var(--cat-3)', ATM: 'var(--cat-4)', Online: 'var(--cat-5)',
+  Mobile: 'var(--cat-6)', Cheque: 'var(--cat-7)',
+  Internet: 'var(--cat-other)', Agent: 'var(--cat-other)',
 };
 
 export function HFCBView({ domain, insights, custId, latest }: {
@@ -141,7 +143,7 @@ export function HFCBView({ domain, insights, custId, latest }: {
             <PartToWhole
               fmt="pct"
               data={channel.slices.map((c) => ({ label: c.channel, value: c.share }))}
-              colors={channel.slices.map((c) => CHANNEL_COLOR[c.channel] ?? 'var(--series-4)')}
+              colors={channel.slices.map((c) => CHANNEL_COLOR[c.channel] ?? 'var(--cat-other)')}
             />
           ) : (
             <EmptyState title="No channel activity" />

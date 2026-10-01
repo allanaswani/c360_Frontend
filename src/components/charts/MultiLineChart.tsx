@@ -1,7 +1,7 @@
 'use client';
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { axisDateFormatter, dayMonth, fmtValue, seriesColor } from '@/lib/format';
+import { axisDateFormatter, dayMonth, fmtValue, MAX_CATEGORIES, OTHER_COLOR, seriesColor } from '@/lib/format';
 import { ChartTooltip, Legend } from './ChartTooltip';
 
 /** Multi-series line — up to ~5 lines on one shared axis (never dual-axis). Used
@@ -15,7 +15,11 @@ export function MultiLineChart({
   fmt: 'kes' | 'count' | 'pct';
   height?: number;
 }) {
-  const colors = keys.map((_, i) => seriesColor(i + 1));
+  // Eleven segments in five colours made different segments the same colour. Keep the
+  // six largest (by their latest value), sum the rest into a grey "Other" line - the
+  // values are additive (segment value), so the sum is a real figure.
+  ({ data, keys } = foldLines(data, keys));
+  const colors = keys.map((k, i) => (k.startsWith('Other (') ? OTHER_COLOR : seriesColor(i + 1)));
   const tickFmt = axisDateFormatter(data, 'period');
   return (
     <div>
@@ -46,4 +50,20 @@ function T({ keys, colors, fmt, active, label, payload }: { keys: string[]; colo
       rows={keys.map((k, i) => ({ key: k, color: colors[i], value: fmtValue(payload.find((p) => p.dataKey === k)?.value ?? 0, fmt) }))}
     />
   );
+}
+
+function foldLines(data: Record<string, number | string>[], keys: string[]) {
+  if (keys.length <= MAX_CATEGORIES) return { data, keys };
+  const last = data[data.length - 1] ?? {};
+  const ranked = [...keys].sort((a, b) => Number(last[b] ?? 0) - Number(last[a] ?? 0));
+  const keep = ranked.slice(0, MAX_CATEGORIES - 1);
+  const rest = ranked.slice(MAX_CATEGORIES - 1);
+  const other = `Other (${rest.length})`;
+  const rows = data.map((r) => {
+    const out: Record<string, number | string> = {};
+    for (const [k, v] of Object.entries(r)) if (!rest.includes(k)) out[k] = v;
+    out[other] = rest.reduce((t, k) => t + Number(r[k] ?? 0), 0);
+    return out;
+  });
+  return { data: rows, keys: [...keep, other] };
 }

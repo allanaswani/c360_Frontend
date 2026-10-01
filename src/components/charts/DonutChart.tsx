@@ -8,7 +8,7 @@ import { TYPE } from '@/lib/type';
 
 interface D { label: string; value: number }
 // Validated categorical order; direct labels + 2px gaps carry identity too.
-const PALETTE = ['var(--series-1)', 'var(--series-2)', 'var(--coral)', 'var(--series-3)', 'var(--series-5)'];
+const PALETTE = ['var(--cat-1)', 'var(--cat-2)', 'var(--cat-3)', 'var(--cat-4)', 'var(--cat-5)', 'var(--cat-6)', 'var(--cat-7)'];
 
 /** Generic part-to-whole donut with legend and a centred total. */
 export function DonutChart({ data, fmt, centerLabel, colors, center }: { data: D[]; fmt: 'kes' | 'count' | 'pct'; centerLabel?: string; colors?: string[]; center?: { label: string; value: string } }) {
