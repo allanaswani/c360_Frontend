@@ -15,7 +15,12 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 /** "What they hold, owe, earn us and do" - the HFCB-tab section built on
  *  /customers/:id/insights/. Every block renders its own state: a source that could
  *  not be read says so, and is never shown as "none". */
-export function CustomerInsights({ data }: { data: Insights | null }) {
+export function CustomerInsights({ data: raw }: { data: Insights | null }) {
+  // A backend older than this page leaves newer blocks out of the payload entirely.
+  // Each missing block becomes "could not be loaded" for that card alone; reading a
+  // block that is not there crashed the whole page (2026-10-01, frontend deployed
+  // ahead of the backend).
+  const data = raw ? withAllBlocks(raw) : null;
   if (!data) {
     return (
       <div className={ui.chartGrid}>
@@ -37,6 +42,18 @@ export function CustomerInsights({ data }: { data: Insights | null }) {
       <ProfileCard data={data} />
     </div>
   );
+}
+
+const BLOCKS = ['products', 'facilities', 'activity', 'profile', 'revenue', 'cashflow', 'loans'] as const;
+const MISSING = { status: 'unavailable' as const, data: null };
+
+function withAllBlocks(raw: Insights): Insights {
+  const out = { ...raw } as Record<string, unknown>;
+  for (const k of BLOCKS) {
+    const b = out[k] as InsightBlock<unknown> | undefined;
+    if (!b || typeof b !== 'object' || !('status' in b)) out[k] = MISSING;
+  }
+  return out as unknown as Insights;
 }
 
 function statusOf(b: InsightBlock<unknown>): Provenance | undefined {

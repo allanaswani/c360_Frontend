@@ -3,6 +3,7 @@
 import type { CustomerInsights as InsightsData, HFCBDomain } from '@/lib/types';
 import { CustomerInsights } from './CustomerInsights';
 import { StatementCard } from './StatementCard';
+import { SafeSection } from './SafeSection';
 import { count, kes } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
@@ -93,7 +94,7 @@ export function HFCBView({ domain, insights, custId, latest }: {
           </EmptyState>
         </div>
       ) : (
-        <CustomerInsights data={insights} />
+        <SafeSection name="Products, cash flow and activity"><CustomerInsights data={insights} /></SafeSection>
       )}
 
       <div className={ui.chartGrid}>
@@ -161,7 +162,7 @@ export function HFCBView({ domain, insights, custId, latest }: {
               right={<TableExport title="Recent transactions" block={domain.tables.recent_transactions} headers={HEADERS} />}>
           <DataTable block={domain.tables.recent_transactions} flow />
         </Card>
-        <StatementCard custId={custId} latest={latest} />
+        <SafeSection name="The statement"><StatementCard custId={custId} latest={latest} /></SafeSection>
       </div>
     </div>
   );

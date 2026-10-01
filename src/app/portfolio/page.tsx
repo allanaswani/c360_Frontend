@@ -18,6 +18,7 @@ import { TopMovers } from '@/components/portfolio/TopMovers';
 import { Worklist } from '@/components/portfolio/Worklist';
 import { ActivityCallList } from '@/components/portfolio/ActivityCallList';
 import { MaturitiesList } from '@/components/portfolio/MaturitiesList';
+import { SafeSection } from '@/components/SafeSection';
 import { ModelPerformance } from '@/components/portfolio/ModelPerformance';
 import ui from '@/components/ui.module.css';
 import { TYPE } from '@/lib/type';
@@ -196,7 +197,7 @@ function PortfolioInner() {
         <Card title="Activity call list" question="Whose transactions point to a product they do not hold?"
               status={act && !act.unavailable ? 'live' : undefined}
               note="From the last 90 days of customer-facing transactions and the accounts held at the latest close. Refreshed every six hours.">
-          {act ? <ActivityCallList data={act} /> : <Skeleton height={200} radius={8} />}
+          {act ? <SafeSection name="The call list"><ActivityCallList data={act} /></SafeSection> : <Skeleton height={200} radius={8} />}
         </Card>
       </div>
 
@@ -204,7 +205,7 @@ function PortfolioInner() {
         <Card title="Deposits maturing in the next 30 days" question="Whose fixed deposits mature soon, so the money can be kept?"
               status={mat && !mat.unavailable ? 'live' : undefined}
               note="Fixed and call deposits with a balance, by maturity date, from the latest deposit close. Refreshed every six hours.">
-          {mat ? <MaturitiesList data={mat} /> : <Skeleton height={200} radius={8} />}
+          {mat ? <SafeSection name="The maturity list"><MaturitiesList data={mat} /></SafeSection> : <Skeleton height={200} radius={8} />}
         </Card>
       </div>
 

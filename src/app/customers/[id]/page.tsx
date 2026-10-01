@@ -16,6 +16,7 @@ import { shortDate } from '@/lib/format';
 import { RecommendationPanel } from '@/components/RecommendationPanel';
 import { OverviewView } from '@/components/OverviewView';
 import { RelationshipPanel } from '@/components/RelationshipPanel';
+import { SafeSection } from '@/components/SafeSection';
 import { HFCBView } from '@/components/HFCBView';
 import { DomainView } from '@/components/DomainView';
 import { ErrorState, Skeleton } from '@/components/States';
@@ -159,7 +160,9 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
           customers only: a property or insurance client holds no bank account. */}
       {detail && !detail.header.property_client && !detail.header.insurance_client && (
         <div style={{ marginTop: 12 }}>
-          <ProductStrip block={insightsFailed ? { status: 'unavailable', data: null } : insights ? insights.products : null} />
+          <SafeSection name="Accounts held">
+            <ProductStrip block={insightsFailed ? { status: 'unavailable', data: null } : insights ? insights.products : null} />
+          </SafeSection>
         </div>
       )}
 
@@ -185,7 +188,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
               <>
                 <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
                 {detail && !detail.header.property_client && !detail.header.insurance_client && (
-                  <RelationshipPanel custId={id} />
+                  <SafeSection name="Timeline and peer comparison"><RelationshipPanel custId={id} /></SafeSection>
                 )}
               </>
             ) : tab === 'hfcb' ? (
