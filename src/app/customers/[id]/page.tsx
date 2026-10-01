@@ -3,7 +3,7 @@
 import { use, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
-import type { CustomerDetail, CustomerInsights as InsightsData, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
+import type { CustomerDetail, Meta, CustomerInsights as InsightsData, CustomerOverview, DomainPayload, HFCBDomain, LinkedParties as LinkedPartiesData, Recommendations } from '@/lib/types';
 import { CustomerHeader } from '@/components/CustomerHeader';
 import { SignalStrip } from '@/components/SignalStrip';
 import { ProductStrip } from '@/components/ProductStrip';
@@ -48,7 +48,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   const [overview, setOverview] = useState<CustomerOverview | null>(null);
   const [hfcb, setHfcb] = useState<HFCBDomain | null>(null);
   const [other, setOther] = useState<DomainPayload | null>(null);
-  const [meta, setMeta] = useState<{ as_of: string } | null>(null);
+  const [meta, setMeta] = useState<{ as_of: string; freshness?: Meta['freshness'] } | null>(null);
   // Last customer-facing transaction — loaded from its own (sometimes slow) endpoint so
   // it never blocks the header; the chip shows 'Checking…' until this resolves.
   const [lastTxn, setLastTxn] = useState<{ value: string | null; note?: string } | null>(null);
@@ -84,7 +84,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         if (!live) return;
         setDetail(d);
         setRecs(r);
-        setMeta({ as_of: m.as_of });
+        setMeta({ as_of: m.as_of, freshness: m.freshness });
       })
       .catch((e: ApiError) => live && setError({ code: e.status, msg: e.message }));
     // Linked parties + last-transaction load independently — a slow or empty result
@@ -172,9 +172,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
               <div style={{ fontSize: TYPE.md, fontWeight: 600, letterSpacing: '-0.01em' }}>{(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).title}</div>
               <div style={{ fontSize: TYPE.xs, color: 'var(--ink-3)', marginTop: 2 }}>
                 {(DOMAIN_LABEL[tab] ?? DOMAIN_LABEL.hfcb).sub}
-                {meta?.as_of
-                  ? ` · balances as of ${shortDate(meta.as_of)}; the period filter drives the trend charts only`
-                  : ' · the period filter drives the trend charts only'}
+                {meta?.as_of ? ` · ${freshnessLine(meta)}` : ''}
+                {' · the period filter drives the trend charts only'}
               </div>
             </div>
             <PeriodFilter value={period} onChange={(p) => setParam('period', p)} />
@@ -204,4 +203,17 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
       </div>
     </main>
   );
+}
+
+/** Which date each figure is current to. The sources load on different days, so one
+ *  "as of" would be wrong for at least one of them. */
+function freshnessLine(meta: { as_of: string; freshness?: Meta['freshness'] }): string {
+  const f = meta.freshness;
+  if (!f) return `balances as of ${shortDate(meta.as_of)}`;
+  const dep = f.deposits ?? meta.as_of;
+  const parts = f.loans && f.loans !== dep
+    ? [`deposits as of ${shortDate(dep)}`, `loans as of ${shortDate(f.loans)}`]
+    : [`balances as of ${shortDate(dep)}`];
+  if (f.transactions) parts.push(`transactions to ${shortDate(f.transactions)}`);
+  return parts.join(', ');
 }

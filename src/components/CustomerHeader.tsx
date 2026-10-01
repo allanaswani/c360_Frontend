@@ -139,7 +139,7 @@ function LastTxnChip({ metric, loading, asOf }: {
   if (loading && !metric) {
     return (
       <div className={s.riskChip} title="Looking up the last customer-facing transaction…">
-        <span className="microlabel">Last transaction</span>
+        <span className="microlabel">Last customer activity</span>
         <span className={s.riskChipVal} style={{ opacity: 0.6 }}>Checking…</span>
       </div>
     );
@@ -148,7 +148,7 @@ function LastTxnChip({ metric, loading, asOf }: {
   if (!val) {
     return (
       <div className={s.riskChip} title={metric?.note || 'No customer-facing transaction found on record.'}>
-        <span className="microlabel">Last transaction</span>
+        <span className="microlabel">Last customer activity</span>
         <span className={s.riskChipPending}>None on record</span>
       </div>
     );
@@ -157,12 +157,16 @@ function LastTxnChip({ metric, loading, asOf }: {
   const years = Math.floor(months / 12);
   const color = months >= 36 ? 'var(--coral)' : months >= 12 ? 'var(--gold)' : undefined;
   const ago = months < 1 ? 'this month' : months < 12 ? `${months} mo ago` : `${years} yr${years > 1 ? 's' : ''} ago`;
-  const title = color
-    ? `Account is marked Active, but its last customer-facing transaction was ${shortDate(val)}, ${ago}.`
-    : `Last customer-facing transaction ${shortDate(val)}.`;
+  // Bank-initiated postings (salary credits, standing orders) are left out on
+  // purpose: they move money without the customer doing anything, so the feed can
+  // show newer entries than this date.
+  const title = (color
+    ? `Account is marked Active, but the customer last transacted ${shortDate(val)}, ${ago}.`
+    : `The customer last transacted ${shortDate(val)}.`)
+    + ' Salary credits, standing orders and other bank postings are not counted here.';
   return (
     <div className={s.riskChip} title={title}>
-      <span className="microlabel">Last transaction</span>
+      <span className="microlabel">Last customer activity</span>
       <span className={s.riskChipVal} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
         {color && <span className={s.badgeDot} style={{ background: color }} />}
         {shortDate(val)}

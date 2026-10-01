@@ -26,6 +26,9 @@ export interface Series {
 export interface Meta {
   data_mode: 'mock' | 'live';
   as_of: string;
+  /** The date each source is current to. Deposits, loans and the transaction ledger
+   *  load on different days; null in preview mode. */
+  freshness?: { business_date: string | null; deposits: string | null; loans: string | null; transactions: string | null } | null;
   period_presets: string[];
   scope: { role: string; whole_book: boolean; can_view_portfolio: boolean };
   provenance_legend: Record<Provenance, string>;
@@ -683,6 +686,8 @@ export interface ProductGroup { key: string; label: string; side: 'deposit' | 'l
 export interface ProductAccount {
   category: string; product: string | null; account_no: string | null; balance: number;
   status: string; side: 'deposit' | 'loan'; opened?: string | null;
+  /** Term and call deposits only. */
+  maturity?: string | null;
 }
 export interface ProductMix {
   headline: ProductHeadline[];
@@ -693,6 +698,7 @@ export interface ProductMix {
   accounts: ProductAccount[];
   liquid_balance: number;
   as_of: string;
+  loans_as_of?: string;
 }
 
 export interface Facility {

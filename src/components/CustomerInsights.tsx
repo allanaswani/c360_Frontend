@@ -27,6 +27,7 @@ export function CustomerInsights({ data }: { data: Insights | null }) {
     <div className={ui.chartGrid}>
       <AccountsCard data={data} />
       <LoansCard data={data} />
+      <AccountListCard data={data} />
       <FacilitiesCard data={data} />
       <ActivityCard data={data} />
       <RevenueCard data={data} />
@@ -59,6 +60,45 @@ function AccountsCard({ data }: { data: Insights }) {
             label: g.label, value: g.balance,
             meta: `${g.accounts} ${g.accounts === 1 ? 'account' : 'accounts'} · ${g.products.join(', ')}`,
           }))} />
+        )}
+    </Card>
+  );
+}
+
+/** Every account, current to fixed deposit, with its number, balance, status and (for a
+ *  term or call deposit) maturity date. One table rather than one per type, so the
+ *  whole relationship reads top to bottom. */
+function AccountListCard({ data }: { data: Insights }) {
+  const b = data.products;
+  const rows = b.data?.accounts ?? [];
+  return (
+    <Card className={ui.spanFull} title="All accounts" status={statusOf(b)}
+          question="Which accounts do they hold, and when do deposits mature?"
+          note={b.data ? `Deposits as of ${shortDate(b.data.as_of)}, loans as of ${shortDate(b.data.loans_as_of ?? b.data.as_of)}.` : undefined}>
+      {b.status === 'unavailable' ? <Unavailable what="Accounts" /> :
+        rows.length === 0 ? <EmptyState title="No accounts with a balance" /> : (
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead>
+                <tr>
+                  <th>Type</th><th>Product</th><th>Account</th><th>Status</th><th>Matures</th>
+                  <th className={ui.tRight}>Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((a) => (
+                  <tr key={`${a.side}-${a.account_no}-${a.product}`}>
+                    <td>{a.category}</td>
+                    <td>{a.product ?? '—'}</td>
+                    <td className={`${ui.tMuted} tnum`}>{a.account_no ?? '—'}</td>
+                    <td>{a.status}</td>
+                    <td>{a.maturity ? shortDate(a.maturity) : '—'}</td>
+                    <td className={`${ui.tRight} tnum`}>{kesFull(a.balance)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
     </Card>
   );
@@ -202,8 +242,13 @@ function RevenueCard({ data }: { data: Insights }) {
               <div><div className={s.factLabel}>Fees and commissions</div><div className={`${s.factValue} tnum`}>{kesFull(r.totals.nfi)}</div></div>
               <div><div className={s.factLabel}>Interest paid to them</div><div className={`${s.factValue} tnum`}>{kesFull(r.totals.interest_expense)}</div></div>
             </div>
-            <LineSeriesChart fmt="kes" height={150} data={r.months.map((m) => ({ period: m.period, net: m.net }))}
-                             series={[{ name: 'Net revenue', dataKey: 'net', colorRole: 1 }]} />
+            <LineSeriesChart fmt="kes" height={170}
+                             data={r.months.map((m) => ({ period: m.period, ii: m.interest_income, nfi: m.nfi, ie: m.interest_expense }))}
+                             series={[
+                               { name: 'Interest income', dataKey: 'ii', colorRole: 1 },
+                               { name: 'Fees and commissions', dataKey: 'nfi', colorRole: 2 },
+                               { name: 'Interest paid to them', dataKey: 'ie', colorRole: 3 },
+                             ]} />
           </>
         )}
     </Card>

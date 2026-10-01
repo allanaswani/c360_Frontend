@@ -10,6 +10,7 @@ export const HEADERS: Record<string, string> = {
   project: 'Project', unit: 'Unit', value: 'Value', loan_balance: 'Loan balance', ltv: 'LTV',
   paid_pct: 'Paid', mortgage: 'Mortgage',
   policy: 'Policy', premium: 'Premium', monthly: 'Monthly', sum_insured: 'Sum insured',
+  account: 'Account',
 };
 const NUMERIC = new Set(['balance', 'amount', 'value', 'loan_balance', 'ltv', 'paid_pct', 'premium', 'monthly', 'sum_insured']);
 
