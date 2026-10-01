@@ -52,10 +52,17 @@ function PortfolioInner() {
     router.replace(`${pathname}?${next.toString()}`, { scroll: false });
   }, [search, router, pathname]);
 
-  useEffect(() => {
-    let live = true;
+  // A new period clears the previous period's overview and error during render, so
+  // the old figures are never painted under the new period's label.
+  const [loadedPeriod, setLoadedPeriod] = useState(period);
+  if (loadedPeriod !== period) {
+    setLoadedPeriod(period);
     setOv(null);
     setError(null);
+  }
+
+  useEffect(() => {
+    let live = true;
     api.portfolioOverview(period)
       .then((d) => live && setOv(d))
       .catch((e: ApiError) => live && setError({ code: e.status, msg: e.message }));

@@ -92,7 +92,8 @@ export default function InsuranceClients() {
                   { key: 'mobile', label: 'Phone', type: 'text' as const },
                   { key: 'policies', label: 'Policies', type: 'num' as const },
                   { key: 'active_policies', label: 'Active', type: 'num' as const },
-                  { key: 'premium', label: 'Premium (KES)', type: 'num' as const },
+                  { key: 'premium', label: 'Premium in force (KES)', type: 'num' as const },
+                  { key: 'premium_all', label: 'Premium, all policies (KES)', type: 'num' as const },
                   { key: 'receipts', label: 'Premium receipts', type: 'num' as const },
                   { key: 'bank_cust_id', label: 'Bank customer', type: 'text' as const },
                 ],
@@ -105,6 +106,7 @@ export default function InsuranceClients() {
                   policies: c.insurance.policies,
                   active_policies: c.insurance.active_policies,
                   premium: c.insurance.premium,
+                  premium_all: c.insurance.premium_all ?? c.insurance.premium,
                   receipts: c.insurance.receipts ?? 'No receipts on file',
                   bank_cust_id: c.insurance.bank_cust_id ?? 'No bank record',
                 })),
@@ -185,7 +187,7 @@ export default function InsuranceClients() {
 
       {data && data.results.length > 0 && (
         <p className={p.foot}>
-          {count(data.results.length)} shown · {kes(premium)} of premium across them
+          {count(data.results.length)} shown · {kes(premium)} of premium in force across them
           {data.staff_unverified > 0 && (
             <>
               {' '}· HF-staff screening could not be run on {count(data.staff_unverified)} of these
@@ -233,7 +235,7 @@ function ClientRow({ c }: { c: InsuranceClient }) {
         </div>
       </div>
       <div className={s.rowFig}>
-        <span className="microlabel">Premium</span>
+        <span className="microlabel">Premium in force</span>
         <span className={`${s.rowFigVal} tnum`}>{kes(c.insurance.premium)}</span>
       </div>
       <div className={s.rowFig}>

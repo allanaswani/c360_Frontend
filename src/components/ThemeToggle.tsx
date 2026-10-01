@@ -14,6 +14,7 @@ export function ThemeToggle() {
   useEffect(() => {
     const stored = (localStorage.getItem('c360-theme') as Mode | null);
     const initial = stored ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only value read after mount; reading it during render would not match the server render
     setMode(initial);
   }, []);
 

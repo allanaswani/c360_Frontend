@@ -17,7 +17,6 @@ export default function BookPage() {
 
   useEffect(() => {
     let live = true;
-    setError(null);
     api.book().then((d) => live && setData(d)).catch((e) => live && setError(e.message));
     return () => { live = false; };
   }, []);

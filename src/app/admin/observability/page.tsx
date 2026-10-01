@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { ObsOverview, ObsSeriesPoint } from '@/lib/types';
@@ -28,28 +28,23 @@ export default function ObservabilityPage() {
   const [data, setData] = useState<ObsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-  // The window is passed in rather than read from a ref. Writing a ref during
-  // render is a rule violation and, more practically, the poll and the render can
-  // then disagree about which window is on screen.
-  const load = useCallback(async (minutes: number) => {
-    try {
-      const d = await api.observability(minutes);
-      setData(d);
-      setUpdatedAt(new Date());
-      setError(null);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, []);
 
   // Live polling — reloads on window change and every REFRESH_MS, paused when the tab
   // is hidden (no point polling a board nobody is looking at).
   useEffect(() => {
     if (!user?.is_admin) return;
-    load(win);
-    const id = setInterval(() => { if (document.visibilityState === 'visible') load(win); }, REFRESH_MS);
-    return () => clearInterval(id);
-  }, [user, win, load]);
+    let live = true;
+    // The window comes from the effect's own closure, not a ref: the poll and the
+    // render always agree on which window is on screen.
+    const poll = () => {
+      api.observability(win)
+        .then((d) => { if (live) { setData(d); setUpdatedAt(new Date()); setError(null); } })
+        .catch((e: Error) => live && setError(e.message));
+    };
+    poll();
+    const id = setInterval(() => { if (document.visibilityState === 'visible') poll(); }, REFRESH_MS);
+    return () => { live = false; clearInterval(id); };
+  }, [user, win]);
 
   const sm = data?.summary;
   const series = data?.series ?? [];

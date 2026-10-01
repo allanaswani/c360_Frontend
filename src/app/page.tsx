@@ -15,9 +15,15 @@ export default function Home() {
   const [rows, setRows] = useState<CustomerSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // A new query clears the previous error before the next paint.
+  const [errorFor, setErrorFor] = useState(q);
+  if (errorFor !== q) {
+    setErrorFor(q);
+    setError(null);
+  }
+
   useEffect(() => {
     let live = true;
-    setError(null);
     const t = setTimeout(() => {
       api.customers(q)
         .then((r) => live && setRows(r.results))

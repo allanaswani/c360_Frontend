@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     consumeSsoHandoff();
     adoptPortfolioSession();
     if (!tokens.access() && !tokens.refresh()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only value read after mount; reading it during render would not match the server render (tokens live in localStorage)
       setStatus('anon');
       return;
     }

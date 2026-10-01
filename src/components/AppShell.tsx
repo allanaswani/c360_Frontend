@@ -43,6 +43,7 @@ function BootSplash() {
   return (
     <div className={s.bootSplash} aria-busy="true">
       <div className={s.bootMark}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- a 26px static mark under the base path; next/image adds nothing here */}
         <img src={asset('/hfcb-mark.png')} alt="" width={26} height={25} />
       </div>
       <div className={s.bootPulse} />

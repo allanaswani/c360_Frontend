@@ -42,6 +42,7 @@ export function TopBar() {
           {/* Official mark on a white tile — brand-correct on light and dark. The image
               FILE keeps its historical name; only the label comes from the brand module. */}
           <span className={s.logoTile}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- a 21px static mark under the base path; next/image adds nothing here */}
             <img src={asset('/hfcb-mark.png')} alt={BRAND.markAlt} width={21} height={20} />
           </span>
           <span className={s.brandName}>Customer <b>360</b></span>

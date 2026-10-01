@@ -84,6 +84,7 @@ export default function LoginPage() {
     <div className={s.screen}>
       <aside className={s.brandPanel}>
         <div className={s.brandTop}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- a 22px static mark under the base path; next/image adds nothing here */}
           <span className={s.brandLogo}><img src={asset('/hfcb-mark.png')} alt={BRAND.markAlt} width={22} height={21} /></span>
           <span className={s.brandWordmark}>Customer <b>360</b></span>
           <span className={s.brandTag}>{BRAND.tag}</span>
@@ -238,6 +239,7 @@ function PortfolioSignIn() {
 
   useEffect(() => {
     const explicit = process.env.NEXT_PUBLIC_PORTFOLIO_URL;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only value read after mount; reading it during render would not match the server render
     if (explicit) { setHref(`${explicit.replace(/\/+$/, '')}/sso/customer-360`); return; }
     if (typeof window === 'undefined') return;
     const { protocol, hostname, port } = window.location;

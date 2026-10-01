@@ -29,7 +29,7 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
   // true and useless: JACCA Consulting holds a live policy and pays KES 85,422 a year
   // and their page led with zero. Each universe leads with what it actually holds.
   const heroLabel = propertyClient ? 'Property holding'
-    : insuranceClient ? 'Annual premium'
+    : insuranceClient ? 'Annual premium in force'
     : 'Relationship value';
   const heroValue = propertyClient ? propertyClient.units_value
     : insuranceClient ? insuranceClient.premium

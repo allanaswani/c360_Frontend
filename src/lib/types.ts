@@ -80,7 +80,10 @@ export interface InsuranceClient {
     bank_cust_id: string | null;
     policies: number;
     active_policies: number;
+    /** Annual premium on policies in force. */
     premium: number;
+    /** Premium on every policy and renewal on file. */
+    premium_all?: number;
     sum_insured: number;
     /** Null when the receipts feed has no row for this client (54% of the register).
      *  Zero would mean rows summing to nothing, which never happens. */

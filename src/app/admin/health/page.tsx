@@ -45,8 +45,13 @@ export default function DataHealthPage() {
   }, []);
 
   useEffect(() => {
-    if (user?.is_admin) load();
-  }, [user, load]);
+    if (!user?.is_admin) return;
+    let live = true;
+    api.dataHealth()
+      .then((d) => live && setData(d))
+      .catch((e) => live && setError(e.message));
+    return () => { live = false; };
+  }, [user]);
 
   const grouped = groupBy(data?.checks ?? [], (c) => c.group);
   const anyProblem = (data?.checks ?? []).some((c) => c.status !== 'ok')

@@ -25,6 +25,7 @@ export function BioPanel({ bio, embedded }: {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only value read after mount; reading it during render would not match the server render
       if (localStorage.getItem(BIO_OPEN_KEY) === '1') setOpen(true);
     } catch {
       /* private mode / blocked storage — keep the default */

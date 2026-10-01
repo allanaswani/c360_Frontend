@@ -72,15 +72,22 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     [search, router, pathname],
   );
 
-  // Identity, recommendations and meta — fetched once per customer.
-  useEffect(() => {
-    let live = true;
+  // Moving to another customer clears the previous one's data during render, so
+  // nothing of theirs is ever painted under the new customer's name.
+  const [loadedId, setLoadedId] = useState(id);
+  if (loadedId !== id) {
+    setLoadedId(id);
     setError(null);
     setDetail(null);
     setLinked(null);
     setLastTxn(null);
     setInsights(null);
     setInsightsFailed(false);
+  }
+
+  // Identity, recommendations and meta — fetched once per customer.
+  useEffect(() => {
+    let live = true;
     Promise.all([api.customer(id), api.recommendations(id), api.meta()])
       .then(([d, r, m]) => {
         if (!live) return;
@@ -97,12 +104,19 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     return () => { live = false; };
   }, [id]);
 
-  // Active-tab payload — re-fetched whenever the tab or global period changes.
-  useEffect(() => {
-    let live = true;
+  // A new tab, period, customer or retry clears the previous payload the same way.
+  const tabKey = `${id}|${tab}|${period}|${reloadTick}`;
+  const [loadedTab, setLoadedTab] = useState(tabKey);
+  if (loadedTab !== tabKey) {
+    setLoadedTab(tabKey);
     setOverview(null);
     setHfcb(null);
     setOther(null);
+  }
+
+  // Active-tab payload — re-fetched whenever the tab or global period changes.
+  useEffect(() => {
+    let live = true;
     if (tab === 'overview') {
       api.overview(id, period).then((d) => live && setOverview(d)).catch(() => live && setOverview(null));
     } else if (tab === 'hfcb') {
