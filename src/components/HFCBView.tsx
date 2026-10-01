@@ -2,6 +2,7 @@
 
 import type { CustomerInsights as InsightsData, HFCBDomain } from '@/lib/types';
 import { CustomerInsights } from './CustomerInsights';
+import { StatementCard } from './StatementCard';
 import { count, kes } from '@/lib/format';
 import { Card } from './Card';
 import { StatStrip, type Stat } from './StatStrip';
@@ -24,10 +25,13 @@ const CHANNEL_COLOR: Record<string, string> = {
   'Whizz / M-Pesa': 'var(--series-1)', Online: 'var(--series-4)', Cheque: 'var(--series-5)',
 };
 
-export function HFCBView({ domain, insights }: {
+export function HFCBView({ domain, insights, custId, latest }: {
   domain: HFCBDomain | null;
   /** null while loading; undefined when the insights request failed outright. */
   insights?: InsightsData | null;
+  custId: string;
+  /** Newest posting in the ledger - the statement's default end date. */
+  latest: string | null;
 }) {
   if (!domain) return <HFCBSkeleton />;
 
@@ -155,8 +159,9 @@ export function HFCBView({ domain, insights }: {
         </Card>
         <Card title="Recent transactions" status={domain.tables.recent_transactions.status} note={domain.tables.recent_transactions.note}
               right={<TableExport title="Recent transactions" block={domain.tables.recent_transactions} headers={HEADERS} />}>
-          <DataTable block={domain.tables.recent_transactions} />
+          <DataTable block={domain.tables.recent_transactions} flow />
         </Card>
+        <StatementCard custId={custId} latest={latest} />
       </div>
     </div>
   );

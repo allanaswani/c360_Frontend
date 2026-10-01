@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import type { ActivityProspects } from '@/lib/types';
 import { count, shortDate } from '@/lib/format';
 import { EmptyState, UnavailableState } from '../States';
+import { CallListChart } from './CallListChart';
 import s from '../ui.module.css';
 import ins from '../insights.module.css';
 
@@ -17,6 +18,7 @@ const PER_RULE = 40;
 export function ActivityCallList({ data }: { data: ActivityProspects }) {
   const [rule, setRule] = useState('');
   const [branch, setBranch] = useState('');
+  const [rm, setRm] = useState('');
   const branches = useMemo(
     () => [...new Set(data.results.map((r) => r.branch).filter(Boolean) as string[])].sort(),
     [data.results]);
@@ -32,7 +34,10 @@ export function ActivityCallList({ data }: { data: ActivityProspects }) {
     return <EmptyState title="No customer’s recent activity points to a missing product" />;
   }
 
-  const rows = data.results.filter((r) => (!rule || r.rule_id === rule) && (!branch || r.branch === branch));
+  const rows = data.results.filter((r) => (!rule || r.rule_id === rule) && (!branch || r.branch === branch)
+                                         && (!rm || r.rm_name === rm));
+  const byBranch = data.by_branch ?? [];
+  const byRm = data.by_rm ?? [];
 
   return (
     <div>
@@ -49,6 +54,20 @@ export function ActivityCallList({ data }: { data: ActivityProspects }) {
           </button>
         ))}
       </div>
+      {byBranch.length > 0 && (
+        <div className={s.chartGrid} style={{ marginTop: 0, marginBottom: 12 }}>
+          <div>
+            <div className="microlabel" style={{ marginBottom: 6 }}>Opportunities by branch, top {byBranch.length} (click a bar to list that branch)</div>
+            <CallListChart rows={byBranch} rules={data.rules} onPick={setBranch} />
+          </div>
+          <div>
+            <div className="microlabel" style={{ marginBottom: 6 }}>Opportunities by current RM</div>
+            {byRm.length > 0
+              ? <CallListChart rows={byRm} rules={data.rules} onPick={setRm} />
+              : <div style={{ fontSize: 'var(--t-xs)', color: 'var(--ink-3)' }}>The RM allocation could not be read, so opportunities are not split by RM.</div>}
+          </div>
+        </div>
+      )}
       <div className={s.worklistBar}>
         <div className={s.worklistCount}>
           <span className="tnum" style={{ fontWeight: 700 }}>{rows.length}</span> shown
@@ -58,6 +77,11 @@ export function ActivityCallList({ data }: { data: ActivityProspects }) {
           </span>
         </div>
         <div className={s.worklistFilters}>
+          {rm && (
+            <button type="button" className={s.select} onClick={() => setRm('')} style={{ cursor: 'pointer' }}>
+              RM: {rm} ✕
+            </button>
+          )}
           <label className={s.selectWrap}>
             <span className="microlabel">Branch</span>
             <select className={s.select} value={branch} onChange={(e) => setBranch(e.target.value)}>

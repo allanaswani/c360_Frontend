@@ -1,0 +1,33 @@
+/* Peer comparison tracks + relationship timeline (Overview tab). */
+
+.peers { display: flex; flex-direction: column; gap: 14px; }
+.peerHead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.peerLabel { font-size: var(--t-xs); color: var(--ink-2); }
+.peerStanding { font-size: var(--t-sm); font-weight: 700; color: var(--ink-1); }
+.track {
+  position: relative; height: 8px; margin: 6px 0 4px; border-radius: 4px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--teal) 8%, var(--grid)), color-mix(in srgb, var(--teal) 28%, var(--grid)));
+}
+.median { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--ink-3); opacity: 0.6; }
+.marker {
+  position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  background: var(--teal); box-shadow: 0 0 0 2px var(--surface);
+}
+.peerSub { font-size: var(--t-2xs); color: var(--ink-1); font-variant-numeric: tabular-nums; }
+.peerSub span { color: var(--ink-3); }
+
+.counts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--t-xs); color: var(--ink-2); margin-bottom: 6px; }
+.counts b { color: var(--ink-1); font-variant-numeric: tabular-nums; }
+
+.timeline { list-style: none; margin: 8px 0 0; padding: 0 0 0 4px; border-left: 2px solid var(--hairline); }
+.event { position: relative; }
+.year { font-size: var(--t-micro); font-weight: 700; letter-spacing: 0.08em; color: var(--ink-3); margin: 10px 0 4px 10px; }
+.row { display: grid; grid-template-columns: 10px 84px 1fr; column-gap: 8px; align-items: baseline; padding: 3px 0 3px 0; margin-left: -6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 2px var(--surface); align-self: center; }
+.date { font-size: var(--t-2xs); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.title { font-size: var(--t-xs); color: var(--ink-1); font-weight: 600; }
+.detail { grid-column: 3; font-size: var(--t-2xs); color: var(--ink-2); }
+.more {
+  all: unset; cursor: pointer; margin-top: 8px; font-size: var(--t-xs); color: var(--teal); font-weight: 600;
+}
+.more:focus-visible { outline: 2px solid color-mix(in srgb, var(--teal) 45%, transparent); outline-offset: 2px; }

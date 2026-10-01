@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
-import type { ActivityProspects, PortfolioOverview, Worklist as WorklistT } from '@/lib/types';
+import type { ActivityProspects, Maturities, PortfolioOverview, Worklist as WorklistT } from '@/lib/types';
 import { count, kes } from '@/lib/format';
 import { Card } from '@/components/Card';
 import { PeriodFilter } from '@/components/PeriodFilter';
@@ -17,6 +17,7 @@ import { MultiLineChart } from '@/components/charts/MultiLineChart';
 import { TopMovers } from '@/components/portfolio/TopMovers';
 import { Worklist } from '@/components/portfolio/Worklist';
 import { ActivityCallList } from '@/components/portfolio/ActivityCallList';
+import { MaturitiesList } from '@/components/portfolio/MaturitiesList';
 import { ModelPerformance } from '@/components/portfolio/ModelPerformance';
 import ui from '@/components/ui.module.css';
 import { TYPE } from '@/lib/type';
@@ -41,6 +42,7 @@ function PortfolioInner() {
   const [ov, setOv] = useState<PortfolioOverview | null>(null);
   const [wl, setWl] = useState<WorklistT | null>(null);
   const [act, setAct] = useState<ActivityProspects | null>(null);
+  const [mat, setMat] = useState<Maturities | null>(null);
   const [error, setError] = useState<{ code: number; msg: string } | null>(null);
 
   const setPeriod = useCallback((p: string) => {
@@ -65,6 +67,9 @@ function PortfolioInner() {
     api.activityProspects().then((d) => live && setAct(d)).catch(() => live && setAct({
       rules: [], results: [], unavailable: true,
       detail: 'The call list could not be loaded. Reload the page to try again.',
+    }));
+    api.maturities(30).then((d) => live && setMat(d)).catch(() => live && setMat({
+      results: [], unavailable: true, detail: 'The maturity list could not be loaded. Reload the page to try again.',
     }));
     return () => { live = false; };
   }, []);
@@ -192,6 +197,14 @@ function PortfolioInner() {
               status={act && !act.unavailable ? 'live' : undefined}
               note="From the last 90 days of customer-facing transactions and the accounts held at the latest close. Refreshed every six hours.">
           {act ? <ActivityCallList data={act} /> : <Skeleton height={200} radius={8} />}
+        </Card>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <Card title="Deposits maturing in the next 30 days" question="Whose fixed deposits mature soon, so the money can be kept?"
+              status={mat && !mat.unavailable ? 'live' : undefined}
+              note="Fixed and call deposits with a balance, by maturity date, from the latest deposit close. Refreshed every six hours.">
+          {mat ? <MaturitiesList data={mat} /> : <Skeleton height={200} radius={8} />}
         </Card>
       </div>
 

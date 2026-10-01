@@ -22,6 +22,9 @@ import type {
   Recommendations,
   CustomerInsights,
   ActivityProspects,
+  Relationship,
+  Statement,
+  Maturities,
   Worklist,
 } from './types';
 
@@ -567,6 +570,10 @@ export const api = {
   recommendations: (id: string) => request<Recommendations>(`/customers/${id}/recommendations/`),
   insights: (id: string) => request<CustomerInsights>(`/customers/${id}/insights/`),
   activityProspects: () => request<ActivityProspects>('/portfolio/activity-prospects/'),
+  relationship: (id: string) => request<Relationship>(`/customers/${id}/relationship/`),
+  statement: (id: string, from: string, to: string) =>
+    request<Statement>(`/customers/${id}/statement/?from=${from}&to=${to}&limit=2000`),
+  maturities: (days = 30) => request<Maturities>(`/portfolio/maturities/?days=${days}`),
   // recommendation outcome-logging (the feedback loop)
   recFeedbackList: (custId: string) =>
     request<{ results: RecFeedback[] }>(`/recommendations/feedback/?cust_id=${encodeURIComponent(custId)}`),

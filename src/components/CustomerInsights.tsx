@@ -5,6 +5,7 @@ import { count, kesFull, pct, shortDate } from '@/lib/format';
 import { Card } from './Card';
 import { RankedBars } from './charts/RankedBars';
 import { LineSeriesChart } from './charts/LineSeriesChart';
+import { CashFlowChart } from './charts/CashFlowChart';
 import { EmptyState, Skeleton, UnavailableState } from './States';
 import ui from './ui.module.css';
 import s from './insights.module.css';
@@ -28,6 +29,8 @@ export function CustomerInsights({ data }: { data: Insights | null }) {
       <AccountsCard data={data} />
       <LoansCard data={data} />
       <AccountListCard data={data} />
+      <CashFlowCard data={data} />
+      <LoanDetailsCard data={data} />
       <FacilitiesCard data={data} />
       <ActivityCard data={data} />
       <RevenueCard data={data} />
@@ -104,6 +107,89 @@ function AccountListCard({ data }: { data: Insights }) {
   );
 }
 
+/** Money in and out over twelve months, and where it comes from and goes. */
+function CashFlowCard({ data }: { data: Insights }) {
+  const b = data.cashflow;
+  const c = b.data;
+  return (
+    <Card className={ui.spanFull} title="Money in and out" status={statusOf(b)}
+          question="Is money building up in the relationship or draining out, and through what?"
+          note={c ? `Every money movement on the customer’s accounts, ${shortDate(c.from)} to ${shortDate(c.to)}. ${c.note}` : undefined}>
+      {b.status === 'unavailable' ? <Unavailable what="Cash flow" /> :
+        !c ? <EmptyState title="No money moved in the last twelve months" /> : (
+          <>
+            <div className={s.facts} style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', marginBottom: 6 }}>
+              <div><div className={s.factLabel}>Money in, 12 months</div><div className={`${s.factValue} tnum`}>{kesFull(c.total_in)}</div></div>
+              <div><div className={s.factLabel}>Money out, 12 months</div><div className={`${s.factValue} tnum`}>{kesFull(c.total_out)}</div></div>
+              <div><div className={s.factLabel}>Net</div><div className={`${s.factValue} tnum`}>{kesFull(c.net)}</div></div>
+            </div>
+            <CashFlowChart months={c.months} to={c.to} />
+            <div className={ui.chartGrid} style={{ marginTop: 6 }}>
+              <div>
+                <div className={s.factLabel} style={{ marginBottom: 6 }}>Where money comes from</div>
+                {c.sources.length ? (
+                  <RankedBars fmt="kes" max={7} rows={c.sources.map((g) => ({
+                    label: g.group, value: g.value, meta: `${g.count} ${g.count === 1 ? 'credit' : 'credits'}` }))} />
+                ) : <div className={s.muted}>Nothing came in.</div>}
+              </div>
+              <div>
+                <div className={s.factLabel} style={{ marginBottom: 6 }}>Where money goes</div>
+                {c.uses.length ? (
+                  <RankedBars fmt="kes" max={7} rows={c.uses.map((g) => ({
+                    label: g.group, value: g.value, meta: `${g.count} ${g.count === 1 ? 'debit' : 'debits'}` }))} />
+                ) : <div className={s.muted}>Nothing went out.</div>}
+              </div>
+            </div>
+          </>
+        )}
+    </Card>
+  );
+}
+
+/** Each live loan: instalment, when it is next due, arrears, maturity, and how it is
+ *  paid when a standing order of exactly the instalment runs. */
+function LoanDetailsCard({ data }: { data: Insights }) {
+  const b = data.loans;
+  const rows = b.data?.loans ?? [];
+  if (b.status === 'none' || (b.status === 'live' && rows.length === 0)) return null;   // no loans: nothing to say
+  return (
+    <Card className={ui.spanFull} title="Loans in detail" status={statusOf(b)}
+          question="What do they pay, when, are they behind, and how is it paid?"
+          note={b.data ? `From the loan book at ${shortDate(b.data.as_of)}. Paid by is shown where a standing order of exactly the instalment ran in the last four months.` : undefined}>
+      {b.status === 'unavailable' ? <Unavailable what="Loan details" /> : (
+        <div className={ui.tableWrap}>
+          <table className={ui.table}>
+            <thead>
+              <tr>
+                <th>Loan</th><th className={ui.tRight}>Balance</th><th className={ui.tRight}>Instalment</th>
+                <th>Next due</th><th>Arrears</th><th>Matures</th><th className={ui.tRight}>Rate</th><th>Paid by</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((l, i) => (
+                <tr key={`${l.account_no}-${i}`}>
+                  <td>{l.product}<div className={ui.tMuted} style={{ fontSize: 'var(--t-2xs)' }}>{l.type ?? ''}{l.status ? ` · ${l.status}` : ''}</div></td>
+                  <td className={`${ui.tRight} tnum`}>{kesFull(l.balance)}</td>
+                  <td className={`${ui.tRight} tnum`}>{l.instalment ? kesFull(l.instalment) : '—'}</td>
+                  <td>{l.next_due ? shortDate(l.next_due) : '—'}</td>
+                  <td>{l.days_overdue > 0
+                    ? <span style={{ color: 'var(--neg)', fontWeight: 600 }}>{l.days_overdue} days, {kesFull(l.arrears)}</span>
+                    : 'None'}</td>
+                  <td>{l.matures ? `${shortDate(l.matures)}${l.months_left ? ` (${l.months_left} mo)` : ''}` : '—'}</td>
+                  <td className={`${ui.tRight} tnum`}>{l.rate != null ? `${l.rate}%` : '—'}</td>
+                  <td style={{ whiteSpace: 'normal', minWidth: 160 }}>{l.paid_by_standing_order
+                    ? `Standing order from ${l.paid_by_standing_order.account ?? 'their account'}, around the ${l.paid_by_standing_order.days.join(' or ')}`
+                    : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function LoansCard({ data }: { data: Insights }) {
   const b = data.products;
   return (
@@ -166,6 +252,18 @@ function FacilitiesCard({ data }: { data: Insights }) {
                 </div>
               </>
             )}
+            {f.history && Object.keys(f.history).length > 0 && (
+              <div className={s.facHist}>
+                {f.facilities.filter((x) => x.active && f.history?.[x.agreement]?.length).map((x) => (
+                  <div key={x.agreement}>
+                    <div className={s.factLabel}>{x.type}: outstanding at each month end, against {kesFull(x.limit)} sanctioned</div>
+                    <LineSeriesChart fmt="kes" height={110}
+                                     data={(f.history![x.agreement]).map((h) => ({ period: h.period, outstanding: h.outstanding }))}
+                                     series={[{ name: 'Outstanding', dataKey: 'outstanding', colorRole: 1 }]} />
+                  </div>
+                ))}
+              </div>
+            )}
             {f.mobile && (
               <div className={s.muted}>
                 Mobile loans: {count(f.mobile.loans_taken)} taken
@@ -197,6 +295,7 @@ function ActivityCard({ data }: { data: Insights }) {
               <RankedBars fmt="count" rows={a.categories.map((c) => ({
                 label: c.label, value: c.count, meta: kesFull(c.value),
               }))} />
+              {a.salary_timing && <div className={s.muted}>{a.salary_timing} A good day to call.</div>}
               {a.watch.map((w) => <div key={w} className={s.watch}>{w}</div>)}
             </div>
             <div>

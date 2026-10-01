@@ -1,0 +1,28 @@
+/* Table tools: search, filters, sortable sticky header, totals line. */
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.search, .filter {
+  font: inherit; font-size: var(--t-xs); color: var(--ink-1);
+  background: var(--surface); border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm); padding: 5px 8px; min-height: 30px;
+}
+.search { min-width: 200px; flex: 0 1 260px; }
+.search:focus, .filter:focus { outline: 2px solid color-mix(in srgb, var(--teal) 45%, transparent); outline-offset: 1px; }
+.count { margin-left: auto; font-size: var(--t-2xs); color: var(--ink-3); }
+
+.scroll { overflow-y: auto; border-bottom: 1px solid var(--hairline); }
+.sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+
+.sortBtn {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+}
+.sortBtn:focus-visible { outline: 2px solid color-mix(in srgb, var(--teal) 45%, transparent); outline-offset: 2px; border-radius: 2px; }
+.arrow { font-size: 8px; min-width: 8px; color: var(--teal); }
+
+.totals {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;
+  padding: 8px 10px 2px; font-size: var(--t-xs); color: var(--ink-2);
+}
+.totalsLabel { font-size: var(--t-2xs); color: var(--ink-3); margin-right: auto; }
+.total b { font-weight: 600; color: var(--ink-1); }

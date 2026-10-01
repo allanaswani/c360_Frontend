@@ -15,6 +15,7 @@ import { PeriodFilter } from '@/components/PeriodFilter';
 import { shortDate } from '@/lib/format';
 import { RecommendationPanel } from '@/components/RecommendationPanel';
 import { OverviewView } from '@/components/OverviewView';
+import { RelationshipPanel } from '@/components/RelationshipPanel';
 import { HFCBView } from '@/components/HFCBView';
 import { DomainView } from '@/components/DomainView';
 import { ErrorState, Skeleton } from '@/components/States';
@@ -181,9 +182,15 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
 
           <div key={tab} className={ui.tabPane}>
             {tab === 'overview' ? (
-              <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
+              <>
+                <OverviewView overview={overview} onOpenDomain={(t) => setParam('tab', t)} />
+                {detail && !detail.header.property_client && !detail.header.insurance_client && (
+                  <RelationshipPanel custId={id} />
+                )}
+              </>
             ) : tab === 'hfcb' ? (
-              <HFCBView domain={hfcb} insights={insightsFailed ? undefined : insights} />
+              <HFCBView domain={hfcb} insights={insightsFailed ? undefined : insights}
+                        custId={id} latest={meta?.freshness?.transactions ?? meta?.as_of ?? null} />
             ) : (
               <DomainView payload={other} onRetry={() => setReloadTick((n) => n + 1)} />
             )}

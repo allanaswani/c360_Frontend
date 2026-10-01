@@ -70,3 +70,6 @@
 .bar { height: 5px; border-radius: 3px; background: var(--grid); overflow: hidden; margin-top: 4px; }
 .barFill { height: 100%; background: var(--teal); border-radius: 3px; }
 .past td { color: var(--ink-3); }
+
+/* Facility usage over time: one small chart per active facility */
+.facHist { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 18px; margin-top: 12px; }

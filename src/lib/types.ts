@@ -713,6 +713,8 @@ export interface MobileLoans {
 export interface Facilities {
   facilities: Facility[]; active_count: number; past_count: number;
   sanctioned_total: number; outstanding_total: number; mobile: MobileLoans | null; as_of: string;
+  /** Month-end outstanding per active facility (agreement no -> points), 12 months. */
+  history?: Record<string, { period: string; date: string; outstanding: number }[]> | null;
 }
 
 export interface ActivityCategory { key: string; label: string; count: number; value: number }
@@ -726,6 +728,7 @@ export interface Activity {
   opportunities: ActivityOpportunity[];
   opportunities_note: string | null;
   watch: string[];
+  salary_timing?: string | null;
 }
 
 export interface CustomerProfileFacts {
@@ -749,6 +752,56 @@ export interface CustomerInsights {
   activity: InsightBlock<Activity>;
   profile: InsightBlock<CustomerProfileFacts>;
   revenue: InsightBlock<Revenue>;
+  cashflow: InsightBlock<CashFlow>;
+  loans: InsightBlock<LoanDetails>;
+}
+
+export interface FlowGroup { group: string; value: number; count: number; share: number }
+export interface CashFlow {
+  months: { period: string; in: number; out: number; net: number }[];
+  total_in: number; total_out: number; net: number;
+  sources: FlowGroup[]; uses: FlowGroup[];
+  note: string; from: string; to: string;
+}
+export interface LoanDetail {
+  product: string; type: string | null; account_no: string | null; balance: number;
+  instalment: number | null; next_due: string | null; days_overdue: number; arrears: number;
+  matures: string | null; months_left: number | null; term_months: number | null;
+  rate: number | null; status: string | null;
+  paid_by_standing_order: { account: string | null; days: number[]; last: string } | null;
+}
+export interface LoanDetails { loans: LoanDetail[]; as_of: string }
+
+// ---- Relationship (/customers/:id/relationship/) ----
+export interface TimelineEvent { date: string; kind: 'joined' | 'account' | 'loan' | 'mobile_loan' | 'digital'; title: string; detail: string | null; open: boolean }
+export interface Timeline {
+  events: TimelineEvent[]; since: string;
+  per_year: { year: string; events: number }[];
+  counts: { accounts_opened: number; accounts_open: number; loans_taken: number; mobile_loans: number };
+}
+export interface PeerMeasure {
+  key: string; label: string; fmt: 'kes' | 'count'; value: number; median: number | null;
+  percentile: number | null; standing: string;
+}
+export interface Peers { customers: number; segment: string; measures: PeerMeasure[] }
+export interface Relationship { cust_id: string; as_of: string; timeline: InsightBlock<Timeline>; peers: InsightBlock<Peers> }
+
+// ---- Statement (/customers/:id/statement/) ----
+export interface Statement {
+  from: string; to: string; total_count: number; total_in: number; total_out: number;
+  rows: { date: string; description: string; account: string | null; channel: string; amount: number; currency: string }[];
+  unavailable?: boolean; detail?: string;
+}
+
+// ---- Deposit maturities (/portfolio/maturities/) ----
+export interface Maturities {
+  as_of?: string; until?: string; days?: number; count?: number; value?: number;
+  by_week?: { week: number; label: string; count: number; value: number }[];
+  past_due_count?: number; past_due_value?: number;
+  results: { cust_id: string; name: string | null; segment: string; branch: string | null; account_no: string | null;
+             product: string; balance: number; matures: string; days_left: number; rm_name: string | null }[];
+  unavailable?: boolean; detail?: string;
+  cache?: { cached: boolean; age_seconds: number };
 }
 
 // ---- Whole-book activity call list (/portfolio/activity-prospects/) ----
@@ -762,6 +815,8 @@ export interface ActivityProspects {
   from?: string; to?: string;
   rules: { rule_id: string; product_name: string; reason_short: string; customers: number }[];
   results: ActivityProspect[];
+  by_branch?: { name: string; total: number; by_rule: Record<string, number> }[];
+  by_rm?: { name: string; total: number; by_rule: Record<string, number> }[];
   unavailable?: boolean;
   detail?: string;
   cache?: { cached: boolean; age_seconds: number };
