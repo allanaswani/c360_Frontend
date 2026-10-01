@@ -313,11 +313,15 @@ export interface HealthCheck {
   label: string;
   group: string;
   table: string;
-  status: 'ok' | 'empty' | 'error' | 'warn' | 'unknown';
+  /** stale: a Freshness row whose source is behind its limit. */
+  status: 'ok' | 'empty' | 'error' | 'warn' | 'unknown' | 'stale';
   value: number | boolean | null;
   latency_ms?: number;
   detail: string;
   delta_pct?: number;   // change in row count vs the previous snapshot (drop alarm)
+  /** Freshness rows: the date the source is current to and how many days behind. */
+  as_of?: string | null;
+  age_days?: number | null;
 }
 export interface HealthPoint {
   at: string;
@@ -414,6 +418,8 @@ export interface DataHealth {
     stale_after_days?: number;
   } | null;
   checks: HealthCheck[];
+  /** The code this backend was built from (C360_BUILD) and when the image was built. */
+  build?: { commit: string | null; built_at: string | null };
   history?: HealthPoint[];
   note?: string;
   generated_at: string;

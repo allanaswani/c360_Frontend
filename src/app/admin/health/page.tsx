@@ -22,7 +22,9 @@ function overallStatus(data: DataHealth): { key: 'healthy' | 'degraded' | 'down'
   const checks = data.checks ?? [];
   const ok = checks.filter((c) => c.status === 'ok').length;
   const down = checks.filter((c) => c.status === 'error').length + (data.freshness?.status === 'error' ? 1 : 0);
-  const warn = checks.filter((c) => c.status === 'empty' || c.status === 'warn' || c.status === 'unknown').length
+  // 'stale' counts too: a source that has stopped loading (Freshness group) needs attention.
+  const warn = checks.filter((c) => c.status === 'empty' || c.status === 'warn' || c.status === 'unknown'
+                                    || c.status === 'stale').length
     + (data.freshness?.status === 'stale' ? 1 : 0);
   const key = down > 0 ? 'down' : warn > 0 ? 'degraded' : 'healthy';
   const word = key === 'down' ? 'Service degraded' : key === 'degraded' ? 'Needs attention' : 'All systems healthy';
