@@ -28,6 +28,14 @@ const nextConfig: NextConfig = {
     root: path.join(__dirname),
   },
 
+  // The /api rewrite below is proxied by Next, which gives up after 30s by default and
+  // answers a bare 500 "Internal Server Error" while Django carries on and logs a 200 -
+  // so a slow customer page showed as a crash with no traceback anywhere. Wait as long
+  // as the backend's own gunicorn worker timeout (120s, backend/Dockerfile).
+  experimental: {
+    proxyTimeout: 120_000,
+  },
+
   // Proxy the SPA's same-origin `/api` calls to the Django backend. This is what
   // lets ONE relative API base (NEXT_PUBLIC_API_BASE=/customer-360/api) serve both
   // access paths: on the public domain nginx routes /customer-360/api → backend,
