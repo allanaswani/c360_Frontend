@@ -47,6 +47,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
   const [detail, setDetail] = useState<CustomerDetail | null>(null);
   const [linked, setLinked] = useState<LinkedPartiesData | null>(null);
   const [recs, setRecs] = useState<Recommendations | null>(null);
+  const [recsFailed, setRecsFailed] = useState(false);
   const [overview, setOverview] = useState<CustomerOverview | null>(null);
   const [hfcb, setHfcb] = useState<HFCBDomain | null>(null);
   const [other, setOther] = useState<DomainPayload | null>(null);
@@ -79,23 +80,27 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
     setLoadedId(id);
     setError(null);
     setDetail(null);
+    setRecs(null);
+    setRecsFailed(false);
     setLinked(null);
     setLastTxn(null);
     setInsights(null);
     setInsightsFailed(false);
   }
 
-  // Identity, recommendations and meta — fetched once per customer.
+  // Identity and meta — fetched once per customer. Recommendations load on their own:
+  // they used to be in this Promise.all, so the header waited for the slowest panel on
+  // the page and a recommendations timeout showed "Couldn't load this customer".
   useEffect(() => {
     let live = true;
-    Promise.all([api.customer(id), api.recommendations(id), api.meta()])
-      .then(([d, r, m]) => {
+    Promise.all([api.customer(id), api.meta()])
+      .then(([d, m]) => {
         if (!live) return;
         setDetail(d);
-        setRecs(r);
         setMeta({ as_of: m.as_of, freshness: m.freshness });
       })
       .catch((e: ApiError) => live && setError({ code: e.status, msg: e.message }));
+    api.recommendations(id).then((r) => live && setRecs(r)).catch(() => live && setRecsFailed(true));
     // Linked parties + last-transaction load independently — a slow or empty result
     // never blocks the page. Last-transaction can be a multi-second warehouse probe.
     api.linked(id).then((l) => live && setLinked(l)).catch(() => live && setLinked(null));
@@ -217,7 +222,12 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         {/* sticky rail — Next Best Product stays in view; profile & links sit beside
             the data rather than pushing it down the page */}
         <aside className={ui.custRail}>
-          {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" /> : <Skeleton height={150} radius={12} />}
+          {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" />
+            : recsFailed ? (
+              <div className={ui.card}>
+                <ErrorState title="Recommendations unavailable" detail="They could not be worked out just now. Reload the page to try again." />
+              </div>
+            ) : <Skeleton height={150} radius={12} />}
           {linked && linked.count > 0 && <LinkedParties data={linked} />}
           {/* Related parties ride on the same payload. Different question from the
               panel above: that one is this customer's OTHER customer numbers; this
