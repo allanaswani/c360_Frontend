@@ -113,7 +113,7 @@ function AccountListCard({ data }: { data: Insights }) {
                     <td className={`${ui.tMuted} tnum`}>{a.account_no ?? '—'}</td>
                     <td>{a.status}</td>
                     <td>{a.maturity ? shortDate(a.maturity) : '—'}</td>
-                    <td className={`${ui.tRight} tnum`}>{kesFull(a.balance)}</td>
+                    <td className={`${ui.tRight} tnum`}>{kesFull(a.balance)}<OwnCurrency code={a.account_currency} amount={a.account_currency_amount} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -186,7 +186,7 @@ function LoanDetailsCard({ data }: { data: Insights }) {
               {rows.map((l, i) => (
                 <tr key={`${l.account_no}-${i}`}>
                   <td>{l.product}<div className={ui.tMuted} style={{ fontSize: 'var(--t-2xs)' }}>{l.type ?? ''}{l.status ? ` · ${l.status}` : ''}</div></td>
-                  <td className={`${ui.tRight} tnum`}>{kesFull(l.balance)}</td>
+                  <td className={`${ui.tRight} tnum`}>{kesFull(l.balance)}<OwnCurrency code={l.account_currency} amount={l.account_currency_amount} /></td>
                   <td className={`${ui.tRight} tnum`}>{l.instalment ? kesFull(l.instalment) : '—'}</td>
                   <td>{l.next_due ? shortDate(l.next_due) : '—'}</td>
                   <td>{l.days_overdue > 0
@@ -396,5 +396,16 @@ function ProfileCard({ data }: { data: Insights }) {
           </>
         )}
     </Card>
+  );
+}
+
+/** The line under a foreign-currency account's KES balance: what it holds in its own
+ *  currency (a USD call deposit is valued in KES everywhere, and shown in USD here). */
+function OwnCurrency({ code, amount }: { code?: string; amount?: number }) {
+  if (!code || amount == null) return null;
+  return (
+    <div className={ui.tMuted} style={{ fontSize: 'var(--t-2xs)' }}>
+      {code} {amount.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    </div>
   );
 }

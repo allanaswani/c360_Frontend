@@ -696,6 +696,8 @@ export interface ProductAccount {
   status: string; side: 'deposit' | 'loan'; opened?: string | null;
   /** Term and call deposits only. */
   maturity?: string | null;
+  /** Foreign-currency accounts only: the account's own currency and amount. `balance` is always KES. */
+  account_currency?: string; account_currency_amount?: number;
 }
 export interface ProductMix {
   headline: ProductHeadline[];
@@ -776,6 +778,8 @@ export interface LoanDetail {
   instalment: number | null; next_due: string | null; days_overdue: number; arrears: number;
   matures: string | null; months_left: number | null; term_months: number | null;
   rate: number | null; status: string | null;
+  /** Foreign-currency accounts only: the account's own currency and amount. `balance` is always KES. */
+  account_currency?: string; account_currency_amount?: number;
   paid_by_standing_order: { account: string | null; days: number[]; last: string } | null;
 }
 export interface LoanDetails { loans: LoanDetail[]; as_of: string }
