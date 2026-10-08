@@ -14,7 +14,7 @@ export const HEADERS: Record<string, string> = {
   project: 'Project', unit: 'Unit', value: 'Value', loan_balance: 'Loan balance', ltv: 'LTV',
   paid_pct: 'Paid', mortgage: 'Mortgage',
   policy: 'Policy', premium: 'Premium', monthly: 'Monthly', sum_insured: 'Sum insured',
-  account: 'Account', insurer: 'Insurer', end: 'Ends', matched_by: 'Matched by', claims: 'Claims',
+  account: 'Account', insurer: 'Insurer', end: 'Ends', matched_by: 'Matched by', claims: 'Claims', shared: 'Also registered to',
   paid: 'Paid to date', outstanding: 'Still to pay', last_payment: 'Last payment', mode: 'Paid by',
 };
 const NUMERIC = new Set(['balance', 'amount', 'value', 'loan_balance', 'ltv', 'paid_pct', 'premium', 'monthly',
