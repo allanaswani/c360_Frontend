@@ -36,6 +36,7 @@ export function CustomerInsights({ data: raw }: { data: Insights | null }) {
       <AccountListCard data={data} />
       <CashFlowCard data={data} />
       <LoanDetailsCard data={data} />
+      <RepaymentCard data={data} />
       <FacilitiesCard data={data} />
       <ActivityCard data={data} />
       <RevenueCard data={data} />
@@ -44,7 +45,7 @@ export function CustomerInsights({ data: raw }: { data: Insights | null }) {
   );
 }
 
-const BLOCKS = ['products', 'facilities', 'activity', 'profile', 'revenue', 'cashflow', 'loans'] as const;
+const BLOCKS = ['products', 'facilities', 'activity', 'profile', 'revenue', 'cashflow', 'loans', 'repayments'] as const;
 const MISSING = { status: 'unavailable' as const, data: null };
 
 function withAllBlocks(raw: Insights): Insights {
@@ -202,6 +203,70 @@ function LoanDetailsCard({ data }: { data: Insights }) {
             </tbody>
           </table>
         </div>
+      )}
+    </Card>
+  );
+}
+
+/** How each loan was paid over twelve months, rebuilt from the daily loan book: what was
+ *  paid down, every instalment that fell into arrears and for how long, and how many
+ *  loans ran at once. The evidence for "why did my limit drop" conversations. */
+function RepaymentCard({ data }: { data: Insights }) {
+  const b = data.repayments;
+  const r = b.data;
+  if (b.status === 'none') return null;   // no loan in twelve months: nothing to say
+  const st = r?.summary;
+  return (
+    <Card className={ui.spanFull} title="Repayment track record" status={statusOf(b)}
+          question="How have they repaid each loan, and were they ever late?"
+          note={r ? `From the daily loan book, ${shortDate(r.from)} to ${shortDate(r.to)}. Paid down is the fall in each loan's balance (interest included), dated when the book recorded it. Days late are the most the book recorded before the arrears cleared.` : undefined}>
+      {b.status === 'unavailable' ? <Unavailable what="Repayment history" /> : !r || !st ? null : (
+        <>
+          <div className={s.facts} style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginBottom: 10 }}>
+            <div><div className={s.factLabel}>Loans, 12 months</div><div className={`${s.factValue} tnum`}>{count(st.loans)}</div></div>
+            <div><div className={s.factLabel}>Instalments paid late</div>
+              <div className={`${s.factValue} tnum`} style={st.late_instalments ? { color: 'var(--neg)' } : undefined}>
+                {st.late_instalments ? `${count(st.late_instalments)} on ${count(st.loans_paid_late)} ${st.loans_paid_late === 1 ? 'loan' : 'loans'}` : 'None'}
+              </div></div>
+            <div><div className={s.factLabel}>Longest in arrears</div><div className={`${s.factValue} tnum`}>{st.worst_days_late ? `${st.worst_days_late} days` : '—'}</div></div>
+            <div><div className={s.factLabel}>Most loans open at once</div>
+              <div className={`${s.factValue} tnum`}>{count(st.max_open_together)}{st.max_open_together > 1 && st.max_open_on ? ` (from ${shortDate(st.max_open_on)})` : ''}</div></div>
+          </div>
+          {st.in_arrears_now > 0 && (
+            <div className={s.watch}>{st.in_arrears_now === 1 ? 'One loan is' : `${st.in_arrears_now} loans are`} in arrears today.</div>
+          )}
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead>
+                <tr>
+                  <th>Loan</th><th>Opened</th><th className={ui.tRight}>Amount</th><th>Status</th>
+                  <th className={ui.tRight}>Paid down</th><th>Late instalments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {r.loans.map((l, i) => (
+                  <tr key={`${l.account_no}-${i}`}>
+                    <td>{l.product}<div className={ui.tMuted} style={{ fontSize: 'var(--t-2xs)' }}>{l.account_no ?? ''}</div></td>
+                    <td>{l.opened ? shortDate(l.opened) : l.first_seen ? shortDate(l.first_seen) : '—'}</td>
+                    <td className={`${ui.tRight} tnum`}>{kesFull(l.amount)}</td>
+                    <td>{l.status === 'closed' ? `Closed${l.closed_on ? ` ${shortDate(l.closed_on)}` : ''}`
+                      : l.status === 'open' ? (l.days_overdue_now > 0
+                        ? <span style={{ color: 'var(--neg)', fontWeight: 600 }}>{l.days_overdue_now} days overdue</span>
+                        : `Open, ${kesFull(l.balance_now)} owed`)
+                      : 'No longer on the loan book'}</td>
+                    <td className={`${ui.tRight} tnum`}>{l.paid_down ? kesFull(l.paid_down) : '—'}</td>
+                    <td style={{ whiteSpace: 'normal', minWidth: 220 }}>{l.late.length === 0 ? 'On time' : l.late.map((e) => (
+                      <div key={e.due} style={{ color: 'var(--neg)' }}>
+                        Due {shortDate(e.due)}: {e.days_late} days late, {kesFull(e.peak_arrears)} overdue
+                        {e.cleared ? `, cleared by ${shortDate(e.cleared)}` : ', not yet cleared'}
+                      </div>
+                    ))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </Card>
   );

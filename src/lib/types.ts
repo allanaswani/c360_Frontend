@@ -764,6 +764,7 @@ export interface CustomerInsights {
   revenue: InsightBlock<Revenue>;
   cashflow: InsightBlock<CashFlow>;
   loans: InsightBlock<LoanDetails>;
+  repayments: InsightBlock<RepaymentHistory>;
 }
 
 export interface FlowGroup { group: string; value: number; count: number; share: number }
@@ -783,6 +784,22 @@ export interface LoanDetail {
   paid_by_standing_order: { account: string | null; days: number[]; last: string } | null;
 }
 export interface LoanDetails { loans: LoanDetail[]; as_of: string }
+export interface LateInstalment { due: string; days_late: number; peak_arrears: number; cleared: string | null }
+export interface LoanRepayment {
+  account_no: string | null; product: string; opened: string | null; matures: string | null;
+  first_seen: string | null; amount: number; status: 'open' | 'closed' | 'off_book';
+  closed_on: string | null; balance_now: number; paid_down: number;
+  payments: { date: string | null; amount: number; final: boolean }[];
+  late: LateInstalment[]; worst_days_late: number; days_overdue_now: number;
+}
+export interface RepaymentHistory {
+  from: string; to: string;
+  summary: {
+    loans: number; loans_paid_late: number; late_instalments: number; worst_days_late: number;
+    in_arrears_now: number; max_open_together: number; max_open_on: string | null;
+  };
+  loans: LoanRepayment[];
+}
 
 // ---- Relationship (/customers/:id/relationship/) ----
 export interface TimelineEvent { date: string; kind: 'joined' | 'account' | 'loan' | 'mobile_loan' | 'digital'; title: string; detail: string | null; open: boolean }
