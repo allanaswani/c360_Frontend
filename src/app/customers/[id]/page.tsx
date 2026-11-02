@@ -223,7 +223,6 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         {/* sticky rail — Next Best Product stays in view; profile & links sit beside
             the data rather than pushing it down the page */}
         <aside className={ui.custRail}>
-          <AskPanel key={id} custId={id} />
           {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" />
             : recsFailed ? (
               <div className={ui.card}>
@@ -237,6 +236,8 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
           <RelatedParties data={linked?.related} />
         </aside>
       </div>
+      {/* Fixed bottom-right launcher, so it is found in the same place on every customer. */}
+      <AskPanel key={id} custId={id} customerName={detail?.header.identity.name.value ?? null} />
     </main>
   );
 }
