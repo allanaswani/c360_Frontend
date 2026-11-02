@@ -16,11 +16,12 @@ export const HEADERS: Record<string, string> = {
   policy: 'Policy', premium: 'Premium', monthly: 'Monthly', sum_insured: 'Sum insured',
   account: 'Account', insurer: 'Insurer', end: 'Ends', matched_by: 'Matched by', claims: 'Claims', shared: 'Also registered to',
   paid: 'Paid to date', outstanding: 'Still to pay', last_payment: 'Last payment', mode: 'Paid by',
+  fee: 'Fee', due: 'Due',
 };
 const NUMERIC = new Set(['balance', 'amount', 'value', 'loan_balance', 'ltv', 'paid_pct', 'premium', 'monthly',
-                         'sum_insured', 'paid', 'outstanding', 'claims']);
-const KES_COLS = new Set(['balance', 'value', 'loan_balance', 'premium', 'monthly', 'sum_insured', 'paid', 'outstanding']);
-const DATE_COLS = new Set(['date', 'end', 'last_payment']);
+                         'sum_insured', 'paid', 'outstanding', 'claims', 'fee']);
+const KES_COLS = new Set(['balance', 'value', 'loan_balance', 'premium', 'monthly', 'sum_insured', 'paid', 'outstanding', 'fee']);
+const DATE_COLS = new Set(['date', 'end', 'last_payment', 'due']);
 // Columns worth a dropdown filter when they hold a handful of distinct values.
 const FILTERABLE = ['channel', 'account', 'status', 'product', 'description', 'insurer', 'mode', 'unit', 'project'];
 const SEARCH_FROM = 8;     // rows before a search box earns its place

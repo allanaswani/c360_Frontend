@@ -14,6 +14,7 @@ import { DomainTabs } from '@/components/DomainTabs';
 import { PeriodFilter } from '@/components/PeriodFilter';
 import { shortDate } from '@/lib/format';
 import { RecommendationPanel } from '@/components/RecommendationPanel';
+import { AskPanel } from '@/components/AskPanel';
 import { OverviewView } from '@/components/OverviewView';
 import { RelationshipPanel } from '@/components/RelationshipPanel';
 import { SafeSection } from '@/components/SafeSection';
@@ -222,6 +223,7 @@ export default function CustomerPage({ params }: { params: Promise<{ id: string 
         {/* sticky rail — Next Best Product stays in view; profile & links sit beside
             the data rather than pushing it down the page */}
         <aside className={ui.custRail}>
+          <AskPanel key={id} custId={id} />
           {recs ? <RecommendationPanel data={recs} custId={id} layout="stack" />
             : recsFailed ? (
               <div className={ui.card}>

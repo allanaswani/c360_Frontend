@@ -1,6 +1,6 @@
 'use client';
 
-import type { CustomerInsights as Insights, InsightBlock, Provenance } from '@/lib/types';
+import type { CustomerInsights as Insights, InsightBlock, Provenance, RevenueTrend } from '@/lib/types';
 import { count, kesFull, pct, shortDate } from '@/lib/format';
 import { Card } from './Card';
 import { RankedBars } from './charts/RankedBars';
@@ -45,7 +45,7 @@ export function CustomerInsights({ data: raw }: { data: Insights | null }) {
   );
 }
 
-const BLOCKS = ['products', 'facilities', 'activity', 'profile', 'revenue', 'cashflow', 'loans', 'repayments'] as const;
+const BLOCKS = ['products', 'facilities', 'activity', 'profile', 'revenue', 'cashflow', 'loans', 'repayments', 'digital_loans'] as const;
 const MISSING = { status: 'unavailable' as const, data: null };
 
 function withAllBlocks(raw: Insights): Insights {
@@ -290,6 +290,9 @@ function LoansCard({ data }: { data: Insights }) {
 function FacilitiesCard({ data }: { data: Insights }) {
   const b = data.facilities;
   const f = b.data;
+  // The digital-loan register covers every Whizz programme; the agreement history
+  // types only plain mobile loans and missed the Mwanabiashara ones.
+  const dig = data.digital_loans.status === 'live' ? data.digital_loans.data : null;
   return (
     <Card className={ui.spanFull} title="Credit facilities" status={statusOf(b)}
           question="How much has the bank sanctioned, and how much is drawn?"
@@ -346,7 +349,16 @@ function FacilitiesCard({ data }: { data: Insights }) {
                 ))}
               </div>
             )}
-            {f.mobile && (
+            {dig ? (
+              <div className={s.muted}>
+                Digital loans: {count(dig.loans_taken)} taken since {dig.first_opened.slice(0, 4)},{' '}
+                {count(dig.last_12m.loans)} in the last 12 months ({kesFull(dig.last_12m.borrowed)} borrowed,{' '}
+                {kesFull(dig.last_12m.fees)} in fees). Largest {kesFull(dig.largest.amount)} ({dig.largest.programme},{' '}
+                {shortDate(dig.largest.opened)}); latest {kesFull(dig.latest.amount)} ({dig.latest.programme},{' '}
+                {shortDate(dig.latest.opened)}). These are amounts borrowed, not a limit: the Whizz limit is not in the
+                warehouse. Every loan is listed on the Whizz tab.
+              </div>
+            ) : f.mobile && (
               <div className={s.muted}>
                 Mobile loans: {count(f.mobile.loans_taken)} taken
                 {f.mobile.first_issued ? ` since ${f.mobile.first_issued.slice(0, 4)}` : ''}, latest approved{' '}
@@ -423,6 +435,7 @@ function RevenueCard({ data }: { data: Insights }) {
               <div><div className={s.factLabel}>Fees and commissions</div><div className={`${s.factValue} tnum`}>{kesFull(r.totals.nfi)}</div></div>
               <div><div className={s.factLabel}>Interest paid to them</div><div className={`${s.factValue} tnum`}>{kesFull(r.totals.interest_expense)}</div></div>
             </div>
+            {r.trend && <RevenueTrendLine t={r.trend} />}
             <LineSeriesChart fmt="kes" height={170}
                              data={r.months.map((m) => ({ period: m.period, ii: m.interest_income, nfi: m.nfi, ie: m.interest_expense }))}
                              series={[
@@ -433,6 +446,22 @@ function RevenueCard({ data }: { data: Insights }) {
           </>
         )}
     </Card>
+  );
+}
+
+/** Is the relationship earning more or less? Last three complete months against the
+ *  three before; a part-loaded month is never compared. */
+function RevenueTrendLine({ t }: { t: RevenueTrend }) {
+  const m = (iso: string) => MONTHS[Number(iso.slice(5, 7)) - 1];
+  const color = t.direction === 'up' ? 'var(--pos)' : t.direction === 'down' ? 'var(--neg)' : undefined;
+  const move = t.direction === 'flat'
+    ? `steady (${t.change_pct > 0 ? '+' : ''}${t.change_pct}%)`
+    : `${t.direction} ${Math.abs(t.change_pct)}%`;
+  return (
+    <div className={s.muted} style={{ marginTop: 0, marginBottom: 8 }}>
+      {m(t.recent_from)} to {m(t.recent_to)}: {kesFull(t.recent)},{' '}
+      <span style={{ color, fontWeight: 600 }}>{move}</span> on {m(t.prior_from)} to {m(t.prior_to)} ({kesFull(t.prior)}).
+    </div>
   );
 }
 

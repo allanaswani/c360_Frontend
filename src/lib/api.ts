@@ -5,7 +5,9 @@
 // an httpOnly cookie); a leaked token's window is small (rotation + blacklist).
 
 import type {
+  AskAnswer,
   AuditPage,
+  BookAlerts,
   ChangePage,
   CustomerDetail,
   CustomerOverview,
@@ -580,6 +582,10 @@ export const api = {
   statement: (id: string, from: string, to: string) =>
     request<Statement>(`/customers/${id}/statement/?from=${from}&to=${to}&limit=2000`),
   maturities: (days = 30) => request<Maturities>(`/portfolio/maturities/?days=${days}`),
+  alerts: () => request<BookAlerts>('/alerts/'),
+  askStatus: (id: string) => request<{ enabled: boolean }>(`/customers/${id}/ask/`),
+  ask: (id: string, question: string) =>
+    request<AskAnswer>(`/customers/${id}/ask/`, { method: 'POST', body: { question } }),
   // recommendation outcome-logging (the feedback loop)
   recFeedbackList: (custId: string) =>
     request<{ results: RecFeedback[] }>(`/recommendations/feedback/?cust_id=${encodeURIComponent(custId)}`),

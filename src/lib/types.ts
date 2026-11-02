@@ -752,6 +752,24 @@ export interface Revenue {
   year: number; first_month: number; last_month: number;
   months: RevenueMonth[];
   totals: { interest_income: number; nfi: number; interest_expense: number; net: number };
+  /** Last three complete months against the three before (absent on older backends). */
+  trend?: RevenueTrend | null;
+}
+export interface RevenueTrend {
+  recent: number; prior: number; change_pct: number; direction: 'up' | 'down' | 'flat';
+  recent_from: string; recent_to: string; prior_from: string; prior_to: string;
+}
+
+/** Every Whizz / digital loan, all programmes (backend c360/digital_loans.py). */
+export interface DigitalLoan { account_no: string | null; opened: string; due: string | null; amount: number; fee: number; programme: string }
+export interface DigitalLoans {
+  loans_taken: number; first_opened: string;
+  latest: { opened: string; amount: number; programme: string; due: string | null };
+  largest: { opened: string; amount: number; programme: string };
+  borrowed_total: number; fees_total: number;
+  last_12m: { loans: number; borrowed: number; fees: number; highest: number };
+  programmes: { programme: string; loans: number; borrowed: number; highest: number; latest_opened: string; latest_amount: number }[];
+  loans: DigitalLoan[]; listed: number;
 }
 
 export interface CustomerInsights {
@@ -765,6 +783,7 @@ export interface CustomerInsights {
   cashflow: InsightBlock<CashFlow>;
   loans: InsightBlock<LoanDetails>;
   repayments: InsightBlock<RepaymentHistory>;
+  digital_loans: InsightBlock<DigitalLoans>;
 }
 
 export interface FlowGroup { group: string; value: number; count: number; share: number }
@@ -832,6 +851,25 @@ export interface Maturities {
   unavailable?: boolean; detail?: string;
   cache?: { cached: boolean; age_seconds: number };
 }
+
+// ---- RM alerts (/alerts/) - backend c360/alerts.py ----
+export type AlertKind = 'arrears' | 'deposit_drop' | 'maturity';
+export interface BookAlert {
+  kind: AlertKind; cust_id: string; name: string | null; segment: string; branch: string | null;
+  date: string; amount: number; account_no: string | null; title: string; detail: string;
+  rm_code: string | null; rm_name: string | null;
+}
+export interface BookAlerts {
+  available: boolean; detail?: string;
+  loan_as_of?: string; deposit_as_of?: string;
+  alerts?: BookAlert[];
+  summary?: { kind: AlertKind; label: string; count: number; amount: number }[];
+  whole_book?: boolean; unassigned?: number | null;
+  cache?: { cached: boolean; age_seconds: number };
+}
+
+// ---- Ask C360 (/customers/:id/ask/) - backend c360/assistant.py ----
+export interface AskAnswer { enabled: boolean; answer?: string; error?: string | { status: number; detail: string }; model?: string; as_of?: string; truncated?: boolean }
 
 // ---- Whole-book activity call list (/portfolio/activity-prospects/) ----
 export interface ActivityProspect {

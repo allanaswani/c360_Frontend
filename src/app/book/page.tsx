@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { api, type BookSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { StatStrip, type Stat } from '@/components/StatStrip';
+import { BookAlertsPanel } from '@/components/BookAlertsPanel';
 import { ErrorState, Skeleton } from '@/components/States';
 import { count, initials, kes, shortDate } from '@/lib/format';
 import ui from '@/components/ui.module.css';
@@ -52,6 +53,9 @@ export default function BookPage() {
         <div className={ui.card} style={{ padding: 28 }}>
           <p style={{ color: 'var(--ink-3)' }}>{data.detail ?? 'Book analytics are not available.'}</p>
         </div>
+        {/* Alerts read the live loan and deposit books, not the allocation upload, so
+            they still load when book analytics cannot. */}
+        <div style={{ marginTop: 16 }}><BookAlertsPanel /></div>
       </main>
     );
   }
@@ -161,6 +165,7 @@ export default function BookPage() {
         </div>
       </div>
       <StatStrip stats={stats} />
+      <div style={{ marginTop: 16 }}><BookAlertsPanel /></div>
 
       {/* ---- working area ---- */}
       <div className={s.layout}>
