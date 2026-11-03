@@ -5,7 +5,7 @@
 // and the top bar can greet the user. All real enforcement is server-side.
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { adoptPortfolioSession, api, type AuthUser, consumeSsoHandoff, type LoginStart, tokens } from './api';
+import { adoptPortfolioSession, api, ApiError, type AuthUser, consumeSsoHandoff, type LoginStart, tokens } from './api';
 
 type Status = 'loading' | 'authed' | 'anon';
 
@@ -40,9 +40,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStatus('anon');
       return;
     }
-    api.me()
-      .then((u) => { if (live) { setUser(u); setStatus('authed'); } })
-      .catch(() => { if (live) { tokens.clear(); setUser(null); setStatus('anon'); } });
+    // Only a real rejection of the session (401/403) signs the user out. A slow or
+    // failing server - a 500, a 502/504 from the proxy, a 429, a dropped connection -
+    // says nothing about the token, so it is retried, never answered by wiping a
+    // valid session. Under a multi-user test on 2026-11-03 every hiccup on /me
+    // cleared the tokens and bounced the user to the login page.
+    const RETRY_MS = [1_000, 3_000, 8_000];
+    const boot = (attempt: number) => {
+      api.me()
+        .then((u) => { if (live) { setUser(u); setStatus('authed'); } })
+        .catch((e: unknown) => {
+          if (!live) return;
+          const status = e instanceof ApiError ? e.status : 0;
+          if (status === 401 || status === 403) {
+            tokens.clear(); setUser(null); setStatus('anon');
+          } else if (attempt < RETRY_MS.length) {
+            setTimeout(() => boot(attempt + 1), RETRY_MS[attempt]);
+          } else {
+            // Still unreachable: show the login page but KEEP the tokens, so the
+            // next load (or the next request) resumes the session.
+            setUser(null); setStatus('anon');
+          }
+        });
+    };
+    boot(0);
     return () => { live = false; };
   }, []);
 

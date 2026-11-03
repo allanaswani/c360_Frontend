@@ -187,23 +187,46 @@ export function reAdoptPortfolioSession(): boolean {
 // A single in-flight refresh shared across concurrent 401s.
 let refreshing: Promise<boolean> | null = null;
 
-async function tryRefresh(): Promise<boolean> {
+// Refresh tokens rotate and the old one is blacklisted (backend SIMPLE_JWT). Tabs
+// share localStorage, so two tabs whose access token expired together both posted the
+// SAME refresh token: the first won, the second got 401 "blacklisted" and cleared the
+// tokens - logging out every tab, the winner included. Two guards:
+//  * the Web Locks API serialises the refresh across tabs, and
+//  * inside the lock, if another tab already stored a newer pair, use it instead.
+async function refreshOnce(): Promise<boolean> {
   const refresh = tokens.refresh();
   if (!refresh) return false;
+  try {
+    const res = await fetch(`${BASE}/auth/token/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh }),
+    });
+    if (!res.ok) {
+      // Lost the race to another tab that rotated it first: its new pair is valid.
+      return tokens.refresh() !== refresh && !!tokens.access();
+    }
+    const data = await res.json();
+    tokens.set(data.access, data.refresh);   // rotation returns a new refresh
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function tryRefresh(): Promise<boolean> {
+  const before = tokens.refresh();
+  if (!before) return false;
   if (!refreshing) {
     refreshing = (async () => {
       try {
-        const res = await fetch(`${BASE}/auth/token/refresh/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh }),
+        const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+        if (!locks) return await refreshOnce();
+        return await locks.request('c360-token-refresh', async () => {
+          // Another tab refreshed while we waited for the lock: nothing to do.
+          if (tokens.refresh() !== before && !tokens.accessExpired()) return true;
+          return refreshOnce();
         });
-        if (!res.ok) return false;
-        const data = await res.json();
-        tokens.set(data.access, data.refresh);   // rotation returns a new refresh
-        return true;
-      } catch {
-        return false;
       } finally {
         refreshing = null;
       }
