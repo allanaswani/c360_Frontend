@@ -234,7 +234,9 @@ function statsFrom(ov: PortfolioOverview): Stat[] {
     ...(active !== undefined ? [{
       label: 'Active customers', countTo: active, fmt: (n: number) => count(Math.round(n)), value: count(active),
       status: S.active_customers!.status,
-      meta: activeShare !== null ? `${activeShare}% of book · transacted recently` : 'transacted recently',
+      // Backend counts customers with at least one deposit account in status Active
+      // (entry_status = 1) — an account-status measure, not a transaction measure.
+      meta: activeShare !== null ? `${activeShare}% of book · hold an active account` : 'hold an active account',
     } as Stat] : []),
     { label: 'Relationship value', countTo: S.relationship_value.value, fmt: (n) => kes(n), value: kes(S.relationship_value.value), status: S.relationship_value.status },
     { label: 'Deposits', countTo: S.deposits.value, fmt: (n) => kes(n), value: kes(S.deposits.value), status: S.deposits.status },
