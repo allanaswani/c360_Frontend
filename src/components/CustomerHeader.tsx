@@ -9,7 +9,7 @@ import { TYPE } from '@/lib/type';
  *  live data (violet, with the basis on hover); CRB stays "not sourced" (needs an
  *  external bureau feed). Never a bare "--". */
 export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLoading }: {
-  header: Header; value: ValueSummary; asOf: string;
+  header: Header; value: ValueSummary | null; asOf: string;
   /** Last customer-facing transaction — loaded separately (own endpoint), so it arrives
    *  after the header. undefined + lastTxnLoading=true → 'checking…'; a metric → shown. */
   lastTransaction?: { value: string | null; note?: string } | null;
@@ -17,7 +17,8 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
 }) {
   const id = header.identity;
   const risk = header.risk;
-  const rel = value.headline.relationship_value.value as number;
+  // null: the warehouse timed out on the value read. Shown as "not available", never KES 0.
+  const rel = (value?.headline?.relationship_value?.value ?? null) as number | null;
   // On an the property register record the hero is the property, always. Relationship value is a
   // BANK figure and this record has no bank side to it — showing KES 0 would read
   // as "we hold nothing on them" while they own units worth millions. That is true
@@ -66,7 +67,9 @@ export function CustomerHeader({ header, value, asOf, lastTransaction, lastTxnLo
         <div style={{ textAlign: 'right' }}>
           <div className="microlabel" style={{ color: 'var(--ink-on-dark-2)' }}>{heroLabel}</div>
           <div className="tnum" style={{ fontFamily: 'var(--font-num)', fontWeight: 700, fontSize: TYPE.xxl, color: '#fff', letterSpacing: '-0.01em' }}>
-            <CountUp value={heroValue} format={(n) => kes(n)} />
+            {heroValue == null
+              ? <span style={{ fontSize: TYPE.md }} title="The warehouse did not answer in time. Reload shortly.">not available right now</span>
+              : <CountUp value={heroValue} format={(n) => kes(n)} />}
           </div>
           <div style={{ fontSize: TYPE.xxs, color: 'var(--ink-on-dark-2)' }}>as of {shortDate(asOf)}</div>
         </div>

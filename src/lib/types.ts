@@ -467,7 +467,9 @@ export interface ValueSummary {
 
 export interface CustomerDetail {
   header: CustomerHeader;
-  value_summary: ValueSummary;
+  /** null when the warehouse was too slow to answer; the header still shows. */
+  value_summary: ValueSummary | null;
+  unavailable?: string[];
 }
 
 export interface ResolvedPeriod {
